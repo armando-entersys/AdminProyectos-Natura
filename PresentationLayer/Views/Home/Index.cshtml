@@ -1,8 +1,27 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-
+<div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-min.js"></script>
+</div>
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+<div class="text-center">
+    <h1>Bienvenido a Knockout.js</h1>
+    <div>
+        <!-- Binding Knockout -->
+        <p>Nombre: <input type="text" data-bind="value: nombre" /></p>
+        <p>Hola, <span data-bind="text: nombre"></span>!</p>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        function ViewModel() {
+            this.nombre = ko.observable('Mundo');
+        }
+
+        ko.applyBindings(new ViewModel());
+    </script>
+}

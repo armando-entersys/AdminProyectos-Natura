@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BusinessLayer.Concrete
 {
-    internal class UsuarioManager : IUsuarioService
+    public class UsuarioManager : IUsuarioService
     {
         private readonly IUsuarioDal _usuarioDal;
         public UsuarioManager(IUsuarioDal usuarioDal)
@@ -31,6 +31,7 @@ namespace BusinessLayer.Concrete
         {
            return _usuarioDal.GetById(id);
         }
+       
 
         public void TInsert(Usuario entity)
         {
@@ -41,5 +42,6 @@ namespace BusinessLayer.Concrete
         {
             _usuarioDal.Update(entity);
         }
+
     }
 }

@@ -1,4 +1,4 @@
-﻿using DataAccessLayer.Abstract;
+﻿
 using DataAccessLayer.Context;
 using DataAccessLayer.Repositories;
 using EntityLayer.Concrete;
@@ -10,11 +10,13 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.EntityFramework
 {
-    public class EfUsuario : GenericRepository<Usuario>, IUsuarioDal
+    public class EfAuth : AuthRepository<Usuario>
     {
-        public EfUsuario(DataAccesContext context) : base(context)
+        public EfAuth(DataAccesContext context) : base(context)
         {
-            
+
         }
+
+       
     }
 }

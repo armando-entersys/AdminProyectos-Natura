@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Abstract
 {
-    public interface IUsuarioDal : IGenericDal<Usuario>
+    public interface IAuthDal
     {
-   
+        Task<Usuario> Autenticar(string correo, string contrasena);
+        Task<Usuario> Registro(string correo, string Nombre);
+
     }
 }

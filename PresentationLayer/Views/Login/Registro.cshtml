@@ -1,0 +1,53 @@
+﻿@model EntityLayer.Concrete.Usuario
+@{
+    ViewData["Title"] = "Registro";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+@await Component.InvokeAsync("_HeaderLayoutComponentPartial")
+<body>
+
+    <div class="container mt-5 pt-5">
+
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-4 col-md-6">
+
+                <div class="card">
+                    <div class="card-header">
+                        Registrate
+                    </div>
+                    <div class="card-body">
+
+                        <form asp-controller="Login" asp-action="Registro" method="post" enctype="multipart/form-data">
+
+                            <input class="form-control mb-3" type="text" placeholder="Nombre Completo" asp-for="Nombre" required />
+                            <input class="form-control mb-3" type="text" placeholder="Correo" required asp-for="Correo" />
+                           
+                            @if (ViewData["Mensaje"] != null)
+                            {
+
+                                <div class="form-group">
+                                    <div class="alert alert-danger" role="alert">
+                                        @ViewData["Mensaje"]
+                                    </div>
+                                </div>
+                            }
+                            ¿Ya tienes una cuenta? <a href="@Url.Action("Index","Login")"> Iniciar Sesion</a>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    @await Component.InvokeAsync("_ScriptLayoutComponentPartial")
+</body>
+</html>
