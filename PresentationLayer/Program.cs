@@ -53,7 +53,19 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+// Middleware personalizado para redirigir usuarios autenticados en la página de login
+app.Use(async (context, next) =>
+{
+    // Verifica si el usuario está autenticado y está intentando acceder a /Account/Login
+    if (context.User.Identity.IsAuthenticated && context.Request.Path.Equals("/Login"))
+    {
+        // Redirige al home
+        context.Response.Redirect("/Home");
+        return;
+    }
 
+    await next();
+});
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Login}/{action=Index}/{id?}");

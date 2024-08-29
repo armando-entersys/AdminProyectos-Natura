@@ -14,7 +14,8 @@ namespace EntityLayer.Concrete
         public string ApellidoMaterno { get; set; }
         public string Correo { get; set; }
         public string? Contrasena { get; set; }
-        public int IdRol { get; set; }
+        public int RolId { get; set; }
+        public Rol UserRol { get; set; }
         public DateTime FechaRegistro { get; set; }
         public DateTime FechaModificacion { get; set; }
         public bool CambioContrasena { get; set; }

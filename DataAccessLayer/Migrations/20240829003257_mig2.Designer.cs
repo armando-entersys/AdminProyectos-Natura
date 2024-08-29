@@ -4,6 +4,7 @@ using DataAccessLayer.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(DataAccesContext))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20240829003257_mig2")]
+    partial class mig2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -236,39 +238,19 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime>("FechaRegistro")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("IdRol")
+                        .HasColumnType("int");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RolId")
-                        .HasColumnType("int");
 
                     b.Property<bool>("SolicitudRegistro")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RolId")
-                        .IsUnique();
-
                     b.ToTable("Usuarios");
-                });
-
-            modelBuilder.Entity("EntityLayer.Concrete.Usuario", b =>
-                {
-                    b.HasOne("EntityLayer.Concrete.Rol", "UserRol")
-                        .WithOne("Usuario")
-                        .HasForeignKey("EntityLayer.Concrete.Usuario", "RolId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("UserRol");
-                });
-
-            modelBuilder.Entity("EntityLayer.Concrete.Rol", b =>
-                {
-                    b.Navigation("Usuario")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

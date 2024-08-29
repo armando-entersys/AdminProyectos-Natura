@@ -8,20 +8,17 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
-<div class="text-center">
-    <h1>Bienvenido a Knockout.js</h1>
-    <div>
-        <!-- Binding Knockout -->
-        <p>Nombre: <input type="text" data-bind="value: nombre" /></p>
-        <p>Hola, <span data-bind="text: nombre"></span>!</p>
-    </div>
+<div>
+    <label>First Name:</label>
+    <input type="text" data-bind="value: firstName" />
+</div>
+<div>
+    <label>Last Name:</label>
+    <input type="text" data-bind="value: lastName" />
+</div>
+<div>
+    <h2>Hello, <span data-bind="text: fullName"></span>!</h2>
 </div>
 @section Scripts {
-    <script>
-        function ViewModel() {
-            this.nombre = ko.observable('Mundo');
-        }
-
-        ko.applyBindings(new ViewModel());
-    </script>
+    <script src="~/js/home/index.js"></script>
 }

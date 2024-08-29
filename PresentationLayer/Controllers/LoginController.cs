@@ -38,7 +38,7 @@ namespace PresentationLayer.Controllers
                new Claim(ClaimTypes.Email, usuario.Correo),
                new Claim(ClaimTypes.Name, usuario.Nombre + usuario.ApellidoPaterno),
                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-               new Claim(ClaimTypes.Role, usuario.IdRol.ToString())
+               new Claim(ClaimTypes.Role, usuario.UserRol.Descripcion.ToString())
 
 
             };

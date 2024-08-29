@@ -19,7 +19,16 @@ namespace DataAccessLayer.Context
         public DbSet<EstatusBrief> EstatusBriefs { get; set; }
         public DbSet<Menu> Menus { get; set; }
         public DbSet<Rol> Roles { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Configuración de la relación uno-a-uno
+            modelBuilder.Entity<Usuario>()
+                .HasOne(u => u.UserRol)
+                .WithOne(r => r.Usuario)
+                .HasForeignKey<Usuario>(u => u.RolId);  // Especificar que Usuario tiene la clave foránea
 
+            base.OnModelCreating(modelBuilder);
+        }
 
     }
 }

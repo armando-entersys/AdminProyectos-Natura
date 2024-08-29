@@ -44,15 +44,10 @@
                         ¿No tienes una cuenta? <a href="@Url.Action("Registro","Login")"> Registraste!</a>
                     </form>
                 </main>
-                <div>
-                    <!-- Binding Knockout -->
-                    <p>Nombre: <input type="text" data-bind="value: nombre" /></p>
-                    <p>Hola, <span data-bind="text: nombre"></span>!</p>
-                </div>
             </div>
         </div>
     </div>
 </body>
-
-@await Component.InvokeAsync("_ScriptLayoutComponentPartial")
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </html>
