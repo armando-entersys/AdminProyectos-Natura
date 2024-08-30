@@ -65,8 +65,9 @@ body {
 }
 
     #sidebar.expand {
-        width: 260px;
-        min-width: 260px;
+        height: 100%;
+        width: 100%;
+        min-width: 100%;
     }
 
 .toggle-btn {

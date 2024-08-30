@@ -4,6 +4,7 @@ using DataAccessLayer.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(DataAccesContext))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20240829164702_mig6")]
+    partial class mig6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,6 +90,12 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("IdEstatusBrief")
                         .HasColumnType("int");
 
+                    b.Property<int>("IdTipoBrief")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdUsuario")
+                        .HasColumnType("int");
+
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -100,17 +108,7 @@ namespace DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TipoBriefId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("TipoBriefId");
-
-                    b.HasIndex("UsuarioId");
 
                     b.ToTable("Briefs");
                 });
@@ -138,10 +136,6 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Icono")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -270,25 +264,6 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("Usuarios");
                 });
 
-            modelBuilder.Entity("EntityLayer.Concrete.Brief", b =>
-                {
-                    b.HasOne("EntityLayer.Concrete.TipoBrief", "TipoBrief")
-                        .WithMany("Briefs")
-                        .HasForeignKey("TipoBriefId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EntityLayer.Concrete.Usuario", "Usuario")
-                        .WithMany("Briefs")
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TipoBrief");
-
-                    b.Navigation("Usuario");
-                });
-
             modelBuilder.Entity("EntityLayer.Concrete.Menu", b =>
                 {
                     b.HasOne("EntityLayer.Concrete.Rol", "Rol")
@@ -327,20 +302,10 @@ namespace DataAccessLayer.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("EntityLayer.Concrete.TipoBrief", b =>
-                {
-                    b.Navigation("Briefs");
-                });
-
             modelBuilder.Entity("EntityLayer.Concrete.TipoUsuario", b =>
                 {
                     b.Navigation("Usuario")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("EntityLayer.Concrete.Usuario", b =>
-                {
-                    b.Navigation("Briefs");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,8 @@
-﻿<header>
+﻿@{
+    string controlador = "";
+    string accion = "Index";
+}
+<header>
     <aside id="sidebar">
         <div class="d-flex">
             <button class="toggle-btn" type="button">
@@ -9,18 +13,27 @@
             </div>
         </div>
         <ul class="sidebar-nav">
-            <li class="sidebar-item">
-                <a href="#" class="sidebar-link">
-                    <i class="lni lni-user"></i>
-                    <span>Profile</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="#" class="sidebar-link">
-                    <i class="lni lni-agenda"></i>
-                    <span>Task</span>
-                </a>
-            </li>
+            @if (ViewBag.Menus != null)
+            {
+                foreach (var menu in ViewBag.Menus)
+                {
+                    controlador = @menu.Ruta;
+
+                    <li class="sidebar-item">
+                        <a href="@Url.Action(accion, controlador)" class="sidebar-link">
+                            <i class="@menu.Icono"></i>
+                            <span>@menu.Nombre</span>
+                        </a>
+                    </li>
+                    @if (@menu.Nombre == "Invitaciones")
+                    {
+                        <hr class="bg-light border-2 border-top border-light" />
+                    }
+                    
+                }
+            }
+
+            <!--
             <li class="sidebar-item">
                 <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
                    data-bs-target="#auth" aria-expanded="false" aria-controls="auth">
@@ -36,60 +49,8 @@
                     </li>
                 </ul>
             </li>
-            <li class="sidebar-item">
-                <a href="#" class="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
-                   data-bs-target="#multi" aria-expanded="false" aria-controls="multi">
-                    <i class="lni lni-layout"></i>
-                    <span>Multi Level</span>
-                </a>
-                <ul id="multi" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                    <li class="sidebar-item">
-                        <a href="#" class="sidebar-link collapsed" data-bs-toggle="collapse"
-                           data-bs-target="#multi-two" aria-expanded="false" aria-controls="multi-two">
-                            Two Links
-                        </a>
-                        <ul id="multi-two" class="sidebar-dropdown list-unstyled collapse">
-                            <li class="sidebar-item">
-                                <a href="#" class="sidebar-link">Link 1</a>
-                            </li>
-                            <li class="sidebar-item">
-                                <a href="#" class="sidebar-link">Link 2</a>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </li>
-            <li class="sidebar-item">
-                <a href="#" class="sidebar-link">
-                    <i class="lni lni-popup"></i>
-                    <span>Notification</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="#" class="sidebar-link">
-                    <i class="lni lni-cog"></i>
-                    <span>Setting</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="#" class="sidebar-link">
-                    <i class="lni lni-cog"></i>
-                    <span>Setting</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="#" class="sidebar-link">
-                    <i class="lni lni-cog"></i>
-                    <span>Setting</span>
-                </a>
-            </li>
-            <li class="sidebar-item">
-                <a href="#" class="sidebar-link">
-                    <i class="lni lni-cog"></i>
-                    <span>Setting</span>
-                </a>
-            </li>
-        </ul>
+             --> 
+
         <div class="sidebar-footer">
             <a href="#" class="sidebar-link">
                 <i class="lni lni-exit"></i>

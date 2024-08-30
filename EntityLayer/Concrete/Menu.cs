@@ -13,6 +13,8 @@ namespace EntityLayer.Concrete
         public string Nombre { get; set; }
         public string Ruta { get; set; }
         public int Orden { get; set; }
-        public int IdRol { get; set; }
+        public string Icono { get; set; }
+        public int RolId { get; set; }
+        public Rol Rol { get; set; }
     }
 }

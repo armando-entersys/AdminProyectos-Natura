@@ -25,32 +25,37 @@ namespace PresentationLayer.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Auth(string Username, string Password)
+        public async Task<IActionResult> Autenticar(string Username, string Password)
         {
+            Username = "ajcortest@gmail.com";
+            Password = "Operaciones.2024";
+
             Usuario usuario = await _authService.Autenticar(Username, Password);
+            
+         
+
             if (usuario == null)
             {
                 ViewData["Mensaje"] = "Error de Autenticación";
                 return View("Index");
             }
+
+           
+
             List<Claim> claims = new List<Claim>()
             {
                new Claim(ClaimTypes.Email, usuario.Correo),
                new Claim(ClaimTypes.Name, usuario.Nombre + usuario.ApellidoPaterno),
                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-               new Claim(ClaimTypes.Role, usuario.UserRol.Descripcion.ToString())
+               new Claim(ClaimTypes.Role, usuario.RolId.ToString())
 
 
             };
-            ClaimsIdentity claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            AuthenticationProperties properties = new AuthenticationProperties()
-            {
-                AllowRefresh = true
-            };
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity),
-                properties);
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPrincipal);
+
             return RedirectToAction("Index", "Home");
         }
     }

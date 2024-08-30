@@ -31,5 +31,10 @@ namespace BusinessLayer.Concrete
             Usuario usuario = await _authDal.Registro(correo,Nombre);
             return usuario;
         }
+        public IEnumerable<Menu> GetMenusByRole(int rolId)
+        {
+            IEnumerable<Menu> menu =  _authDal.GetMenusByRole(rolId);
+            return menu;
+        }
     }
 }

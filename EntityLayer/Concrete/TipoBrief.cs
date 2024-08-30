@@ -10,5 +10,8 @@ namespace EntityLayer.Concrete
     {
         public int Id { get; set; }
         public int Descripcion { get; set; }
+
+        // Colección de Briefs asociados con el TipoBrief
+        public ICollection<Brief> Briefs { get; set; }
     }
 }

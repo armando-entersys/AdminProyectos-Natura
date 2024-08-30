@@ -22,19 +22,33 @@ namespace DataAccessLayer.Repositories
         public async Task<Usuario> Autenticar(string correo, string contrasena)
         {
             Usuario usuario = await _context.Usuarios.Where(q => q.Correo == correo && q.Contrasena == contrasena).FirstOrDefaultAsync();
-
-            return usuario;
+            if(usuario != null)
+            {
+                usuario.UserRol = new Rol();
+                usuario.UserRol = await _context.Roles.Where(q => q.Id == usuario.RolId).FirstOrDefaultAsync();
+                usuario.UserRol.Menus = _context.Menus.Where(q=> q.RolId ==  usuario.RolId).ToList();
+            }
+             return usuario;
         }
 
         public async Task<Usuario> Registro(string correo,string Nombre)
         {
-            Usuario usuario = _context.Usuarios.Where(q => q.Correo == correo).FirstOrDefault();
+            Usuario usuario =  _context.Usuarios.Where(q => q.Correo == correo).FirstOrDefault();
            
             _context.Add(usuario = new Usuario());
             await _context.SaveChangesAsync();
             return usuario;
             
         }
+        public IEnumerable<Menu> GetMenusByRole(int rolId)
+        {
+            return  _context.Menus
+                                 .Where(m => m.RolId == rolId)
+                                 .OrderBy(m => m.Orden)
+                                 .ToList();
+        }
+
+       
     }
 
 }

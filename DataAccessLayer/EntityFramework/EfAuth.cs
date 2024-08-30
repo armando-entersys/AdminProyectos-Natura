@@ -1,4 +1,5 @@
 ﻿
+using DataAccessLayer.Abstract;
 using DataAccessLayer.Context;
 using DataAccessLayer.Repositories;
 using EntityLayer.Concrete;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.EntityFramework
 {
-    public class EfAuth : AuthRepository<Usuario>
+    public class EfAuth : AuthRepository<Usuario>, IAuthDal
     {
         public EfAuth(DataAccesContext context) : base(context)
         {

@@ -15,11 +15,15 @@ namespace EntityLayer.Concrete
         public string Correo { get; set; }
         public string? Contrasena { get; set; }
         public int RolId { get; set; }
-        public Rol UserRol { get; set; }
+        public Rol UserRol { get; set; } = new Rol();
+        public int TipoUsuarioId { get; set; }
+        public TipoUsuario TipoUsuario { get; set; } = new TipoUsuario();
         public DateTime FechaRegistro { get; set; }
         public DateTime FechaModificacion { get; set; }
         public bool CambioContrasena { get; set; }
         public bool SolicitudRegistro { get; set; }
+        // Colección de Briefs asociados con el Usuario
+        public ICollection<Brief> Briefs { get; set; }
 
     }
 }

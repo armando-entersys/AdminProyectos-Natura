@@ -11,5 +11,7 @@ namespace EntityLayer.Concrete
         public int Id { get; set; }
         public string Descripcion { get; set; }
         public Usuario Usuario { get; set; }
+        // Colección de Menus
+        public ICollection<Menu> Menus { get; set; }
     }
 }

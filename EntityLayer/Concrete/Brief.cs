@@ -9,14 +9,19 @@ namespace EntityLayer.Concrete
     public class Brief
     {
         public int Id { get; set; }
-        public int IdUsuario { get; set; }
+        // Llave foránea para Usuario
+        public int UsuarioId { get; set; }
+        public Usuario Usuario { get; set; } = new Usuario();
         public string Nombre { get; set; }
         public string Descripcion { get; set; }
         public string Objetivo { get; set; }
         public string DirigidoA { get; set; }
         public string Comentario { get; set; }
         public string RutaArchivo { get; set; }
-        public int IdTipoBrief { get; set; }
+        // Llave foránea para TipoBrief
+        public int TipoBriefId { get; set; }
+        public TipoBrief TipoBrief { get; set; } = new TipoBrief();  // Navegación al TipoBrief
+
         public int IdEstatusBrief { get; set; }
         public DateTime FechaEntrega { get; set; }
 
