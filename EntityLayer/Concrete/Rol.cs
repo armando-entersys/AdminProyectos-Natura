@@ -10,8 +10,11 @@ namespace EntityLayer.Concrete
     {
         public int Id { get; set; }
         public string Descripcion { get; set; }
-        public Usuario Usuario { get; set; }
+
+        // Colección de Usuarios asociados con este Rol
+        public ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
+
         // Colección de Menus
-        public ICollection<Menu> Menus { get; set; }
+        public ICollection<Menu> Menus { get; set; } = new List<Menu>();
     }
 }

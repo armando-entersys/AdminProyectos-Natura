@@ -15,9 +15,8 @@ namespace EntityLayer.Concrete
         public string Correo { get; set; }
         public string? Contrasena { get; set; }
         public int RolId { get; set; }
-        public Rol UserRol { get; set; } = new Rol();
-        public int TipoUsuarioId { get; set; }
-        public TipoUsuario TipoUsuario { get; set; } = new TipoUsuario();
+        public Rol UserRol { get; set; }
+        public bool Estatus { get; set; }
         public DateTime FechaRegistro { get; set; }
         public DateTime FechaModificacion { get; set; }
         public bool CambioContrasena { get; set; }

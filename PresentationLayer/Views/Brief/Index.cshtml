@@ -1,0 +1,26 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<div class="row" data-bind="foreach: columns">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title" data-bind="text: name"></h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group sortable" data-bind="foreach: tasks, attr: { id: id }">
+                    <div class="list-group-item" data-bind="text: title, attr: { 'data-task-id': id }">
+                    </div>
+                </div>
+                <button class="btn btn-primary mt-3" data-bind="click: $parent.addTask">Add Task</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/js/brief/Brief.js"></script>
+

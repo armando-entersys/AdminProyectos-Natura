@@ -1,5 +1,12 @@
 ﻿
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/knockout@3.5.1/build/knockout-min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
-<script src="~/node_modules/knockout/build/output/knockout-latest.js"></script>
+<script>
+    function showAlertModal(message) {
+        $('#alertMessage').text(message);
+        var alertModal = new bootstrap.Modal(document.getElementById('alertModal'), {});
+        alertModal.show();
+    }
+</script>

@@ -3,6 +3,7 @@ using BusinessLayer.Concrete;
 using DataAccessLayer.Abstract;
 using DataAccessLayer.Context;
 using DataAccessLayer.EntityFramework;
+using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
@@ -17,8 +18,17 @@ builder.Services.AddDbContext<DataAccesContext>();
 builder.Services.AddScoped<IUsuarioDal, EfUsuario>();
 builder.Services.AddScoped<IUsuarioService, UsuarioManager>();
 
+builder.Services.AddScoped<IRolDal, EfRol>();
+builder.Services.AddScoped<IRolService, RolService>();
+
 builder.Services.AddScoped<IAuthDal, EfAuth>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+// Configurar EmailSettings
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
+// Registrar IEmailSender
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options => {

@@ -4,6 +4,7 @@ using DataAccessLayer.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(DataAccesContext))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20240902144916_mig10")]
+    partial class mig10
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -247,7 +249,8 @@ namespace DataAccessLayer.Migrations
                     b.HasIndex("Correo")
                         .IsUnique();
 
-                    b.HasIndex("RolId");
+                    b.HasIndex("RolId")
+                        .IsUnique();
 
                     b.ToTable("Usuarios");
                 });
@@ -285,8 +288,8 @@ namespace DataAccessLayer.Migrations
             modelBuilder.Entity("EntityLayer.Concrete.Usuario", b =>
                 {
                     b.HasOne("EntityLayer.Concrete.Rol", "UserRol")
-                        .WithMany("Usuarios")
-                        .HasForeignKey("RolId")
+                        .WithOne("Usuario")
+                        .HasForeignKey("EntityLayer.Concrete.Usuario", "RolId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -297,7 +300,8 @@ namespace DataAccessLayer.Migrations
                 {
                     b.Navigation("Menus");
 
-                    b.Navigation("Usuarios");
+                    b.Navigation("Usuario")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.TipoBrief", b =>

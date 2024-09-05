@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Abstract;
 using DataAccessLayer.Abstract;
+using DataAccessLayer.EntityFramework;
 using EntityLayer.Concrete;
 using System;
 using System.Collections.Generic;
@@ -35,11 +36,16 @@ namespace BusinessLayer.Concrete
 
         public void TInsert(Usuario entity)
         {
+            entity.FechaRegistro = DateTime.Now;
+            entity.FechaModificacion = DateTime.Now;
+            entity.CambioContrasena = false;
             _usuarioDal.Insert(entity);
+            
         }
 
         public void TUpdate(Usuario entity)
         {
+            entity.FechaModificacion = DateTime.Now;
             _usuarioDal.Update(entity);
         }
 

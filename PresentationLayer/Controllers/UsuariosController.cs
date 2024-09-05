@@ -1,21 +1,26 @@
 ﻿using BusinessLayer.Abstract;
 using EntityLayer.Concrete;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PresentationLayer.Models;
 using System.Net;
 using System.Security.Claims;
-
+using System.Net.Http;
+using BusinessLayer.Concrete;
+using Newtonsoft.Json.Linq;
 namespace PresentationLayer.Controllers
 {
     public class UsuariosController : Controller
     {
         private readonly IAuthService _authService;
         private readonly IUsuarioService _usuarioService;
-        public UsuariosController(IAuthService authService, IUsuarioService usuarioService)
+        private readonly IRolService _rolService;
+        private readonly IEmailSender _emailSender;
+        public UsuariosController(IAuthService authService, IUsuarioService usuarioService, IRolService rolService, IEmailSender emailSender)
         {
             _authService = authService;
             _usuarioService = usuarioService;
+            _rolService = rolService;
+            _emailSender = emailSender;
         }
         // GET: UsuariosController
         public ActionResult Index()
@@ -42,80 +47,86 @@ namespace PresentationLayer.Controllers
         public IActionResult GetAll()
         {
             respuestaServicio res = new respuestaServicio();
-            var usuarios = _usuarioService.TGetAll();
+            var usuarios = _usuarioService.TGetAll()
+                .Select(q => new Usuario
+                {
+                    Id = q.Id,
+                    Nombre = q.Nombre,
+                    ApellidoMaterno = q.ApellidoMaterno,
+                    ApellidoPaterno = q.ApellidoPaterno,
+                    Correo = q.Correo,
+                    Contrasena = q.Contrasena,
+                    Estatus = q.Estatus,
+                    RolId = q.RolId
+                    //UserRol = _rolService.TGetById(q.RolId)
+                })
+                .ToList();
+
             res.Datos = usuarios;
             res.Exito = true;
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("This is an example response", System.Text.Encoding.UTF8, "text/plain")
+            };
             return Ok(res);
+        }
+        [HttpGet]
+        public IActionResult GetAllRoles()
+        {
+            respuestaServicio res = new respuestaServicio();
+            var roles = _rolService.TGetAll();
+            res.Datos = roles;
+            res.Exito = true;
+        
 
+            return Ok(res);
         }
 
-        // GET: UsuariosController/Details/5
+        [HttpGet]
         public ActionResult Details(int id)
         {
-            return View();
+            respuestaServicio res = new respuestaServicio();
+            var usuario = _usuarioService.TGetById(id);
+            res.Datos = usuario;
+            res.Exito = true;
+            return Ok(res);
         }
 
-        // GET: UsuariosController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: UsuariosController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create([FromBody] Usuario usuario)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            respuestaServicio res = new respuestaServicio();
+
+          
+            usuario.UserRol = _rolService.TGetById(usuario.RolId);
+            _usuarioService.TInsert(usuario);
+            _emailSender.SendEmailAsync(usuario.Correo, "Bienvenido a Administrador de Proyectos", "<h1>Gracias por unirte a MyApp</h1>");
+            res.Mensaje = "Usuario agregado exitosamente";
+            res.Exito = true;
+            return Ok(res);
         }
 
-        // GET: UsuariosController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpPut]
+        public ActionResult Edit([FromBody] Usuario usuario)
         {
-            return View();
+            respuestaServicio res = new respuestaServicio();
+         
+            _usuarioService.TUpdate(usuario);
+            res.Datos = usuario;
+            res.Mensaje = "Usuario Actualizado exitosamente";
+            res.Exito = true;
+            return Ok(res);
         }
 
-        // POST: UsuariosController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
 
-        // GET: UsuariosController/Delete/5
+        [HttpDelete]
         public ActionResult Delete(int id)
         {
-            return View();
+            respuestaServicio res = new respuestaServicio();
+            _usuarioService.TDelete(id);
+            res.Exito = true;
+            return Ok(res);
         }
 
-        // POST: UsuariosController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
     }
 }

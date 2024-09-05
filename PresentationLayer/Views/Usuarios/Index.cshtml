@@ -5,32 +5,101 @@
 }
 
 <h1>Usuarios</h1>
+<row>
+    <div class="col">
 
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Nombre</th>
-            <th scope="col">Correo</th>
-            <th scope="col">Detalles</th>
+    </div>
+    <div class="col">
+    </div>
+    <div class="col">
+        <button type="button" class="btn btn-outline-primary" data-bind="click:Agregar">
+            <i class="lni lni-download"></i>
+            <span>Agregar Usuario</span>
+        </button>
+    </div>
+</row>
+<row>
+    <div class="col">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Correo</th>
+                    <th scope="col">Detalles</th>
 
-        </tr>
-    </thead>
-    <tbody data-bind="foreach: registros">
-        <tr>
-            <td data-bind="text: id"></td>
-            <td data-bind="text: nombre"></td>
-            <td data-bind="text: correo"></td>
-            <td class="small">
-                <a href="#" title="Asignar contraseña">
-                    <span class=""></span>
-                </a>
-            </td>
-        </tr>
-    </tbody>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: registros">
+                <tr>
+                    <td data-bind="text: id"></td>
+                    <td data-bind="text: nombre"></td>
+                    <td data-bind="text: correo"></td>
+                    <td class="small">
+                        <button type="button" class="btn btn-outline-primary" data-bind="click:$root.Editar">
+                            <i class="lni lni-pencil"></i>
+                            <span>Editar Usuario</span>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
 
-</table>
+        </table>
+    </div>
+</row>
+
+<div class="modal fade" id="divEdicion" tabindex="-1" aria-labelledby="Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="Modal">Editar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="formulario">
+                    <div class="mb-3" data-bind="validationElement: nombre">
+                        <label for="recipient-name" class="col-form-label">Nombre:</label>
+                        <input type="text" class="form-control" id="nombre" maxlength="128" data-bind="value: nombre" />
+                        <span class="text-danger" data-bind="validationMessage: nombre"></span>
+                    </div>
+                    <div class="mb-3" data-bind="validationElement: apellidopaterno">
+                        <label for="recipient-name" class="col-form-label">Apellido Paterno:</label>
+                        <input type="text" class="form-control" id="apellidoPaterno" maxlength="128" data-bind="value: apellidoPaterno">
+                    </div>
+                    <div class="mb-3" data-bind="validationElement: apellidoMaterno">
+                        <label for="recipient-name" class="col-form-label">Apellido Materno:</label>
+                        <input type="text" class="form-control" id="apellidoMaterno" maxlength="128" data-bind="value: apellidoMaterno">
+                    </div>
+                    <div class="mb-3" data-bind="validationElement: contrasena">
+                        <label for="recipient-name" class="col-form-label">Contraseña:</label>
+                        <input type="text" class="form-control" id="contrasena" maxlength="128" data-bind="value: contrasena">
+                    </div>
+                    <div class="mb-3" data-bind="validationElement: correo">
+                        <label for="recipient-name" class="col-form-label">Correo:</label>
+                        <input type="text" class="form-control" id="correo" maxlength="128" data-bind="value: correo">
+                    </div>
+                    <div class="mb-3" data-bind="validationElement: Rol">
+                        <label class="col-form-label">Rol:</label>
+                        <select class="form-control" data-bind="options: catRoles, value: Rol, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                    </div>
+                    <div class="mb-3" data-bind="validationElement: Estatus">
+                        <label class="col-form-label">Estatus:</label>
+                        <select class="form-control" data-bind="options: catEstatus, value: Estatus, optionsText: 'Estatus', optionsCaption: 'Seleccione'"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" data-bind="click:Guardar">
+                    <i class="lni lni-save"></i>
+                    <span>Guardar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
+
     <script src="~/js/Usuarios/Usuarios.js"></script>
 }

@@ -11,7 +11,6 @@ namespace DataAccessLayer.Context
             optionsBuilder.UseSqlServer("Server=solucionesmkt.com.mx;initial catalog=AdminProyectosNaturaDB;user id=mkt;password=123456789;");
 
         }
-        public DbSet<TipoUsuario> TiposUsuario { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Alerta> Alertas { get; set; }
         public DbSet<Brief> Briefs { get; set; }
@@ -23,22 +22,22 @@ namespace DataAccessLayer.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configuración de la relación uno-a-uno
+            // Configuración de la relación muchos a uno entre Usuario y Rol
             modelBuilder.Entity<Usuario>()
                 .HasOne(u => u.UserRol)
-                .WithOne(r => r.Usuario)
-                .HasForeignKey<Usuario>(u => u.RolId);  // Especificar que Usuario tiene la clave foránea
-                                                        // Configurar la relación de muchos a uno entre Menu y Rol
+                .WithMany(r => r.Usuarios) // Rol tiene muchos Usuarios
+                .HasForeignKey(u => u.RolId);  // Especificar que Usuario tiene la clave foránea
+
+            modelBuilder.Entity<Usuario>()
+                .HasIndex(u => u.Correo)
+                .IsUnique();
+            
             modelBuilder.Entity<Menu>()
                 .HasOne(m => m.Rol)        // Un Menu tiene un Rol
                 .WithMany(r => r.Menus)    // Un Rol tiene muchos Menus
                 .HasForeignKey(m => m.RolId); // Llave foránea en Menu
                                               // Configurar la relación de uno a uno entre Usuario y TipoUsuario
-            modelBuilder.Entity<Usuario>()
-                .HasOne(u => u.TipoUsuario)  // Un Usuario tiene un TipoUsuario
-                .WithOne(t => t.Usuario)     // Un TipoUsuario tiene un Usuario
-                .HasForeignKey<Usuario>(u => u.TipoUsuarioId); // Llave foránea en Usuario
-                                                               // Configurar la relación de uno a muchos entre Usuario y Brief
+           
             modelBuilder.Entity<Usuario>()
                 .HasMany(u => u.Briefs)         // Un Usuario tiene muchos Briefs
                 .WithOne(b => b.Usuario)       // Cada Brief tiene un Usuario
