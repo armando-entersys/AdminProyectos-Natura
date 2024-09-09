@@ -1,26 +1,38 @@
 ﻿
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Briefs";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<h1>Brief</h1>
+<div class="custom-width overflow-auto">
+    <div class="row" data-bind="foreach: columns">
+        <div class="col" style="flex: 0 0 22%; max-width: 22%;">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title" data-bind="text: name"></h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group sortable" data-bind="foreach: tasks, attr: { id: id }">
+                        <div class="list-group-item" data-bind="attr: { 'data-task-id': id }">
+                            <div >
+                                <p data-bind="text: title"></p>
+                                <p data-bind="text: elemento.usuario.nombre"></p>
 
-
-<div class="row" data-bind="foreach: columns">
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title" data-bind="text: name"></h5>
-            </div>
-            <div class="card-body">
-                <div class="list-group sortable" data-bind="foreach: tasks, attr: { id: id }">
-                    <div class="list-group-item" data-bind="text: title, attr: { 'data-task-id': id }">
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <button class="btn btn-primary mt-3" data-bind="click: $parent.addTask">Add Task</button>
             </div>
         </div>
     </div>
 </div>
-<script src="~/js/brief/Brief.js"></script>
+<style>
+    .custom-width {
+        max-width: 1200px; /* Puedes definir cualquier ancho aquí */
+    }
+</style>
+@section Scripts {
 
+    <script src="~/js/brief/Brief.js"></script>
+}

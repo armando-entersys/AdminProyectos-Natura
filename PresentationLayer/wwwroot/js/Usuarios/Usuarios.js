@@ -27,7 +27,7 @@ function AppViewModel() {
             contentType: "application/json",
             success: function (d) {
                 self.registros.removeAll();
-                self.registros.push.apply(self.registros, d.datos);
+                self.registros.push.apply(self.registros, d.datos.$values);
                 self.catEstatus.removeAll();
                 self.catEstatus.push.apply(self.catEstatus, catEstatus);
                 $("#divEdicion").modal("hide");
@@ -38,7 +38,7 @@ function AppViewModel() {
                     contentType: "application/json",
                     success: function (d) {
                         self.catRoles.removeAll();
-                        self.catRoles.push.apply(self.catRoles,d.datos);
+                        self.catRoles.push.apply(self.catRoles, d.datos.$values);
                         $("#divEdicion").modal("hide");
                         self.Limpiar();
                     },

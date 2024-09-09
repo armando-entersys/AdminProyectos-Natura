@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace EntityLayer.Concrete
 {
-    public class EstatusBrief
+    public class Tasks<T>
     {
         public int Id { get; set; }
-        public string Descripcion { get; set; }
-        // Colección de Briefs asociados con el TipoBrief
-        public ICollection<Brief> Briefs { get; set; }
+        public string Title { get; set; }
+
+        public T Elemento { get; set; }
     }
 }

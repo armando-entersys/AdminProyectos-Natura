@@ -31,8 +31,8 @@ namespace PresentationLayer.Controllers
             {
                 ViewBag.RolId = Int32.Parse(User.FindFirst(ClaimTypes.Role)?.Value);
                 ViewBag.Email = User.FindFirst(ClaimTypes.Email)?.Value;
-                ViewBag.Name = User.FindFirst(ClaimTypes.Email)?.Value;
-                ViewBag.UsuarioId = User.FindFirst(ClaimTypes.Email)?.Value;
+                ViewBag.Name = User.FindFirst(ClaimTypes.Name)?.Value;
+                ViewBag.UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
                 ViewBag.Menus = _authService.GetMenusByRole(ViewBag.RolId);
             }

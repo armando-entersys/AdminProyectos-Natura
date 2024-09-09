@@ -14,7 +14,6 @@ namespace DataAccessLayer.Context
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Alerta> Alertas { get; set; }
         public DbSet<Brief> Briefs { get; set; }
-        public DbSet<TipoBrief> TiposBrief { get; set; }
         public DbSet<EstatusBrief> EstatusBriefs { get; set; }
         public DbSet<Menu> Menus { get; set; }
         public DbSet<Rol> Roles { get; set; }
@@ -44,9 +43,9 @@ namespace DataAccessLayer.Context
                 .HasForeignKey(b => b.UsuarioId); // Llave foránea en Brief
 
             modelBuilder.Entity<Brief>()
-              .HasOne(b => b.TipoBrief)      // Un Brief tiene un TipoBrief
-              .WithMany(t => t.Briefs)       // Un TipoBrief tiene muchos Briefs
-              .HasForeignKey(b => b.TipoBriefId)  // Llave foránea en Brief
+              .HasOne(b => b.EstatusBrief)      // Un Brief tiene un EstatusBrief
+              .WithMany(t => t.Briefs)       // Un EstatusBrief tiene muchos Briefs
+              .HasForeignKey(b => b.EstatusBriefId)  // Llave foránea en Brief
               .OnDelete(DeleteBehavior.Cascade); // Opcional: configuración para la eliminación en cascada
         }
 

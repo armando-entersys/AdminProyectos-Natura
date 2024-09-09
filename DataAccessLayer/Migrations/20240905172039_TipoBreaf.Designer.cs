@@ -4,6 +4,7 @@ using DataAccessLayer.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(DataAccesContext))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20240905172039_TipoBreaf")]
+    partial class TipoBreaf
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,9 +78,6 @@ namespace DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EstatusBriefId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("FechaEntrega")
                         .HasColumnType("datetime2");
 
@@ -87,6 +86,9 @@ namespace DataAccessLayer.Migrations
 
                     b.Property<DateTime>("FechaRegistro")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("IdEstatusBrief")
+                        .HasColumnType("int");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -100,12 +102,15 @@ namespace DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("TipoBriefId")
+                        .HasColumnType("int");
+
                     b.Property<int>("UsuarioId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EstatusBriefId");
+                    b.HasIndex("TipoBriefId");
 
                     b.HasIndex("UsuarioId");
 
@@ -120,9 +125,8 @@ namespace DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("Descripcion")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Descripcion")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -177,6 +181,23 @@ namespace DataAccessLayer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.TipoBrief", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TiposBrief");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.Usuario", b =>
@@ -236,9 +257,9 @@ namespace DataAccessLayer.Migrations
 
             modelBuilder.Entity("EntityLayer.Concrete.Brief", b =>
                 {
-                    b.HasOne("EntityLayer.Concrete.EstatusBrief", "EstatusBrief")
+                    b.HasOne("EntityLayer.Concrete.TipoBrief", "TipoBrief")
                         .WithMany("Briefs")
-                        .HasForeignKey("EstatusBriefId")
+                        .HasForeignKey("TipoBriefId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -248,7 +269,7 @@ namespace DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("EstatusBrief");
+                    b.Navigation("TipoBrief");
 
                     b.Navigation("Usuario");
                 });
@@ -275,16 +296,16 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("UserRol");
                 });
 
-            modelBuilder.Entity("EntityLayer.Concrete.EstatusBrief", b =>
-                {
-                    b.Navigation("Briefs");
-                });
-
             modelBuilder.Entity("EntityLayer.Concrete.Rol", b =>
                 {
                     b.Navigation("Menus");
 
                     b.Navigation("Usuarios");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.TipoBrief", b =>
+                {
+                    b.Navigation("Briefs");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.Usuario", b =>

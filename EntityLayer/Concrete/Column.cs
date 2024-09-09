@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace EntityLayer.Concrete
 {
-    public class TipoBrief
+    public class Column<T>
     {
         public int Id { get; set; }
-        public int Descripcion { get; set; }
-
-        // Colección de Briefs asociados con el TipoBrief
-        public ICollection<Brief> Briefs { get; set; }
+        public string Name { get; set; }
+        public ICollection<Tasks<T>> Tasks { get; set; }
     }
 }
