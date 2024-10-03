@@ -16,31 +16,54 @@
     </div>
    
 </div>
-<div class="row">
-    <div class="col">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th scope="col">Id</th>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Detalles</th>
 
-                </tr>
-            </thead>
-            <tbody data-bind="foreach: registros">
-                <tr>
-                    <td data-bind="text: id"></td>
-                    <td data-bind="text: nombre"></td>
-                    <td class="small">
-                        <button type="button" class="btn btn-outline-primary" data-bind="click:$root.Editar">
-                            <i class="lni lni-pencil"></i>
-                            <span>Editar</span>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
+<div class="custom-width overflow-auto">
+    <div class="row" data-bind="foreach: columns">
+        <div class="col" style="flex: 0 0 22%; max-width: 22%;">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title" data-bind="text: name"></h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group sortable" data-bind="foreach: tasks, attr: { id: id }">
+                        <div class="list-group-item" data-bind="attr: { 'data-task-id': id }">
+                            <div >
+                                <div>
+                                    <i class="lni lni-folder"></i>
+                                    <span data-bind="text: title"></span>
+                                </div>
+                                <div>
+                                    <i class="lni lni-user"></i>
+                                    <span data-bind="text: nombreUsuario"></span>
+                                </div>
+                                <div>
+                                    <i class="lni lni-calendar"></i>
+                                    <span data-bind="text: fechaEntrega"></span>
+                                </div>
+                               <div class="row">
+                                   <div class="col-4">
+                                       l
+                                   </div>
+                                   <div class="col-4">
+                                       l
+                                   </div>
+                                    <div class="col-4">
+                                        <div>
+                                            <i data-bind="click:$root.Editar" class="lni lni-search-alt"></i>
+                                        </div>
+                                    </div>
+                               </div>
 
-        </table>
+                            </div>
+                           
+                        </div>
+                        <!-- Menú desplegable con el ícono de 3 puntos -->
+                       
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <div class="modal fade" id="divEdicion" tabindex="-1" aria-labelledby="Modal" aria-hidden="true">
@@ -53,7 +76,7 @@
             <div class="modal-body">
                 <div id="formulario">
                     <div class="mb-3" data-bind="validationElement: EstatusBrief">
-                        <label class="col-form-label">Estatus Brief:</label>
+                        <label class="col-form-label">Rol:</label>
                         <select class="form-control" data-bind="options: catEstatusBrief, value: EstatusBrief, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
                     </div>
                     <div class="mb-3" data-bind="validationElement: nombre">

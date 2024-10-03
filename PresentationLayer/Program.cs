@@ -7,6 +7,7 @@ using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
+using PresentationLayer.Models;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,10 +26,16 @@ builder.Services.AddScoped<IRolService, RolService>();
 builder.Services.AddScoped<IAuthDal, EfAuth>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+builder.Services.AddScoped<IToolsDal, EfTools>();
+builder.Services.AddScoped<IToolsService, ToolsService>();
+
 builder.Services.AddScoped<IBriefDal, EfBrief>();
 builder.Services.AddScoped<IBriefService, BriefService>();
 // Configurar EmailSettings
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<CategoriaCorreo>(builder.Configuration.GetSection("CategoriasDeCorreo"));
+// Registrar el servicio de envío de correos
+builder.Services.AddScoped<EmailSender>();
 
 // Registrar IEmailSender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
@@ -60,6 +67,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
+
 
 var app = builder.Build();
 

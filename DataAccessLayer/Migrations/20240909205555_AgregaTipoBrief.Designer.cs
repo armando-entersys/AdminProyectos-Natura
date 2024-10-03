@@ -4,6 +4,7 @@ using DataAccessLayer.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(DataAccesContext))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20240909205555_AgregaTipoBrief")]
+    partial class AgregaTipoBrief
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,9 +74,6 @@ namespace DataAccessLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("DeterminarEstadoEstadoId")
-                        .HasColumnType("int");
-
                     b.Property<string>("DirigidoA")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -88,11 +87,7 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime>("FechaModificacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("FechaPublicacion")
-                        .HasColumnType("datetime2");
-
                     b.Property<DateTime>("FechaRegistro")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Nombre")
@@ -102,9 +97,6 @@ namespace DataAccessLayer.Migrations
                     b.Property<string>("Objetivo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PlanComunicacion")
-                        .HasColumnType("bit");
 
                     b.Property<string>("RutaArchivo")
                         .IsRequired()
@@ -142,60 +134,6 @@ namespace DataAccessLayer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EstatusBriefs");
-                });
-
-            modelBuilder.Entity("EntityLayer.Concrete.Material", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("AudienciaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BriefId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Ciclo")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("FechaEntrega")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Mensaje")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PCNId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PrioridadId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Proceso")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Produccion")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Responsable")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BriefId");
-
-                    b.ToTable("Material");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.Menu", b =>
@@ -347,17 +285,6 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("Usuario");
                 });
 
-            modelBuilder.Entity("EntityLayer.Concrete.Material", b =>
-                {
-                    b.HasOne("EntityLayer.Concrete.Brief", "Brief")
-                        .WithMany("Materiales")
-                        .HasForeignKey("BriefId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Brief");
-                });
-
             modelBuilder.Entity("EntityLayer.Concrete.Menu", b =>
                 {
                     b.HasOne("EntityLayer.Concrete.Rol", "Rol")
@@ -378,11 +305,6 @@ namespace DataAccessLayer.Migrations
                         .IsRequired();
 
                     b.Navigation("UserRol");
-                });
-
-            modelBuilder.Entity("EntityLayer.Concrete.Brief", b =>
-                {
-                    b.Navigation("Materiales");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.EstatusBrief", b =>

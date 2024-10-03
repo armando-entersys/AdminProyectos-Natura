@@ -11,10 +11,12 @@ namespace DataAccessLayer.Abstract
     {
         void Delete(int id);
         List<Brief> GetAll();
-        List<Brief> GetAllByUserId(int id);
         List<Column<Brief>> GetColumnsByUserId(int id);
+        IEnumerable<Brief> GetAllbyUserId(int usuarioId);
         Brief GetById(int id);
         void Insert(Brief entity);
         void Update(Brief entity);
+        IEnumerable<EstatusBrief> GetAllEstatusBrief();
+        IEnumerable<TipoBrief> GetAllTipoBrief();
     }
 }

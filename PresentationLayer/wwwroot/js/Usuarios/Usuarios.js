@@ -1,4 +1,4 @@
-﻿var estatusActivo = { IdEstatus: true, Estatus: "Activo" };
+﻿    var estatusActivo = { IdEstatus: true, Estatus: "Activo" };
 var estatusInactivo = { IdEstatus: false, Estatus: "Inactivo" };
 
 var catEstatus = [estatusActivo, estatusInactivo];
@@ -65,7 +65,7 @@ function AppViewModel() {
         self.contrasena("");
     }
     self.Agregar = function () {
-       
+        self.Limpiar();
         $("#divEdicion").modal("show");
 
     }

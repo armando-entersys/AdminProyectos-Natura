@@ -11,6 +11,10 @@ namespace EntityLayer.Concrete
         public int Id { get; set; }
         public string Title { get; set; }
 
-        public T Elemento { get; set; }
+        public int UsuarioId { get; set; }
+        public string NombreUsuario { get; set; }
+        public string FechaEntrega { get; set; }
+        
+
     }
 }

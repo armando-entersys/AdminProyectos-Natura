@@ -17,6 +17,9 @@ namespace DataAccessLayer.Context
         public DbSet<EstatusBrief> EstatusBriefs { get; set; }
         public DbSet<Menu> Menus { get; set; }
         public DbSet<Rol> Roles { get; set; }
+        public DbSet<TipoBrief> TiposBrief { get; set; }
+        public DbSet<Material> Materiales { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -43,10 +46,23 @@ namespace DataAccessLayer.Context
                 .HasForeignKey(b => b.UsuarioId); // Llave foránea en Brief
 
             modelBuilder.Entity<Brief>()
-              .HasOne(b => b.EstatusBrief)      // Un Brief tiene un EstatusBrief
-              .WithMany(t => t.Briefs)       // Un EstatusBrief tiene muchos Briefs
-              .HasForeignKey(b => b.EstatusBriefId)  // Llave foránea en Brief
-              .OnDelete(DeleteBehavior.Cascade); // Opcional: configuración para la eliminación en cascada
+                .HasOne(b => b.EstatusBrief)      // Un Brief tiene un EstatusBrief
+                .WithMany(t => t.Briefs)       // Un EstatusBrief tiene muchos Briefs
+                .HasForeignKey(b => b.EstatusBriefId)  // Llave foránea en Brief
+                .OnDelete(DeleteBehavior.Cascade); // Opcional: configuración para la eliminación en cascada
+
+            modelBuilder.Entity<Brief>()
+                .HasOne(b => b.TipoBrief)
+                .WithMany(tb => tb.Briefs)  // Navegación inversa
+                .HasForeignKey(b => b.TipoBriefId)
+                .OnDelete(DeleteBehavior.Restrict); // Configura el comportamiento de eliminación
+
+            // Configuración de la relación uno a muchos
+            modelBuilder.Entity<Brief>()
+                .HasMany(b => b.Materiales)  // Un Brief tiene muchos Materiales
+                .WithOne(m => m.Brief)        // Un Material pertenece a un Brief
+                .HasForeignKey(m => m.BriefId) // Llave foránea en Material
+                .OnDelete(DeleteBehavior.Cascade); // Eliminar materiales cuando se elimine el Brief
         }
 
     }

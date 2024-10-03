@@ -17,7 +17,19 @@
             {
                 foreach (var menu in ViewBag.Menus)
                 {
-                    controlador = @menu.Ruta;
+                    if (!@menu.Ruta.Contains("/"))
+                    {
+                        controlador = @menu.Ruta;
+                    }
+                    else
+                    {
+                        // Descomponer la ruta en controlador y acción
+                        var rutaDividida = menu.Ruta.Split('/');
+                        controlador = rutaDividida[0];
+                        accion = rutaDividida.Length > 1 ? rutaDividida[1] : "Index";
+                    }
+                   
+                   
 
                     <li class="sidebar-item">
                         <a href="@Url.Action(accion, controlador)" class="sidebar-link">

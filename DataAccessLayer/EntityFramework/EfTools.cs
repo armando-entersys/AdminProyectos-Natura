@@ -10,13 +10,12 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.EntityFramework
 {
-    public class EfAuth : AuthRepository<Usuario>, IAuthDal
+    public class EfTools : ToolsRepository, IToolsDal
     {
-        public EfAuth(DataAccesContext context) : base(context)
+        public EfTools(DataAccesContext context) : base(context)
         {
 
         }
 
-       
     }
 }

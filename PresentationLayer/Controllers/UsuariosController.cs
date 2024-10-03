@@ -100,7 +100,17 @@ namespace PresentationLayer.Controllers
           
             usuario.UserRol = _rolService.TGetById(usuario.RolId);
             _usuarioService.TInsert(usuario);
-            _emailSender.SendEmailAsync(usuario.Correo, "Bienvenido a Administrador de Proyectos", "<h1>Gracias por unirte a MyApp</h1>");
+
+            // Diccionario con los valores dinámicos a reemplazar
+            var valoresDinamicos = new Dictionary<string, string>
+            {
+                { "Nombre", "Carlos" },
+                { "Fecha", DateTime.Now.AddDays(7).ToString("dd/MM/yyyy") }
+            };
+            var Destinatarios = new List<string>();
+            Destinatarios.Add(usuario.Correo);
+
+            _emailSender.SendEmailAsync(Destinatarios, "MensajeBienvenida", valoresDinamicos);
             res.Mensaje = "Usuario agregado exitosamente";
             res.Exito = true;
             return Ok(res);

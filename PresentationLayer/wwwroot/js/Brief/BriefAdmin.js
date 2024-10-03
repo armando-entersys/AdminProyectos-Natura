@@ -34,14 +34,41 @@ function AppViewModel() {
     self.TipoBrief = ko.observable().extend({ required: true });
     self.cargaArchivo = ko.observable().extend({ required: true });
     self.registros = ko.observableArray();
+    self.planComunicacion = ko.observable();
+    self.determinarEstado = ko.observable();
+    self.fechaPublicacion = ko.observable();
+    self.proyecto = ko.observable();
+    self.mensaje = ko.observable();
+    self.prioridad = ko.observable();
+    self.ciclo = ko.observable();
+    self.pnc = ko.observable();
+    self.audicencia = ko.observable();
+    self.fechaEntrega = ko.observable();
+    self.proceso = ko.observable();
+    self.produccion = ko.observable();
+    self.respondable = ko.observable();
+
+
+
     self.inicializar = function () {
         $.ajax({
-            url: "/Brief/GetAllbyUserId", // URL del método GetAll en tu API
+            url: "/Brief/GetAllColumns", // URL del método GetAll en tu API
             type: "GET",
             contentType: "application/json",
             success: function (d) {
-                self.registros.removeAll();
-                self.registros.push.apply(self.registros, d.datos.$values);
+                self.columns.removeAll();
+                // Asegúrate de que los datos se transformen en instancias de Task y Column
+                var transformedColumns = d.datos.$values.map(function (columnData) {
+                    var tasks = columnData.tasks.$values.map(function (taskData) {
+                        return new Task(taskData.id, taskData.title, taskData.usuarioId, taskData.nombreUsuario, taskData.fechaEntrega);
+                    });
+                    return new Column(columnData.id, columnData.name, tasks);
+                });
+
+                self.columns.push.apply(self.columns, transformedColumns); // Añadimos las columnas transformadas
+
+                // Inicializa SortableJS una vez que los datos han sido cargados
+                initializeSortable();
                 $.ajax({
                     url: "/Brief/GetAllEstatusBrief", // URL del método GetAll en tu API
                     type: "GET",
@@ -84,7 +111,42 @@ function AppViewModel() {
     self.isRoleVisible = function (allowedRoles) {
         return allowedRoles.includes(RolId);
     };
+    self.addTask = function (column) {
+        var newId = column.tasks().length + 1;
+        column.tasks.push(new Task(newId, 'New Task ' + newId));
+    };
 
+    self.clearTasks = function (column) {
+        column.tasks.removeAll(); // Limpia todas las tareas de la columna
+    };
+
+    self.refreshTasks = function (column, taskToMove, targetColumn) {
+        column.tasks.remove(taskToMove);
+        targetColumn.tasks.push(taskToMove);
+        column.tasks.valueHasMutated();  // Actualizar columna origen
+        targetColumn.tasks.valueHasMutated();  // Actualizar columna destino
+    };
+
+    self.moveTask = function (taskId, fromColumnId, toColumnId, newIndex) {
+        var brief = {
+            Id: taskId,
+            EstatusBriefId: toColumnId
+        }
+        $.ajax({
+            url: "/Brief/EditStatus", // URL del método GetAll en tu API
+            type: "PUT",
+            contentType: "application/json",
+            data: JSON.stringify(brief),
+            success: function (d) {
+                self.inicializar();
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al obtener los datos: ", error);
+                alert("Error al obtener los datos: " + xhr.responseText);
+            }
+        });
+
+    };
     self.cargarArchivo = function (data, event) {
         var file = event.target.files[0];
         if (file) {
@@ -159,6 +221,9 @@ function AppViewModel() {
                 alert("Error al obtener los datos: " + xhr.responseText);
             }
         });
+
+ 
+
        
     }
     self.GuardarEditar = function () {
@@ -220,7 +285,7 @@ function AppViewModel() {
         }
        
         $.ajax({
-            url: "/Brief/AddBrief", // URL del método GetAll en tu API
+            url: "/Brief/EditBrief", // URL del método GetAll en tu API
             type: "POST",
             contentType: false,  // Important to avoid jQuery processing data
             processData: false,  // Important to avoid jQuery processing data

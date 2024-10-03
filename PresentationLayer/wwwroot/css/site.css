@@ -36,6 +36,12 @@ li {
 h1 {
     font-weight: 600;
     font-size: 1.5rem;
+    color:#FFAA16
+}
+h2 {
+    font-weight: 600;
+    font-size: 1rem;
+
 }
 
 body {
@@ -59,7 +65,7 @@ body {
     min-width: 70px;
     z-index: 1000;
     transition: all .25s ease-in-out;
-    background-color: #0e2238;
+    background-color: #EB6619;
     display: flex;
     flex-direction: column;
 }
@@ -129,7 +135,7 @@ a.sidebar-link:hover {
     position: absolute;
     top: 0;
     left: 70px;
-    background-color: #0e2238;
+    background-color: #EB6619;
     padding: 0;
     min-width: 15rem;
     display: none;
@@ -158,4 +164,14 @@ a.sidebar-link:hover {
 #sidebar.expand .sidebar-link[data-bs-toggle="collapse"].collapsed::after {
     transform: rotate(45deg);
     transition: all .2s ease-out;
+}
+.btn-primary:hover {
+    color: #fff;
+    background-color: #FFAA16;
+    border-color: #FFAA16;
+}
+.btn-primary {
+    color: #fff;
+    background-color: #EB6619;
+    border-color: #FFAA16;
 }

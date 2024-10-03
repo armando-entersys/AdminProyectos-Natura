@@ -1,0 +1,289 @@
+﻿@{
+    ViewData["Title"] = "Briefs";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="py-3">Brief</h1>
+<div class="row py-3">
+    <div class="col" data-bind="visible:isRoleVisible([2])">
+        <button type="button" class="btn btn-outline-primary" data-bind="click:Agregar">
+            <i class="lni circle-plus"></i>
+            <span>Agregar Brief</span>
+        </button>
+    </div>
+    <div class="col">
+    </div>
+
+</div>
+
+<div class="custom-width overflow-auto">
+    <div class="row" data-bind="foreach: columns">
+        <div class="col" style="flex: 0 0 22%; max-width: 22%;">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title" data-bind="text: name"></h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group sortable" data-bind="foreach: tasks, attr: { id: id }">
+                        <div class="list-group-item" data-bind="attr: { 'data-task-id': id }">
+                            <div>
+                                <div>
+                                    <i class="lni lni-folder"></i>
+                                    <span data-bind="text: title"></span>
+                                </div>
+                                <div>
+                                    <i class="lni lni-user"></i>
+                                    <span data-bind="text: nombreUsuario"></span>
+                                </div>
+                                <div>
+                                    <i class="lni lni-calendar"></i>
+                                    <span data-bind="text: fechaEntrega"></span>
+                                </div>
+                                <div class="row">
+                                    <div class="col-4">
+                                        l
+                                    </div>
+                                    <div class="col-4">
+                                        l
+                                    </div>
+                                    <div class="col-4">
+                                        <div>
+                                            <i data-bind="click:$root.Editar" class="lni lni-search-alt"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <!-- Menú desplegable con el ícono de 3 puntos -->
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="divEdicion" tabindex="-1" aria-labelledby="Modal" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen-xxl-down" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="Modal">Solicitud Brief</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="background-color: rgba(0, 0, 0, .03);">
+                <div class="row">   
+                    <div class="col">
+                        <div id="formulario" style="background-color: #FFFFFF;" class="p-3" >
+                            <h1>Solicitud</h1>
+                            <div class="mb-3" data-bind="validationElement: EstatusBrief">
+                                <label class="col-form-label">Rol:</label>
+                                <select class="form-control" data-bind="options: catEstatusBrief, value: EstatusBrief, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: nombre">
+                                <label for="recipient-name" class="col-form-label">Nombre:</label>
+                                <input type="text" class="form-control" id="nombre" maxlength="128" data-bind="value: nombre" />
+                                <span class="text-danger" data-bind="validationMessage: nombre"></span>
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: descripcion">
+                                <label for="recipient-name" class="col-form-label">Descripción:</label>
+                                <input type="text" class="form-control" id="descripcion" maxlength="128" data-bind="value: descripcion">
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: objetivo">
+                                <label for="recipient-name" class="col-form-label">Objetivo de comunicación:</label>
+                                <input type="text" class="form-control" id="objetivo" maxlength="128" data-bind="value: objetivo">
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: dirigidoA">
+                                <label for="recipient-name" class="col-form-label">A quién va dirigido :</label>
+                                <input type="text" class="form-control" id="dirigidoA" maxlength="128" data-bind="value: dirigidoA">
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: fechaEntrega">
+                                <label for="recipient-name" class="col-form-label">Fecha de entrega deseada:</label>
+                                <input type="date" class="form-control" id="fechaEntrega" maxlength="128" data-bind="value: fechaEntrega">
+                            </div>
+                          
+                            <div class="mb-3" data-bind="validationElement: TipoBrief">
+                                <label class="col-form-label">Rol:</label>
+                                <select class="form-control" data-bind="options: catTipoBrief, value: TipoBrief, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: cargaArchivo">
+                                <label for="cargaArchivo" class="col-form-label">Cargar Documento:</label>
+                                <input type="file" class="form-control" id="cargaArchivo" data-bind="event: { change: cargarArchivo }" accept=".pdf,.doc,.docx">
+                                <span class="text-danger" data-bind="validationMessage: cargaArchivo"></span>
+                            </div>
+                            <div class="mb-3" data-bind="visible: rutaArchivo">
+                                <label for="archivoCargado" class="col-form-label">Archivo cargado:</label>
+                                <a data-bind="attr: { href: '/Brief/DownloadFile/' + id() }, text: rutaArchivo" class="form-control" target="_blank">Descargar archivo</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div id="formularioAdmin" class="p-3">
+                            <h1>Panel Edición Administrador</h1>
+
+                            <div class="mb-3" data-bind="validationElement: EstatusBrief">
+                                <label class="col-form-label">Clasificación:</label>
+                                <select class="form-control" data-bind="options: catEstatusBrief, value: EstatusBrief, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: comentarios">
+                                <label for="recipient-name" class="col-form-label">Comentario:</label>
+                                <input type="text" class="form-control" id="comentario" maxlength="128" data-bind="value: comentario">
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: planComunicacion">
+                                <label for="recipient-name" class="col-form-label">Requiere Plan de Comunicación:</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
+                                    <label class="form-check-label" for="inlineRadio1">1</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+                                    <label class="form-check-label" for="inlineRadio2">2</label>
+                                </div>
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: determinarEstado">
+                                <label for="recipient-name" class="col-form-label">Determinar Estado:</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
+                                    <label class="form-check-label" for="inlineRadio1">1</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
+                                    <label class="form-check-label" for="inlineRadio2">2</label>
+                                </div>
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: fechaPublicacion">
+                                <label for="recipient-name" class="col-form-label">Fecha Publicacion:</label>
+                                <input type="date" class="form-control" id="fechaEntrega" maxlength="128" data-bind="value: fechaPublicacion">
+                            </div>
+                            <button type="button" class="btn btn-primary" data-bind="click:Guardar">
+                                <i class="lni lni-save"></i>
+                                <span>Guardar</span>
+                            </button>
+                        </div>
+                        <div id="formularioMateriales"  class="p-3">
+                            <h1>Asignar Material</h1>
+                            <div class="mb-3" data-bind="validationElement: proyecto">
+                                <label for="recipient-name" class="col-form-label">Proyecto:</label>
+                                <input type="text" class="form-control" id="comentario" maxlength="128" data-bind="value: proyecto">
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: mensaje">
+                                <label for="recipient-name" class="col-form-label">Mensaje:</label>
+                                <input type="text" class="form-control" id="comentario" maxlength="128" data-bind="value: mensaje">
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: prioridad">
+                                <label class="col-form-label">Prioridad:</label>
+                                <select class="form-control" data-bind="options: catEstatusBrief, value: EstatusBrief, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: ciclo">
+                                <label for="recipient-name" class="col-form-label">Ciclo:</label>
+                                <input type="text" class="form-control" id="ciclo" maxlength="128" data-bind="value: ciclo">
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: pcn">
+                                <label class="col-form-label">PCN:</label>
+                                <select class="form-control" data-bind="options: catEstatusBrief, value: EstatusBrief, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: audicencia">
+                                <label class="col-form-label">Audicencia:</label>
+                                <select class="form-control" data-bind="options: catEstatusBrief, value: EstatusBrief, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: fechaEntrega">
+                                <label for="recipient-name" class="col-form-label">Fecha Entrega:</label>
+                                <input type="date" class="form-control" id="fechaEntrega" maxlength="128" data-bind="value: fechaEntrega">
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: proceso">
+                                <label for="recipient-name" class="col-form-label">Proceso:</label>
+                                <input type="text" class="form-control" id="proceso" maxlength="128" data-bind="value: proceso">
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: produccion">
+                                <label for="recipient-name" class="col-form-label">Produccion:</label>
+                                <input type="text" class="form-control" id="produccion" maxlength="128" data-bind="value: produccion">
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: respondable">
+                                <label for="recipient-name" class="col-form-label">Responsable:</label>
+                                <input type="text" class="form-control" id="respondable" maxlength="128" data-bind="value: respondable">
+                            </div>
+                            <button type="button" class="btn btn-primary" data-bind="click:Guardar">
+                                <i class="lni lni-save"></i>
+                                <span>Agregar Material</span>
+                            </button>
+                        </div>
+                        <div id="ListaMateriales" class="p-3">
+                            <h2 style="color:#FFAA16;">Materiales Asignados</h2>
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">Nombre</th>
+                                        <th scope="col">Nombre</th>
+                                        <th scope="col">Detalles</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody data-bind="foreach: registros">
+                                    <tr>
+                                        <td data-bind="text: id"></td>
+                                        <td data-bind="text: nombre"></td>
+                                        <td data-bind="text: nombre"></td>
+                                        <td class="small">
+                                            <button type="button" class="btn btn-outline-primary" data-bind="click:$root.Editar">
+                                                <i class="lni lni-pencil"></i>
+                                                <span>Editar</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <h2 style="color:#FFAA16;">Participantes del proyecto</h2>
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">Nombre</th>
+                                        <th scope="col">Detalles</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody data-bind="foreach: registros">
+                                    <tr>
+                                        <td data-bind="text: id"></td>
+                                        <td data-bind="text: nombre"></td>
+                                        <td class="small">
+                                            <button type="button" class="btn btn-outline-primary" data-bind="click:$root.Editar">
+                                                <i class="lni lni-pencil"></i>
+                                                <span>Enviar Mensaje</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+             
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" data-bind="click:Guardar">
+                    <i class="lni lni-save"></i>
+                    <span>Guardar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .custom-width {
+        max-width: 1200px; /* Puedes definir cualquier ancho aquí */
+    }
+</style>
+@section Scripts {
+    <script>
+        // Pasar los valores de ViewBag a variables JavaScript
+        var RolId = @Html.Raw(ViewBag.RolId);
+
+    </script>
+    <script src="~/js/brief/BriefAdmin.js"></script>
+
+}

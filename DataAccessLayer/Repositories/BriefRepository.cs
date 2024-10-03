@@ -63,7 +63,9 @@ namespace DataAccessLayer.Repositories
                                 {
                                     Id = i.Id,
                                     Title = i.Nombre,
-                                    Elemento = Briefs.FirstOrDefault(q => q.Id == i.Id)
+                                    UsuarioId = i.UsuarioId,
+                                    NombreUsuario = _context.Usuarios.Where(p=> p.Id == i.UsuarioId).Select(u=>u.Nombre).FirstOrDefault(),
+                                    FechaEntrega = i.FechaEntrega.ToShortDateString()
                                 }).ToList()
                     });
                 }
@@ -81,7 +83,12 @@ namespace DataAccessLayer.Repositories
             }
             return brief;
         }
+        public IEnumerable<Brief> GetAllbyUserId(int usuarioId)
+        {
+            IEnumerable<Brief> briefs = _context.Briefs.Where(q=> q.UsuarioId == usuarioId).ToList();
 
+            return briefs;
+        }
         public void Insert(Brief entity)
         {
             _context.Set<Brief>().Add(entity);
@@ -96,6 +103,14 @@ namespace DataAccessLayer.Repositories
                 _context.Entry(existingEntity).CurrentValues.SetValues(entity);  // Solo copia los valores modificados
                 _context.SaveChanges();
             }
+        }
+        public IEnumerable<EstatusBrief> GetAllEstatusBrief()
+        {
+            return _context.EstatusBriefs.ToList();
+        }
+        public IEnumerable<TipoBrief> GetAllTipoBrief()
+        {
+            return _context.TiposBrief.ToList();
         }
     }
 }

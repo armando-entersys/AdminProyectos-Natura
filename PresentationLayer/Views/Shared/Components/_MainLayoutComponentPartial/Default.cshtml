@@ -1,9 +1,29 @@
-﻿<div name="Main">
+﻿<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<div name="Main">
+   
     <div class="btn-group" role="group" aria-label="Basic outlined example">
-        <button type="button" class="btn btn-outline-primary">Left</button>
-        <button type="button" class="btn btn-outline-primary">Middle</button>
-        <button type="button" class="btn btn-outline-primary">Right</button>
-        <button type="button" class="btn btn-primary position-relative">
+        <div class="d-flex justify-content-center p-2">
+            <button class="btn btn-primary d-flex flex-column align-items-center">
+                <i class="bi bi-tools fs-3"></i> <!-- Ejemplo de ícono Bootstrap -->
+                <span class="mb-1">Materiales</span>
+            </button>
+        </div>
+        <div class="d-flex justify-content-center  p-2">
+            <button class="btn btn-primary d-flex flex-column align-items-center">
+                <i class="bi bi-tools fs-3"></i> <!-- Ejemplo de ícono Bootstrap -->
+                <span class="mb-1">Proyectos</span>
+            </button>
+        </div>
+        <div class="d-flex justify-content-center  p-2">
+            <button class="btn btn-primary d-flex flex-column align-items-center">
+                <i class="bi bi-tools fs-3"></i> <!-- Ejemplo de ícono Bootstrap -->
+                <span class="mb-1">Calendario de Proyectos</span>
+            </button>
+        </div>
+
+        <button type="button" class="btn btn-primary position-relative  p-2">
             Inbox
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                 99+

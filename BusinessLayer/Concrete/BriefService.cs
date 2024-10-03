@@ -21,10 +21,6 @@ namespace BusinessLayer.Concrete
         {
             _briefDal.Delete(id);
         }
-        public List<Brief> GetAllByUserId(int id)
-        {
-            return _briefDal.GetAllByUserId(id);
-        }
         public List<Column<Brief>> GetColumnsByUserId(int id)
         {
             return _briefDal.GetColumnsByUserId(id);
@@ -33,7 +29,10 @@ namespace BusinessLayer.Concrete
         {
             return _briefDal.GetAll();
         }
-
+        public IEnumerable<Brief> GetAllbyUserId(int usuarioId)
+        {
+            return _briefDal.GetAllbyUserId(usuarioId);
+        }
         public Brief GetById(int id)
         {
             return _briefDal.GetById(id);
@@ -48,6 +47,14 @@ namespace BusinessLayer.Concrete
         public void Update(Brief entity)
         {
             _briefDal.Update(entity);
+        }
+        public IEnumerable<EstatusBrief> GetAllEstatusBrief()
+        {
+            return _briefDal.GetAllEstatusBrief();
+        }
+        public IEnumerable<TipoBrief> GetAllTipoBrief()
+        {
+            return _briefDal.GetAllTipoBrief();
         }
     }
 }
