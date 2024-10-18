@@ -12,6 +12,41 @@ function Column(id, name, tasks) {
     this.name = ko.observable(name);
     this.tasks = ko.observableArray(tasks);
 }
+var PrioridadPequena = { Id: 1, Descripcion: "Pequeña" };
+var PrioridadMediana = { Id: 2, Descripcion: "Mediana" };
+var PrioridadGrande = { Id: 3, Descripcion: "Grande" };
+var catPrioridad = [PrioridadPequena, PrioridadMediana, PrioridadGrande];
+
+var catPCN = [{ Id: 1, Descripcion: "Medio" }
+    , { Id: 2, Descripcion: "Facebook cocreando" }
+    , { Id: 3, Descripcion: "Mi natura digital" }
+    , { Id: 4, Descripcion: "Whatsapp" }
+    , { Id: 5, Descripcion: "Mailing" }
+    , { Id: 6, Descripcion: "Instagram" }
+    , { Id: 7, Descripcion: "Folleto digital" }];
+
+var catFormato = [{ Id: 1, Descripcion: "placa" }
+    , { Id: 1, Descripcion: "panel home" }
+    , { Id: 2, Descripcion: "panel captación" }
+    , { Id: 3, Descripcion: "vitrina" }
+    , { Id: 4, Descripcion: "history" }
+    , { Id: 5, Descripcion: "video" }
+    , { Id: 6, Descripcion: "card" }
+    , { Id: 7, Descripcion: "comunicado" }
+    , { Id: 8, Descripcion: "email " }
+    , { Id: 9, Descripcion: "guia interactiva" }
+    , { Id: 10, Descripcion: "pdf" }
+    , { Id: 11, Descripcion: "infografia" }
+    , { Id: 12, Descripcion: "landing page" }
+    , { Id: 13, Descripcion: "placa animada" }
+    , { Id: 14, Descripcion: "posteo" }
+    , { Id: 15, Descripcion: "video tictoc " }
+    , { Id: 16, Descripcion: "video" }];
+
+var catAudiencia = [{ Id: 1, Descripcion: "Consultor" }
+    , { Id: 2, Descripcion: "Cliente final" }
+    , { Id: 3, Descripcion: "Líderes" }
+    , { Id: 4, Descripcion: "Segmento especifico" }]
 
 function AppViewModel() {
     var self = this;
@@ -39,10 +74,16 @@ function AppViewModel() {
     self.fechaPublicacion = ko.observable();
     self.proyecto = ko.observable();
     self.mensaje = ko.observable();
+    self.catPrioridad = ko.observableArray();
     self.prioridad = ko.observable();
     self.ciclo = ko.observable();
+    self.catPCN = ko.observableArray();
     self.pnc = ko.observable();
-    self.audicencia = ko.observable();
+    self.formato = ko.observable();
+    self.catFormato = ko.observableArray();
+    self.audiencia = ko.observable();
+    self.catAudiencia = ko.observableArray();
+
     self.fechaEntrega = ko.observable();
     self.proceso = ko.observable();
     self.produccion = ko.observable();
@@ -84,6 +125,19 @@ function AppViewModel() {
                             success: function (d) {
                                 self.catTipoBrief.removeAll();
                                 self.catTipoBrief.push.apply(self.catTipoBrief, d.datos.$values);
+
+                                self.catPrioridad.removeAll();
+                                self.catPrioridad.push.apply(self.catPrioridad, catPrioridad);
+
+                                self.catPCN.removeAll();
+                                self.catPCN.push.apply(self.catPCN, catPCN);
+
+                                self.catFormato.removeAll();
+                                self.catFormato.push.apply(self.catFormato, catFormato);
+
+                                self.catAudiencia.removeAll();
+                                self.catAudiencia.push.apply(self.catAudiencia, catAudiencia);
+                                
                                 $("#divEdicion").modal("hide");
                             },
                             error: function (xhr, status, error) {

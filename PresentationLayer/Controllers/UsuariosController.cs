@@ -15,12 +15,15 @@ namespace PresentationLayer.Controllers
         private readonly IUsuarioService _usuarioService;
         private readonly IRolService _rolService;
         private readonly IEmailSender _emailSender;
-        public UsuariosController(IAuthService authService, IUsuarioService usuarioService, IRolService rolService, IEmailSender emailSender)
+        private readonly IToolsService _toolService;
+
+        public UsuariosController(IAuthService authService, IUsuarioService usuarioService, IRolService rolService, IEmailSender emailSender, IToolsService toolService)
         {
             _authService = authService;
             _usuarioService = usuarioService;
             _rolService = rolService;
             _emailSender = emailSender;
+            _toolService = toolService;
         }
         // GET: UsuariosController
         public ActionResult Index()
@@ -101,7 +104,6 @@ namespace PresentationLayer.Controllers
             usuario.UserRol = _rolService.TGetById(usuario.RolId);
             _usuarioService.TInsert(usuario);
 
-            // Diccionario con los valores dinámicos a reemplazar
             var valoresDinamicos = new Dictionary<string, string>
             {
                 { "Nombre", "Carlos" },
@@ -110,7 +112,7 @@ namespace PresentationLayer.Controllers
             var Destinatarios = new List<string>();
             Destinatarios.Add(usuario.Correo);
 
-            _emailSender.SendEmailAsync(Destinatarios, "MensajeBienvenida", valoresDinamicos);
+            _emailSender.SendEmail(Destinatarios, "MensajeBienvenida", valoresDinamicos);
             res.Mensaje = "Usuario agregado exitosamente";
             res.Exito = true;
             return Ok(res);
@@ -128,7 +130,6 @@ namespace PresentationLayer.Controllers
             return Ok(res);
         }
 
-
         [HttpDelete]
         public ActionResult Delete(int id)
         {
@@ -136,6 +137,64 @@ namespace PresentationLayer.Controllers
             _usuarioService.TDelete(id);
             res.Exito = true;
             return Ok(res);
+        }
+
+        [HttpPost]
+        public IActionResult SolicitudUsuario(string Nombre, string Correo,string ApellidoPaterno, string ApellidoMaterno, string Contrasena)
+        {
+            Usuario usuario = new Usuario();
+            usuario.Correo = Correo;
+            usuario.Nombre = Nombre;
+            usuario.ApellidoPaterno = ApellidoPaterno;
+            usuario.ApellidoMaterno = ApellidoMaterno;
+            usuario.Contrasena = Contrasena;
+            usuario.RolId = 2;
+            usuario.Estatus = false;
+            usuario.SolicitudRegistro = true;
+            usuario.FechaRegistro = DateTime.Now;
+            usuario.FechaModificacion = DateTime.Now;
+
+            var resp =_authService.SolicitudUsuario(usuario);
+            if(!resp.Exito)
+            {
+                ViewData["Mensaje"] = resp.Mensaje;
+                return RedirectToAction("Registro", "Login");
+            }
+            else
+            {
+                ViewData["Mensaje"] = resp.Mensaje;
+                return RedirectToAction("Index", "Login");
+            }
+           
+        }
+
+        [HttpGet]
+        public IActionResult ObtenerSolicitudesUsuario()
+        {
+            respuestaServicio res = new respuestaServicio();
+            var usuarios = _toolService.GetUsuarioBySolicitud();
+            res.Datos = usuarios;
+            res.Exito = true;
+
+
+            return Ok(res);
+        }
+
+        [HttpPost]
+        public IActionResult CambioContrasena(int id, string Contrasena)
+        {
+
+            respuestaServicio resp = new respuestaServicio();
+          
+            Usuario usuario = _usuarioService.TGetById(id);
+            usuario.Contrasena = Contrasena;
+            usuario.CambioContrasena = false;
+
+            _usuarioService.TUpdate(usuario);
+
+            TempData["MensajeExito"] = "La contraseña ha sido actualizada exitosamente.";
+            return RedirectToAction("CambioContrasena", "Login");
+            
         }
 
     }

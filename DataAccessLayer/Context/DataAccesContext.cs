@@ -19,11 +19,10 @@ namespace DataAccessLayer.Context
         public DbSet<Rol> Roles { get; set; }
         public DbSet<TipoBrief> TiposBrief { get; set; }
         public DbSet<Material> Materiales { get; set; }
+        public DbSet<Proyecto> Proyectos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
-
             // Configuración de la relación muchos a uno entre Usuario y Rol
             modelBuilder.Entity<Usuario>()
                 .HasOne(u => u.UserRol)
@@ -63,6 +62,14 @@ namespace DataAccessLayer.Context
                 .WithOne(m => m.Brief)        // Un Material pertenece a un Brief
                 .HasForeignKey(m => m.BriefId) // Llave foránea en Material
                 .OnDelete(DeleteBehavior.Cascade); // Eliminar materiales cuando se elimine el Brief
+           
+            // Configuración de la relación uno a uno
+            modelBuilder.Entity<Proyecto>()
+                .HasOne(p => p.Brief)
+                .WithOne(b => b.Proyecto)
+                .HasForeignKey<Proyecto>(p => p.BriefId);
+
+            base.OnModelCreating(modelBuilder);
         }
 
     }

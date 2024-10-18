@@ -151,7 +151,6 @@ namespace PresentationLayer.Controllers
             return Ok(res);
         }
 
-
         [HttpPut]
         public ActionResult EditStatus([FromBody] Brief brief)
         {
@@ -230,7 +229,7 @@ namespace PresentationLayer.Controllers
             };
             var Destinatarios = _toolsService.GetUsuarioByRol(1).Select(q=> q.Correo).ToList();
 
-            _emailSender.SendEmailAsync(Destinatarios, "NuevoBreaf", valoresDinamicos);
+            _emailSender.SendEmail(Destinatarios, "NuevoBreaf", valoresDinamicos);
 
            
             res.Datos = brief;
@@ -297,7 +296,7 @@ namespace PresentationLayer.Controllers
             };
             var Destinatarios = _toolsService.GetUsuarioByRol(1).Select(q => q.Correo).ToList();
 
-            _emailSender.SendEmailAsync(Destinatarios, "EdicionBreaf", valoresDinamicos);
+            _emailSender.SendEmail(Destinatarios, "EdicionBreaf", valoresDinamicos);
 
 
             res.Datos = brief;
@@ -330,5 +329,25 @@ namespace PresentationLayer.Controllers
             return Ok(res);
         }
 
+        [HttpPost]
+        public ActionResult CreateProyecto([FromBody] Proyecto proyecto)
+        {
+            respuestaServicio res = new respuestaServicio();
+
+            proyecto.FechaModificacion = DateTime.Now;
+            try
+            {
+                _briefService.InsertProyecto(proyecto);
+                res.Mensaje = "Creado exitosamente";
+                res.Exito = true;
+            }
+            catch (Exception ex)
+            {
+                res.Mensaje = "Error al Crear el Usuario";
+                res.Exito = false;
+            }
+            
+            return Ok(res);
+        }
     }
 }

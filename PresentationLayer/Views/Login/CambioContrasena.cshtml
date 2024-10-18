@@ -1,0 +1,72 @@
+﻿@model EntityLayer.Concrete.Usuario
+@{
+    ViewData["Title"] = "Cambio Contraseña";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+@await Component.InvokeAsync("_HeaderLayoutComponentPartial")
+<body>
+
+    <div class="container mt-5 pt-5">
+
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-4 col-md-6">
+
+                <div class="card">
+                    <div class="card-header">
+                        Registrate
+                    </div>
+                    <div class="card-body">
+
+                        <form asp-controller="Usuarios" asp-action="CambioContrasena" method="post" enctype="multipart/form-data">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+
+                            <input class="form-control mb-3" type="text" placeholder="Id" required asp-for="Id" />
+
+                            <input class="form-control mb-3" type="password" placeholder="Contraseña" required asp-for="Contrasena" />
+                            <span asp-validation-for="Contrasena" class="text-danger"></span>
+
+                            <button class="w-100 btn btn-lg btn-primary" type="submit">Registrarme</button>
+
+                            @if (ViewData["Mensaje"] != null)
+                            {
+                                <div class="form-group">
+                                    <div class="alert alert-danger" role="alert">
+                                        @ViewData["Mensaje"]
+                                    </div>
+                                </div>
+                            }
+                        </form>
+
+                    </div>
+
+                </div>
+                @{
+                    var mensajeExito = TempData["MensajeExito"] as string;
+                }
+
+                @if (!string.IsNullOrEmpty(mensajeExito))
+                {
+                    <div class="alert alert-success" role="alert">
+                        @mensajeExito
+                    </div>
+                    <!-- Script para redirigir automáticamente después de unos segundos -->
+                    <script type="text/javascript">
+                        setTimeout(function () {
+                            window.location.href = '@Url.Action("Index", "Login")';
+                        }, 5000); // Redirige después de 5 segundos (5000 milisegundos)
+                    </script>
+                }
+            </div>
+        </div>
+
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

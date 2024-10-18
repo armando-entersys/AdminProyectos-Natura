@@ -1,4 +1,5 @@
 ﻿using DataAccessLayer.Abstract;
+using DataAccessLayer.Concrete;
 using DataAccessLayer.Context;
 using EntityLayer.Concrete;
 using Microsoft.EntityFrameworkCore;
@@ -47,8 +48,27 @@ namespace DataAccessLayer.Repositories
                                  .OrderBy(m => m.Orden)
                                  .ToList();
         }
+        public respuestaServicio SolicitudUsuario(Usuario usuario)
+        {
+            respuestaServicio resp = new respuestaServicio();
+            Usuario usuarioBD = _context.Usuarios.Where(q => q.Correo == usuario.Correo).FirstOrDefault();
+            if (usuarioBD == null)
+            {
+                _context.Add(usuario);
+                _context.SaveChanges();
+                resp.Exito = true;
+                resp.Mensaje = "Solicitud registrada con exito";
+                
+            }
+            else
+            {
+                resp.Exito = false;
+                resp.Mensaje = "Correo registrado anteriormente";
+            }
+            return resp;
+        }
 
-       
+
     }
 
 }

@@ -60,5 +60,20 @@ namespace PresentationLayer.Controllers
 
             
         }
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            // Cerrar sesión
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Redirigir a la página de inicio u otra página deseada
+            return RedirectToAction("Index", "Home");
+        }
+        public IActionResult CambioContrasena(int id)
+        {
+            ViewData["id"] = id;
+            return View();
+        }
+
     }
 }

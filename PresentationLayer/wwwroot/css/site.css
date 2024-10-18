@@ -172,6 +172,11 @@ a.sidebar-link:hover {
 }
 .btn-primary {
     color: #fff;
-    background-color: #EB6619;
+    background-color: #FFAA16;
     border-color: #FFAA16;
 }
+    .btn-check:active + .btn-primary, .btn-check:checked + .btn-primary, .btn-primary.active, .btn-primary:active, .show > .btn-primary.dropdown-toggle {
+        color: #fff;
+        background-color: #EB6619;
+        border-color: #EB6619;
+    }

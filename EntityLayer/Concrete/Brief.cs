@@ -39,5 +39,8 @@ namespace EntityLayer.Concrete
 
         // Nueva relación de uno a muchos
         public ICollection<Material> Materiales { get; set; } = new List<Material>();
+
+        // Relación uno a uno con Proyecto
+        public Proyecto Proyecto { get; set; }
     }
 }

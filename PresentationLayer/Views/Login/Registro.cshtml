@@ -21,11 +21,15 @@
                     </div>
                     <div class="card-body">
 
-                        <form asp-controller="Login" asp-action="Registro" method="post" enctype="multipart/form-data">
+                        <form asp-controller="Usuarios" asp-action="SolicitudUsuario" method="post" enctype="multipart/form-data">
 
                             <input class="form-control mb-3" type="text" placeholder="Nombre Completo" asp-for="Nombre" required />
-                            <input class="form-control mb-3" type="text" placeholder="Correo" required asp-for="Correo" />
-                           
+                            <input class="form-control mb-3" type="text" placeholder="Apellido Paterno" required asp-for="ApellidoPaterno" required />
+                            <input class="form-control mb-3" type="text" placeholder="Apellido Materno" required asp-for="ApellidoMaterno" required />
+                            <input class="form-control mb-3" type="text" placeholder="Correo" required asp-for="Correo" required />
+                            <input class="form-control mb-3" type="text" placeholder="Contraseña" required asp-for="Contrasena" required />
+
+                            <button class="w-100 btn btn-lg btn-primary" type="submit">Registrarme</button>
                             @if (ViewData["Mensaje"] != null)
                             {
 
@@ -47,7 +51,7 @@
         </div>
 
     </div>
-
-    @await Component.InvokeAsync("_ScriptLayoutComponentPartial")
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

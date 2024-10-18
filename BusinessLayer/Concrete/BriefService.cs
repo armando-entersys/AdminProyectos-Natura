@@ -56,5 +56,14 @@ namespace BusinessLayer.Concrete
         {
             return _briefDal.GetAllTipoBrief();
         }
+        public void InsertProyecto(Proyecto entity)
+        {
+            _briefDal.InsertProyecto(entity);
+        }
+        public void InsertMaterial(Material entity)
+        {
+            _briefDal.InsertMaterial(entity);
+            
+        }
     }
 }

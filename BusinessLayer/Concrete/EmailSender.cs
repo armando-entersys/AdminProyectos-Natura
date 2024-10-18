@@ -24,13 +24,29 @@ namespace BusinessLayer.Concrete
             _emailSettings = emailSettings.Value;
             _configuration = configuration;
         }
-        public async Task SendEmailAsync(List<string> _toEmails,string _category, Dictionary<string, string> dynamicValues)
+        private string ReemplazarMarcadores(string texto, Dictionary<string, string> placeholders)
+        {
+            foreach (var placeholder in placeholders)
+            {
+                texto = texto.Replace($"{{{placeholder.Key}}}", placeholder.Value);
+            }
+            return texto;
+        }
+        public void SendEmail(List<string> _toEmails, string _category, Dictionary<string, string> dynamicValues)
         {
             var emailMessage = new MimeMessage();
+
+            // Lee el archivo HTML correspondiente a la plantilla
+            string htmlTemplatePath = Path.Combine(Directory.GetCurrentDirectory(), "EmailTemplates", $"{_category}.html");
+            string htmlContent = File.ReadAllText(htmlTemplatePath);
+
+
+
+
             // Leer destinatarios, asunto y cuerpo desde appsettings.json
 
             var asuntoTemplate = _configuration[$"CategoriasDeCorreo:{_category}:Asunto"];
-            var cuerpoTemplate = _configuration[$"CategoriasDeCorreo:{_category}:Cuerpo"];
+            var cuerpoTemplate = htmlContent;
             // Reemplazar las variables dinámicas en el asunto y cuerpo
             foreach (var key in dynamicValues.Keys)
             {
@@ -47,21 +63,22 @@ namespace BusinessLayer.Concrete
             {
                 emailMessage.To.Add(new MailboxAddress(destinatario, destinatario));
             }
-
-
-            
+            // Asignar el campo From
+            emailMessage.From.Add(new MailboxAddress("Natura", "ajcortest@gmail.com"));
+            emailMessage.Sender = new MailboxAddress("Natura", "ajcortest@gmail.com");
+           
 
             using var client = new MailKit.Net.Smtp.SmtpClient();
           
 
             try
             {
-                await client.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.SmtpPort, SecureSocketOptions.StartTls);
-                await client.AuthenticateAsync(_emailSettings.Username, _emailSettings.Password);
+                 client.Connect(_emailSettings.SmtpServer, _emailSettings.SmtpPort, SecureSocketOptions.StartTls);
+                 client.Authenticate(_emailSettings.Username, _emailSettings.Password);
 
                
                 
-                await client.SendAsync(emailMessage);
+                client.Send(emailMessage);
             }
             catch (Exception ex)
             {
@@ -70,7 +87,7 @@ namespace BusinessLayer.Concrete
             }
             finally
             {
-                await client.DisconnectAsync(true);
+                 client.Disconnect(true);
             }
         }
     }

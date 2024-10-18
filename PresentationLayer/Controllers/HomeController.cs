@@ -15,8 +15,6 @@ namespace PresentationLayer.Controllers
         private readonly IAuthService _authService;
         private readonly ILogger<HomeController> _logger;
 
-        List<Claim> claims = null;
-
 
         public HomeController(ILogger<HomeController> logger, IAuthService authService)
         {

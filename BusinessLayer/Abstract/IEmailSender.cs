@@ -8,6 +8,6 @@ namespace BusinessLayer.Abstract
 {
     public interface IEmailSender
     {
-        Task SendEmailAsync(List<string> toEmails, string category, Dictionary<string, string> dynamicValues);
+        void SendEmail(List<string> _toEmails, string _category, Dictionary<string, string> dynamicValues);
     }
 }

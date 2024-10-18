@@ -89,19 +89,40 @@ app.UseAuthorization();
 // Middleware personalizado para redirigir usuarios autenticados en la página de login
 app.Use(async (context, next) =>
 {
-    // Verifica si el usuario está autenticado y está intentando acceder a /Account/Login
-    if (context.User.Identity.IsAuthenticated && (context.Request.Path.Equals("/Login") || context.Request.Path.Equals("/")))
+    // Verifica si el usuario está autenticado
+    if (!context.User.Identity.IsAuthenticated)
     {
-        // Redirige al home
-        context.Response.Redirect("/Home");
-        return;
+        // Si no está autenticado y no intenta acceder a /Login
+        if (!context.Request.Path.StartsWithSegments("/Login"))
+        {
+            if (context.Request.Path.StartsWithSegments("/Usuarios/SolicitudUsuario")|| context.Request.Path.StartsWithSegments("/Usuarios/CambioContrasena"))
+            {
+                
+            }
+            else
+            {
+                context.Response.Redirect("/Login");
+                return;
+            }
+
+           
+        }
     }
-    /*if (!context.User.Identity.IsAuthenticated && !context.Request.Path.Equals("/Login"))
+    else
     {
-        // Redirige al home
-        context.Response.Redirect("/Login");
-        return;
-    }*/
+        // Si el usuario está autenticado y está intentando acceder a /Login o /Login/Logout
+        if (context.Request.Path.StartsWithSegments("/Login"))
+        {
+            // No redirigir si es el método de Logout
+            if (!context.Request.Path.Equals("/Login/Logout"))
+            {
+                // Redirige al home si ya está autenticado
+                context.Response.Redirect("/Home");
+                return;
+            }
+        }
+    }
+
     await next();
 });
 app.MapControllers();

@@ -112,5 +112,15 @@ namespace DataAccessLayer.Repositories
         {
             return _context.TiposBrief.ToList();
         }
+        public void InsertProyecto(Proyecto entity)
+        {
+            _context.Set<Proyecto>().Add(entity);
+            _context.SaveChanges();
+        }
+        public void InsertMaterial(Material entity)
+        {
+            _context.Set<Material>().Add(entity);
+            _context.SaveChanges();
+        }
     }
 }

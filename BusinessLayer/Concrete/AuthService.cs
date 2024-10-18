@@ -1,5 +1,6 @@
 ﻿using BusinessLayer.Abstract;
 using DataAccessLayer.Abstract;
+using DataAccessLayer.Concrete;
 using DataAccessLayer.Context;
 using EntityLayer.Concrete;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,10 @@ namespace BusinessLayer.Concrete
         {
             IEnumerable<Menu> menu =  _authDal.GetMenusByRole(rolId);
             return menu;
+        }
+        public respuestaServicio SolicitudUsuario(Usuario usuario)
+        {
+           return _authDal.SolicitudUsuario(usuario);
         }
     }
 }

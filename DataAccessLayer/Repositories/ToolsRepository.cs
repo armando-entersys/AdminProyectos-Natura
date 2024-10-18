@@ -1,4 +1,5 @@
 ﻿using DataAccessLayer.Abstract;
+using DataAccessLayer.Concrete;
 using DataAccessLayer.Context;
 using EntityLayer.Concrete;
 using System;
@@ -22,6 +23,21 @@ namespace DataAccessLayer.Repositories
             return _context.Usuarios
                                  .Where(m => m.RolId == rolId)
                                  .ToList();
+        }
+        public IEnumerable<Usuario> GetUsuarioBySolicitud()
+        {
+            return _context.Usuarios
+                                 .Where(m => m.SolicitudRegistro == true)
+                                 .ToList();
+        }
+        public Usuario CambioSolicitudUsuario(int id,bool estatus)
+        {
+
+            Usuario usuario = _context.Usuarios.Where(q => q.Id == id).FirstOrDefault();
+            usuario.Estatus = estatus;
+            usuario.FechaModificacion = DateTime.Now;
+            _context.SaveChanges();
+            return usuario;
         }
     }
 }

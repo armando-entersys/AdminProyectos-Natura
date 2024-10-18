@@ -19,7 +19,7 @@ namespace PresentationLayer.Controllers
         {
             try
             {
-                _emailSender.SendEmailAsync(_toEmails, _category, dynamicValues);
+                _emailSender.SendEmail(_toEmails, _category, dynamicValues);
                 return Ok("Correo enviado.");
                 return Ok(new { mensaje = "Correos enviados exitosamente" });
             }
