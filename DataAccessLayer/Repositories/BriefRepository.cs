@@ -112,6 +112,10 @@ namespace DataAccessLayer.Repositories
         {
             return _context.TiposBrief.ToList();
         }
+        public IEnumerable<ClasificacionProyecto> GetAllClasificacionProyecto()
+        {
+            return _context.clasificacionProyectos.Where(q => q.Estatus == true).ToList();
+        }
         public void InsertProyecto(Proyecto entity)
         {
             _context.Set<Proyecto>().Add(entity);
@@ -121,6 +125,15 @@ namespace DataAccessLayer.Repositories
         {
             _context.Set<Material>().Add(entity);
             _context.SaveChanges();
+        }
+        public Proyecto GetProyectoByBriefId(int id)
+        {
+            return _context.Proyectos.Where(q => q.BriefId == id).FirstOrDefault();
+        }
+
+        public List<Material> GetMaterialesByBriefId(int id)
+        {
+            return _context.Materiales.Where(q => q.BriefId == id).ToList();
         }
     }
 }

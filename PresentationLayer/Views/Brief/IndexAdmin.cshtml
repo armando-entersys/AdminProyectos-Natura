@@ -6,10 +6,7 @@
 <h1 class="py-3">Proyecto</h1>
 <div class="row py-3">
     <div class="col" data-bind="visible:isRoleVisible([2])">
-        <button type="button" class="btn btn-outline-primary" data-bind="click:Agregar">
-            <i class="lni circle-plus"></i>
-            <span>Agregar Brief</span>
-        </button>
+       
     </div>
     <div class="col">
     </div>
@@ -114,54 +111,54 @@
                         <div id="formularioAdmin" class="p-3">
                             <h1>Panel Edición Administrador</h1>
 
-                            <div class="mb-3" data-bind="validationElement: EstatusBrief">
+                            <div class="mb-3" data-bind="validationElement: ClasificacionProyecto">
                                 <label class="col-form-label">Clasificación:</label>
-                                <select class="form-control" data-bind="options: catEstatusBrief, value: EstatusBrief, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                                <select class="form-control" data-bind="options: catClasificacionProyecto, value: ClasificacionProyecto, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
                             </div>
-                            <div class="mb-3" data-bind="validationElement: comentarios">
+                            <div class="mb-3" data-bind="validationElement: comentarioProyecto">
                                 <label for="recipient-name" class="col-form-label">Comentario:</label>
-                                <input type="text" class="form-control" id="comentario" maxlength="128" data-bind="value: comentario">
+                                <input type="text" class="form-control" id="comentarioProyecto" maxlength="128" data-bind="value: comentarioProyecto">
                             </div>
                             <div class="mb-3" data-bind="validationElement: planComunicacion">
                                 <label for="recipient-name" class="col-form-label">Requiere Plan de Comunicación:</label>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
-                                    <label class="form-check-label" for="inlineRadio1">Sí</label>
+                                    <input class="form-check-input" type="radio" name="planComunicacionOptions" id="planComunicacion1" value="Ciclal Regional" data-bind="checked: planComunicacion">
+                                    <label class="form-check-label" for="planComunicacion1">Sí</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
-                                    <label class="form-check-label" for="inlineRadio2">No</label>
+                                    <input class="form-check-input" type="radio" name="planComunicacionOptions" id="planComunicacion2" value="Ciclal Local" data-bind="checked: planComunicacion">
+                                    <label class="form-check-label" for="planComunicacion2">No</label>
                                 </div>
                             </div>
                             <div class="mb-3" data-bind="validationElement: determinarEstado">
                                 <label for="recipient-name" class="col-form-label">Determinar Estado:</label>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="option1">
-                                    <label class="form-check-label" for="inlineRadio1">Ciclal Regional</label>
+                                    <input class="form-check-input" type="radio" name="determinarEstadoOptions" id="determinarEstado1" value="Ciclal Regional" data-bind="checked: determinarEstado">
+                                    <label class="form-check-label" for="determinarEstado1">Ciclal Regional</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2">
-                                    <label class="form-check-label" for="inlineRadio2">Ciclal Local</label>
+                                    <input class="form-check-input" type="radio" name="determinarEstadoOptions" id="determinarEstado2" value="Ciclal Local" data-bind="checked: determinarEstado">
+                                    <label class="form-check-label" for="determinarEstado2">Ciclal Local</label>
                                 </div>
                             </div>
                             <div class="mb-3" data-bind="validationElement: fechaPublicacion">
                                 <label for="recipient-name" class="col-form-label">Fecha Publicacion:</label>
                                 <input type="date" class="form-control" id="fechaEntrega" maxlength="128" data-bind="value: fechaPublicacion">
                             </div>
-                            <button type="button" class="btn btn-primary" data-bind="click:Guardar">
+                            <button type="button" class="btn btn-primary" data-bind="click:GuardarProyecto">
                                 <i class="lni lni-save"></i>
                                 <span>Guardar</span>
                             </button>
                         </div>
                         <div id="formularioMateriales"  class="p-3">
                             <h1>Asignar Material</h1>
-                            <div class="mb-3" data-bind="validationElement: proyecto">
-                                <label for="recipient-name" class="col-form-label">Proyecto:</label>
-                                <input type="text" class="form-control" id="comentario" maxlength="128" data-bind="value: proyecto">
+                            <div class="mb-3" data-bind="validationElement: nombreMaterial">
+                                <label for="recipient-name" class="col-form-label">Nombre:</label>
+                                <input type="text" class="form-control" id="nombreMaterial" maxlength="128" data-bind="value: nombreMaterial">
                             </div>
                             <div class="mb-3" data-bind="validationElement: mensaje">
                                 <label for="recipient-name" class="col-form-label">Mensaje:</label>
-                                <input type="text" class="form-control" id="comentario" maxlength="128" data-bind="value: mensaje">
+                                <input type="text" class="form-control" id="mensaje" maxlength="128" data-bind="value: mensaje">
                             </div>
                             <div class="mb-3" data-bind="validationElement: prioridad">
                                 <label class="col-form-label">Prioridad:</label>

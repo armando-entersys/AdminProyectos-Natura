@@ -20,6 +20,8 @@ namespace DataAccessLayer.Context
         public DbSet<TipoBrief> TiposBrief { get; set; }
         public DbSet<Material> Materiales { get; set; }
         public DbSet<Proyecto> Proyectos { get; set; }
+        public DbSet<ClasificacionProyecto> clasificacionProyectos { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -68,6 +70,13 @@ namespace DataAccessLayer.Context
                 .HasOne(p => p.Brief)
                 .WithOne(b => b.Proyecto)
                 .HasForeignKey<Proyecto>(p => p.BriefId);
+
+            modelBuilder.Entity<Proyecto>()
+            .HasOne(p => p.ClasificacionProyecto)
+            .WithMany(c => c.Proyectos)
+            .HasForeignKey(p => p.ClasificacionProyectoId);
+
+            base.OnModelCreating(modelBuilder);
 
             base.OnModelCreating(modelBuilder);
         }

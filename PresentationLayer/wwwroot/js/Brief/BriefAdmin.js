@@ -67,12 +67,17 @@ function AppViewModel() {
     self.EstatusBrief = ko.observable().extend({ required: true });
     self.catTipoBrief = ko.observableArray();
     self.TipoBrief = ko.observable().extend({ required: true });
+    self.catClasificacionProyecto = ko.observableArray();
+    self.ClasificacionProyecto = ko.observable().extend({ required: true });
+    
     self.cargaArchivo = ko.observable().extend({ required: true });
     self.registros = ko.observableArray();
     self.planComunicacion = ko.observable();
+
     self.determinarEstado = ko.observable();
     self.fechaPublicacion = ko.observable();
-    self.proyecto = ko.observable();
+    self.nombreMaterial = ko.observable();
+
     self.mensaje = ko.observable();
     self.catPrioridad = ko.observableArray();
     self.prioridad = ko.observable();
@@ -89,8 +94,11 @@ function AppViewModel() {
     self.produccion = ko.observable();
     self.respondable = ko.observable();
 
-
-
+    self.determinarEstado = ko.observable();
+    self.planComunicacion = ko.observable();
+    self.fechaPublicacion = ko.observable();
+    self.comentarioProyecto = ko.observable();
+   
     self.inicializar = function () {
         $.ajax({
             url: "/Brief/GetAllColumns", // URL del método GetAll en tu API
@@ -137,8 +145,21 @@ function AppViewModel() {
 
                                 self.catAudiencia.removeAll();
                                 self.catAudiencia.push.apply(self.catAudiencia, catAudiencia);
-                                
-                                $("#divEdicion").modal("hide");
+                                $.ajax({
+                                    url: "/Brief/GetAllClasificacionProyecto", // URL del método GetAll en tu API
+                                    type: "GET",
+                                    contentType: "application/json",
+                                    success: function (d) {
+                                        self.catClasificacionProyecto.removeAll();
+                                        self.catClasificacionProyecto.push.apply(self.catClasificacionProyecto, d.datos.$values);
+                                        $("#divEdicion").modal("hide");
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.error("Error al obtener los datos: ", error);
+                                        alert("Error al obtener los datos: " + xhr.responseText);
+                                    }
+                                });
+                         
                             },
                             error: function (xhr, status, error) {
                                 console.error("Error al obtener los datos: ", error);
@@ -160,6 +181,41 @@ function AppViewModel() {
     };
 
     self.inicializar();
+    self.Editar = function (brief) {
+        self.Limpiar();
+
+        self.id(brief.id);
+        $.ajax({
+            url: "/Brief/Details/" + self.id(), // URL del método GetAll en tu API
+            type: "GET",
+            contentType: "application/json",
+            success: function (d) {
+                self.nombre(d.datos.nombre);
+                self.descripcion(d.datos.descripcion);
+                self.objetivo(d.datos.objetivo);
+                self.dirigidoA(d.datos.dirigidoA);
+                self.comentario(d.datos.comentario);
+                self.rutaArchivo(d.datos.rutaArchivo);
+                self.fechaEntrega(new Date(d.datos.fechaEntrega).toISOString().split('T')[0]);
+
+                var EstatusBrief = self.catEstatusBrief().find(function (r) {
+                    return r.id === d.datos.estatusBriefId;
+                });
+                self.EstatusBrief(EstatusBrief);
+                var TipoBrief = self.catTipoBrief().find(function (r) {
+                    return r.id === d.datos.tipoBriefId;
+                });
+                self.TipoBrief(TipoBrief);
+
+                $("#divEdicion").modal("show");
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al obtener los datos: ", error);
+                alert("Error al obtener los datos: " + xhr.responseText);
+            }
+        });
+
+    }
 
     // Método para comprobar si el rol actual coincide con el pasado
     self.isRoleVisible = function (allowedRoles) {
@@ -216,20 +272,6 @@ function AppViewModel() {
             }
         }
     };
-    self.Agregar = function () {
-
-        $("#divEdicion").modal("show");
-
-    }
-    self.Guardar = function () {
-        if (self.id() === 0) {
-            self.GuardarNuevo();
-        }
-        else {
-            self.GuardarEditar();
-        }
-
-    }
     self.Limpiar = function () {
         self.id(0);
         self.nombre("");
@@ -242,75 +284,31 @@ function AppViewModel() {
         self.rutaArchivo("");
         self.cargaArchivo("");
     }
-    self.Editar = function (brief) {
-        self.Limpiar();
-       
-        self.id(brief.id);
-        $.ajax({
-            url: "/Brief/Details/" + self.id(), // URL del método GetAll en tu API
-            type: "GET",
-            contentType: "application/json",
-            success: function (d) {
-                self.nombre(d.datos.nombre);
-                self.descripcion(d.datos.descripcion);
-                self.objetivo(d.datos.objetivo);
-                self.dirigidoA(d.datos.dirigidoA);
-                self.comentario(d.datos.comentario);
-                self.rutaArchivo(d.datos.rutaArchivo);
-                self.fechaEntrega(new Date(d.datos.fechaEntrega).toISOString().split('T')[0]);
-
-                var EstatusBrief = self.catEstatusBrief().find(function (r) {
-                    return r.id === d.datos.estatusBriefId;
-                });
-                self.EstatusBrief(EstatusBrief);
-                var TipoBrief = self.catTipoBrief().find(function (r) {
-                    return r.id === d.datos.tipoBriefId;
-                });
-                self.TipoBrief(TipoBrief);
-
-                $("#divEdicion").modal("show");
-            },
-            error: function (xhr, status, error) {
-                console.error("Error al obtener los datos: ", error);
-                alert("Error al obtener los datos: " + xhr.responseText);
-            }
-        });
-
- 
-
-       
-    }
-    self.GuardarEditar = function () {
-        var formData = new FormData();
-
-        formData.append("Id", self.id());
-        formData.append("Nombre", self.nombre());
-        formData.append("Descripcion", self.descripcion());
-        formData.append("Objetivo", self.objetivo());
-        formData.append("DirigidoA", self.dirigidoA());
-        formData.append("Comentario", self.comentario());
-        formData.append("FechaEntrega", self.fechaEntrega());
-        formData.append("EstatusBriefId", self.EstatusBrief().id);
-        formData.append("TipoBriefId", self.TipoBrief().id);
-
-        // Solo agregar el archivo si se ha seleccionado uno
-        if (self.cargaArchivo()) {
-            formData.append("Archivo", self.cargaArchivo());
+    self.GuardarProyecto = function () {
+        var PlanComunicacion = false;
+        if (self.determinarEstado() === "Sí") {
+            PlanComunicacion = true;
         }
-
+        var proyecto = {
+            BriefId: self.id(),
+            EstatusBriefId: self.EstatusBrief().id,
+            ClasificacionProyectoId: self.ClasificacionProyecto().id,
+            Comentario: self.comentarioProyecto(),
+            Estado: self.determinarEstado(),
+            RequierePlan: PlanComunicacion,
+            FechaPublicacion: self.fechaPublicacion()
+        };
+       
+       
         $.ajax({
-            url: "/Brief/EditBrief", // URL del método GetAll en tu API
+            url: "/Brief/CreateProyecto",
             type: "POST",
-            contentType: false,  // Important to avoid jQuery processing data
-            processData: false,  // Important to avoid jQuery processing data
-            data: formData,
+            contentType: "application/json",  // Cambiado a JSON
+            data: JSON.stringify(proyecto),  // Convertir a JSON
             success: function (d) {
                 self.inicializar();
                 $("#divEdicion").modal("hide");
                 $('#alertMessage').text(d.mensaje);
-                $('#alertModalLabel').text("Success");
-                $("#alertModal").modal("show");
-                self.Limpiar();
             },
             error: function (xhr, status, error) {
                 console.error("Error al obtener los datos: ", error);
@@ -320,26 +318,24 @@ function AppViewModel() {
             }
         });
     }
-    self.GuardarNuevo = function () {
-       
-        var formData = new FormData();
-       
-        formData.append("Nombre", self.nombre());
-        formData.append("Descripcion", self.descripcion());
-        formData.append("Objetivo", self.objetivo());
-        formData.append("DirigidoA", self.dirigidoA());
-        formData.append("Comentario", self.comentario());
-        formData.append("FechaEntrega", self.fechaEntrega());
-        formData.append("EstatusBriefId", self.EstatusBrief().id);
-        formData.append("TipoBriefId", self.TipoBrief().id);
+    self.GuardarMaterial = function () {
 
-        // Solo agregar el archivo si se ha seleccionado uno
-        if (self.cargaArchivo()) {
-            formData.append("Archivo", self.cargaArchivo());
-        }
-       
+        var formData = new FormData();
+        formData.append("BriefId", self.id().id);
+        formData.append("Nombre", self.nombreMaterial());
+        formData.append("Mensaje", self.mensaje());
+        formData.append("PrioridadId", self.prioridad().id);
+        formData.append("Ciclo", self.ciclo());
+        formData.append("PCNId", self.pcn().id);
+        formData.append("AudienciaId", self.audiencia().id);
+        formData.append("FormatoId", self.formato().id);
+        formData.append("FechaEntrega", self.fechaEntrega());
+        formData.append("Proceso", self.proceso());
+        formData.append("Produccion", self.produccion());
+        formData.append("Responsable", self.responsable());
+
         $.ajax({
-            url: "/Brief/EditBrief", // URL del método GetAll en tu API
+            url: "/Brief/CreateMaterial", // URL del método GetAll en tu API
             type: "POST",
             contentType: false,  // Important to avoid jQuery processing data
             processData: false,  // Important to avoid jQuery processing data

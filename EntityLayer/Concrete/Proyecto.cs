@@ -11,7 +11,6 @@ namespace EntityLayer.Concrete
     {
         public int Id { get; set; }
         public int BriefId { get; set; }
-        public int ClasificaciónId { get; set; }
         public string Comentario { get; set; }
         public bool RequierePlan { get; set; }
         public  string  Estado { get; set; }
@@ -21,5 +20,11 @@ namespace EntityLayer.Concrete
 
         // Propiedad de navegación a Brief (relación uno a uno)
         public Brief Brief { get; set; }
+
+        // Foreign key for ClasificacionProyecto
+        public int ClasificacionProyectoId { get; set; }
+
+        // Navigation property
+        public ClasificacionProyecto ClasificacionProyecto { get; set; }
     }
 }

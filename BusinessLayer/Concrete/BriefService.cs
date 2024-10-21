@@ -65,5 +65,20 @@ namespace BusinessLayer.Concrete
             _briefDal.InsertMaterial(entity);
             
         }
+
+        public Proyecto GetProyectoByBriefId(int id)
+        {
+            return _briefDal.GetProyectoByBriefId(id);
+        }
+
+        public List<Material> GetMaterialesByBriefId(int id)
+        {
+            return _briefDal.GetMaterialesByBriefId(id);
+        }
+
+        public IEnumerable<ClasificacionProyecto> GetAllClasificacionProyecto()
+        {
+            return _briefDal.GetAllClasificacionProyecto();
+        }
     }
 }

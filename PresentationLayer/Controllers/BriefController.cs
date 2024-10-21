@@ -328,6 +328,16 @@ namespace PresentationLayer.Controllers
 
             return Ok(res);
         }
+        [HttpGet]
+        public IActionResult GetAllClasificacionProyecto()
+        {
+            respuestaServicio res = new respuestaServicio();
+            res.Datos = _briefService.GetAllClasificacionProyecto();
+            res.Exito = true;
+
+
+            return Ok(res);
+        }
 
         [HttpPost]
         public ActionResult CreateProyecto([FromBody] Proyecto proyecto)
@@ -338,6 +348,7 @@ namespace PresentationLayer.Controllers
             try
             {
                 _briefService.InsertProyecto(proyecto);
+                res.Datos = _briefService.GetProyectoByBriefId(proyecto.BriefId);
                 res.Mensaje = "Creado exitosamente";
                 res.Exito = true;
             }
@@ -348,6 +359,46 @@ namespace PresentationLayer.Controllers
             }
             
             return Ok(res);
+        }
+        [HttpPost]
+        public ActionResult CreateMaterial([FromBody] Material material)
+        {
+            respuestaServicio res = new respuestaServicio();
+
+            material.FechaModificacion = DateTime.Now;
+            try
+            {
+                _briefService.InsertMaterial(material);
+                res.Mensaje = "Creado exitosamente";
+                res.Exito = true;
+            }
+            catch (Exception ex)
+            {
+                res.Mensaje = "Error al Crear el Usuario";
+                res.Exito = false;
+            }
+
+            return Ok(res);
+        }
+        public ActionResult ObtenerProyecto(int id)
+        {
+            respuestaServicio res = new respuestaServicio();
+            var proyecto = _briefService.GetProyectoByBriefId(id);
+            res.Datos = proyecto;
+            res.Exito = true;
+
+            return Ok(res);
+
+        }
+        public ActionResult ObtenerMateriales(int id)
+        {
+            respuestaServicio res = new respuestaServicio();
+            var materiales = _briefService.GetMaterialesByBriefId(id);
+            res.Datos = materiales;
+            res.Exito = true;
+
+            return Ok(res);
+
         }
     }
 }

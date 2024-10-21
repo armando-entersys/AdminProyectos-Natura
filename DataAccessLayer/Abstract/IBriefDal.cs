@@ -18,7 +18,10 @@ namespace DataAccessLayer.Abstract
         void Update(Brief entity);
         IEnumerable<EstatusBrief> GetAllEstatusBrief();
         IEnumerable<TipoBrief> GetAllTipoBrief();
+        IEnumerable<ClasificacionProyecto> GetAllClasificacionProyecto();
         void InsertProyecto(Proyecto entity);
         void InsertMaterial(Material entity);
+        Proyecto GetProyectoByBriefId(int id);
+        List<Material> GetMaterialesByBriefId(int id);
     }
 }
