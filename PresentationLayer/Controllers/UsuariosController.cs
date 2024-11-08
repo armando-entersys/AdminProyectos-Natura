@@ -157,12 +157,12 @@ namespace PresentationLayer.Controllers
             var resp =_authService.SolicitudUsuario(usuario);
             if(!resp.Exito)
             {
-                ViewData["Mensaje"] = resp.Mensaje;
+                TempData["Mensaje"] = resp.Mensaje;
                 return RedirectToAction("Registro", "Login");
             }
             else
             {
-                ViewData["Mensaje"] = resp.Mensaje;
+                TempData["Mensaje"] = resp.Mensaje;
                 return RedirectToAction("Index", "Login");
             }
            
@@ -195,6 +195,56 @@ namespace PresentationLayer.Controllers
             TempData["MensajeExito"] = "La contraseña ha sido actualizada exitosamente.";
             return RedirectToAction("CambioContrasena", "Login");
             
+        }
+        [HttpPost]
+        public ActionResult BuscarUsuario([FromBody] Usuario usuario)
+        {
+            respuestaServicio res = new respuestaServicio();
+            var usuarios = _toolService.BuscarUsuario(usuario.Nombre.ToUpper());
+            res.Datos = usuarios;
+            res.Exito = true;
+            return Ok(res);
+        }
+        // GET: BriefController/ObtenerParticipantes/5
+        public ActionResult ObtenerParticipantes(int id)
+        {
+            respuestaServicio res = new respuestaServicio();
+
+            try
+            {
+                res.Datos = _toolService.ObtenerParticipantes(id);
+                res.Mensaje = "Solicitud Exitosa";
+                res.Exito = true;
+            }
+            catch (Exception ex)
+            {
+                res.Mensaje = "Petición fallida";
+                res.Exito = false;
+            }
+            return Ok(res);
+
+        }
+        [HttpPost]
+        public ActionResult AgregarParticipante([FromBody] Participante participante)
+        {
+            respuestaServicio res = new respuestaServicio();
+
+            try
+            {
+                var participanteBD = _toolService.AgregarParticipante(participante);
+                participante.Usuario = _usuarioService.TGetById(participante.UsuarioId);
+
+                res.Datos = participanteBD;
+                res.Mensaje = "Creado exitosamente";
+                res.Exito = true;
+            }
+            catch (Exception ex)
+            {
+                res.Mensaje = "Error al Crear el Usuario";
+                res.Exito = false;
+            }
+
+            return Ok(res);
         }
 
     }

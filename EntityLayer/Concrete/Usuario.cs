@@ -28,6 +28,8 @@ namespace EntityLayer.Concrete
         public bool SolicitudRegistro { get; set; }
         // Colección de Briefs asociados con el Usuario
         public ICollection<Brief> Briefs { get; set; }
+        // Nueva colección para Participantes
+        public ICollection<Participante> Participantes { get; set; } // Nueva colección
 
     }
 }

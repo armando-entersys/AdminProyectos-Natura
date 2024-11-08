@@ -96,7 +96,7 @@ namespace PresentationLayer.Controllers
 
 
             return Ok(res);
-        
+
         }
         [HttpGet]
         public IActionResult DownloadFile(int id)
@@ -144,8 +144,8 @@ namespace PresentationLayer.Controllers
 
             brief.FechaModificacion = DateTime.Now;
             brief.FechaRegistro = DateTime.Now;
-        
-           // _emailSender.SendEmailAsync(usuario.Correo, "Bienvenido a Administrador de Proyectos", "<h1>Gracias por unirte a MyApp</h1>");
+
+            // _emailSender.SendEmailAsync(usuario.Correo, "Bienvenido a Administrador de Proyectos", "<h1>Gracias por unirte a MyApp</h1>");
             res.Mensaje = "Brief agregado exitosamente";
             res.Exito = true;
             return Ok(res);
@@ -220,18 +220,19 @@ namespace PresentationLayer.Controllers
 
             _briefService.Insert(brief);
             //Envio Correo
-            
+
             // Diccionario con los valores dinámicos a reemplazar
             var valoresDinamicos = new Dictionary<string, string>()
             {
                 { "nombre", User.FindFirst(ClaimTypes.Name)?.Value },
-                { "nombreBreaf", brief.Nombre }
+                { "nombreBreaf", brief.Nombre },
+                { "link", brief.Id.ToString() }
             };
-            var Destinatarios = _toolsService.GetUsuarioByRol(1).Select(q=> q.Correo).ToList();
+            var Destinatarios = _toolsService.GetUsuarioByRol(1).Select(q => q.Correo).ToList();
 
-            _emailSender.SendEmail(Destinatarios, "NuevoBreaf", valoresDinamicos);
+            _emailSender.SendEmail(Destinatarios, "NuevoProyecto", valoresDinamicos);
 
-           
+
             res.Datos = brief;
             res.Mensaje = "Se ha recibido correctamente tu solicitud. En breve recibirás una notificación del estatus de tu solicitud.";
             res.Exito = true;
@@ -300,7 +301,7 @@ namespace PresentationLayer.Controllers
 
 
             res.Datos = brief;
-            res.Mensaje = "Se ha recibido correctamente tu solicitud. En breve recibirás una notificación del estatus de tu solicitud.";
+            res.Mensaje = "Se ha recibido correctamente tu solicitud.";
             res.Exito = true;
 
             return Ok(res);
@@ -357,7 +358,7 @@ namespace PresentationLayer.Controllers
                 res.Mensaje = "Error al Crear el Usuario";
                 res.Exito = false;
             }
-            
+
             return Ok(res);
         }
         [HttpPost]
@@ -366,21 +367,34 @@ namespace PresentationLayer.Controllers
             respuestaServicio res = new respuestaServicio();
 
             material.FechaModificacion = DateTime.Now;
+            material.EstatusMaterialId = 1;
             try
             {
                 _briefService.InsertMaterial(material);
+                var brief = _briefService.GetById(material.BriefId);
+                Alerta alertaUsuario = new Alerta
+                {
+                    IdUsuario = brief.Id,
+                    Nombre = "Nuevo Material",
+                    Descripcion = "Se agrego un material al brief " + brief.Nombre
+
+                };
+
+                _toolsService.CrearAlerta(alertaUsuario);
+
                 res.Mensaje = "Creado exitosamente";
                 res.Exito = true;
             }
             catch (Exception ex)
             {
-                res.Mensaje = "Error al Crear el Usuario";
+                res.Mensaje = "Error al Crear el Material";
                 res.Exito = false;
             }
 
             return Ok(res);
         }
-        public ActionResult ObtenerProyecto(int id)
+        [HttpGet]
+        public ActionResult ObtenerProyectoPorBrief(int id)
         {
             respuestaServicio res = new respuestaServicio();
             var proyecto = _briefService.GetProyectoByBriefId(id);
@@ -390,6 +404,7 @@ namespace PresentationLayer.Controllers
             return Ok(res);
 
         }
+        [HttpGet]
         public ActionResult ObtenerMateriales(int id)
         {
             respuestaServicio res = new respuestaServicio();
@@ -399,6 +414,146 @@ namespace PresentationLayer.Controllers
 
             return Ok(res);
 
+        }
+        [HttpGet]
+        public ActionResult EliminarMaterial(int id)
+        {
+            respuestaServicio res = new respuestaServicio();
+            
+            try
+            {
+                _briefService.EliminarMaterial(id);
+                res.Exito = true;
+            }
+            catch (Exception ex)
+            {
+                res.Mensaje = "Error al remover el Material";
+                res.Exito = false;
+            }
+            return Ok(res);
+
+        }
+        [HttpGet]
+        public ActionResult EliminarParticipante(int id)
+        {
+            respuestaServicio res = new respuestaServicio();
+
+            try
+            {
+                _briefService.EliminarParticipante(id);
+                res.Exito = true;
+            }
+            catch (Exception ex)
+            {
+                res.Mensaje = "Error al remover el Participante";
+                res.Exito = false;
+            }
+            return Ok(res);
+
+        }
+
+        [HttpGet]
+        public ActionResult ObtenerConteoPorProyectos()
+        {
+            respuestaServicio res = new respuestaServicio();
+
+            try
+           {
+                var UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+                res.Datos =_briefService.ObtenerConteoProyectos(UsuarioId);
+                res.Mensaje = "Solicitud Exitosa";
+                res.Exito = true;
+            }
+            catch (Exception ex)
+            {
+                res.Mensaje = "Petición fallida";
+                res.Exito = false;
+            }
+            return Ok(res);
+
+        }
+        [HttpGet]
+        public ActionResult ObtenerConteoMateriales()
+        {
+            respuestaServicio res = new respuestaServicio();
+
+            try
+            {
+                var UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+                res.Datos = _briefService.ObtenerConteoMateriales(UsuarioId);
+                res.Mensaje = "Solicitud Exitosa";
+                res.Exito = true;
+            }
+            catch (Exception ex)
+            {
+                res.Mensaje = "Petición fallida";
+                res.Exito = false;
+            }
+            return Ok(res);
+
+        }
+        [HttpGet]
+        public ActionResult ObtenerConteoProyectoFecha()
+        {
+            respuestaServicio res = new respuestaServicio();
+
+            try
+            {
+                var UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+                res.Datos = _briefService.ObtenerConteoProyectoFecha(UsuarioId);
+                res.Mensaje = "Solicitud Exitosa";
+                res.Exito = true;
+            }
+            catch (Exception ex)
+            {
+                res.Mensaje = "Petición fallida";
+                res.Exito = false;
+            }
+            return Ok(res);
+
+        }
+        [HttpGet]
+        public IActionResult GetAllPrioridad()
+        {
+            respuestaServicio res = new respuestaServicio();
+            var data = _briefService.GetAllPrioridades();
+            res.Datos = data;
+            res.Exito = true;
+
+            return Ok(res);
+        }
+        [HttpGet]
+        public IActionResult GetAllAudiencias()
+        {
+            respuestaServicio res = new respuestaServicio();
+            var data = _briefService.GetAllAudiencias();
+            res.Datos = data;
+            res.Exito = true;
+
+            return Ok(res);
+        }
+        [HttpGet]
+        public IActionResult GetAllPCN()
+        {
+            respuestaServicio res = new respuestaServicio();
+            var data = _briefService.GetAllPCN();
+            res.Datos = data;
+            res.Exito = true;
+
+            return Ok(res);
+        }
+        [HttpGet]
+        public IActionResult GetAllFormatos()
+        {
+            respuestaServicio res = new respuestaServicio();
+            var data = _briefService.GetAllFormatos();
+            res.Datos = data;
+            res.Exito = true;
+
+            return Ok(res);
         }
     }
 }

@@ -13,5 +13,14 @@ namespace BusinessLayer.Abstract
         IEnumerable<Usuario> GetUsuarioByRol(int rolId);
         IEnumerable<Usuario> GetUsuarioBySolicitud();
         respuestaServicio CambioSolicitud(int id, bool estatus);
+        IEnumerable<Alerta> ObtenerAlertaUsuario(int id);
+        IEnumerable<Usuario> BuscarUsuario(string nombre);
+        Participante AgregarParticipante(Participante _participante);
+        List<Participante> ObtenerParticipantes(int BriefId);
+        List<Alerta> ObtenerAlertas(int IdUsuario);
+        Alerta CrearAlerta(Alerta alerta);
+        int ConteoAlertas(int IdUsuario);
+        List<TipoAlerta> ObtenerTiposAlerta();
+        void UpdateAlerta(int Id);
     }
 }

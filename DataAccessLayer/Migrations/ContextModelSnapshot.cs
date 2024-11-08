@@ -41,6 +41,9 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("IdTipoAlerta")
+                        .HasColumnType("int");
+
                     b.Property<int>("IdUsuario")
                         .HasColumnType("int");
 
@@ -53,7 +56,29 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IdTipoAlerta");
+
                     b.ToTable("Alertas");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.Audiencia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Audiencia");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.Brief", b =>
@@ -94,6 +119,10 @@ namespace DataAccessLayer.Migrations
                     b.Property<DateTime>("FechaRegistro")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("LinksReferencias")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -164,6 +193,72 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("EstatusBriefs");
                 });
 
+            modelBuilder.Entity("EntityLayer.Concrete.EstatusMaterial", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("EstatusMateriales");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.Formato", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Formato");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.HistorialMaterial", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Comentarios")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaRegistro")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MaterialId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("archivos")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MaterialId");
+
+                    b.ToTable("HistorialMateriales");
+                });
+
             modelBuilder.Entity("EntityLayer.Concrete.Material", b =>
                 {
                     b.Property<int>("Id")
@@ -181,6 +276,9 @@ namespace DataAccessLayer.Migrations
                     b.Property<string>("Ciclo")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EstatusMaterialId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("FechaEntrega")
                         .HasColumnType("datetime2");
@@ -222,7 +320,17 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AudienciaId");
+
                     b.HasIndex("BriefId");
+
+                    b.HasIndex("EstatusMaterialId");
+
+                    b.HasIndex("FormatoId");
+
+                    b.HasIndex("PCNId");
+
+                    b.HasIndex("PrioridadId");
 
                     b.ToTable("Materiales");
                 });
@@ -258,6 +366,69 @@ namespace DataAccessLayer.Migrations
                     b.HasIndex("RolId");
 
                     b.ToTable("Menus");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.Participante", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("BriefId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BriefId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("Participantes");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.PCN", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PCN");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.Prioridad", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Prioridad");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.Proyecto", b =>
@@ -304,6 +475,31 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("Proyectos");
                 });
 
+            modelBuilder.Entity("EntityLayer.Concrete.RetrasoMaterial", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Comentario")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MaterialId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MotivoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MaterialId");
+
+                    b.ToTable("RetrasoMateriales");
+                });
+
             modelBuilder.Entity("EntityLayer.Concrete.Rol", b =>
                 {
                     b.Property<int>("Id")
@@ -319,6 +515,23 @@ namespace DataAccessLayer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.TipoAlerta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TipoAlerta");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.TipoBrief", b =>
@@ -395,6 +608,17 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("Usuarios");
                 });
 
+            modelBuilder.Entity("EntityLayer.Concrete.Alerta", b =>
+                {
+                    b.HasOne("EntityLayer.Concrete.TipoAlerta", "TipoAlerta")
+                        .WithMany("Alertas")
+                        .HasForeignKey("IdTipoAlerta")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TipoAlerta");
+                });
+
             modelBuilder.Entity("EntityLayer.Concrete.Brief", b =>
                 {
                     b.HasOne("EntityLayer.Concrete.EstatusBrief", "EstatusBrief")
@@ -422,15 +646,66 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("Usuario");
                 });
 
+            modelBuilder.Entity("EntityLayer.Concrete.HistorialMaterial", b =>
+                {
+                    b.HasOne("EntityLayer.Concrete.Material", "Material")
+                        .WithMany("Historiales")
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Material");
+                });
+
             modelBuilder.Entity("EntityLayer.Concrete.Material", b =>
                 {
+                    b.HasOne("EntityLayer.Concrete.Audiencia", "Audiencia")
+                        .WithMany("Materiales")
+                        .HasForeignKey("AudienciaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("EntityLayer.Concrete.Brief", "Brief")
                         .WithMany("Materiales")
                         .HasForeignKey("BriefId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("EntityLayer.Concrete.EstatusMaterial", "EstatusMaterial")
+                        .WithMany()
+                        .HasForeignKey("EstatusMaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EntityLayer.Concrete.Formato", "Formato")
+                        .WithMany("Materiales")
+                        .HasForeignKey("FormatoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EntityLayer.Concrete.PCN", "PCN")
+                        .WithMany("Materiales")
+                        .HasForeignKey("PCNId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EntityLayer.Concrete.Prioridad", "Prioridad")
+                        .WithMany("Materiales")
+                        .HasForeignKey("PrioridadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Audiencia");
+
                     b.Navigation("Brief");
+
+                    b.Navigation("EstatusMaterial");
+
+                    b.Navigation("Formato");
+
+                    b.Navigation("PCN");
+
+                    b.Navigation("Prioridad");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.Menu", b =>
@@ -442,6 +717,25 @@ namespace DataAccessLayer.Migrations
                         .IsRequired();
 
                     b.Navigation("Rol");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.Participante", b =>
+                {
+                    b.HasOne("EntityLayer.Concrete.Brief", "Brief")
+                        .WithMany()
+                        .HasForeignKey("BriefId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EntityLayer.Concrete.Usuario", "Usuario")
+                        .WithMany("Participantes")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Brief");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.Proyecto", b =>
@@ -463,6 +757,17 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("ClasificacionProyecto");
                 });
 
+            modelBuilder.Entity("EntityLayer.Concrete.RetrasoMaterial", b =>
+                {
+                    b.HasOne("EntityLayer.Concrete.Material", "Material")
+                        .WithMany("Retrasos")
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Material");
+                });
+
             modelBuilder.Entity("EntityLayer.Concrete.Usuario", b =>
                 {
                     b.HasOne("EntityLayer.Concrete.Rol", "UserRol")
@@ -472,6 +777,11 @@ namespace DataAccessLayer.Migrations
                         .IsRequired();
 
                     b.Navigation("UserRol");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.Audiencia", b =>
+                {
+                    b.Navigation("Materiales");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.Brief", b =>
@@ -492,11 +802,38 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("Briefs");
                 });
 
+            modelBuilder.Entity("EntityLayer.Concrete.Formato", b =>
+                {
+                    b.Navigation("Materiales");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.Material", b =>
+                {
+                    b.Navigation("Historiales");
+
+                    b.Navigation("Retrasos");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.PCN", b =>
+                {
+                    b.Navigation("Materiales");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.Prioridad", b =>
+                {
+                    b.Navigation("Materiales");
+                });
+
             modelBuilder.Entity("EntityLayer.Concrete.Rol", b =>
                 {
                     b.Navigation("Menus");
 
                     b.Navigation("Usuarios");
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.TipoAlerta", b =>
+                {
+                    b.Navigation("Alertas");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.TipoBrief", b =>
@@ -507,6 +844,8 @@ namespace DataAccessLayer.Migrations
             modelBuilder.Entity("EntityLayer.Concrete.Usuario", b =>
                 {
                     b.Navigation("Briefs");
+
+                    b.Navigation("Participantes");
                 });
 #pragma warning restore 612, 618
         }

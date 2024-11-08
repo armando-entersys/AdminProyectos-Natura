@@ -21,6 +21,18 @@ namespace DataAccessLayer.Context
         public DbSet<Material> Materiales { get; set; }
         public DbSet<Proyecto> Proyectos { get; set; }
         public DbSet<ClasificacionProyecto> clasificacionProyectos { get; set; }
+        public DbSet<Participante> Participantes { get; set; }
+        public DbSet<EstatusMaterial> EstatusMateriales { get; set; }
+        public DbSet<TipoAlerta> TipoAlerta { get; set; }
+        public DbSet<RetrasoMaterial> RetrasoMateriales { get; set; }
+        public DbSet<HistorialMaterial> HistorialMateriales { get; set; }
+        public DbSet<Prioridad> Prioridad { get; set; }
+        public DbSet<PCN> PCN { get; set; }
+        public DbSet<Audiencia> Audiencia { get; set; }
+        public DbSet<Formato> Formato { get; set; }
+
+
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -76,9 +88,63 @@ namespace DataAccessLayer.Context
             .WithMany(c => c.Proyectos)
             .HasForeignKey(p => p.ClasificacionProyectoId);
 
-            base.OnModelCreating(modelBuilder);
+            // Configuración de la relación
+            modelBuilder.Entity<Alerta>()
+                .HasOne(a => a.TipoAlerta)
+                .WithMany(t => t.Alertas)
+                .HasForeignKey(a => a.IdTipoAlerta);
+
+            modelBuilder.Entity<Participante>()
+          .HasKey(p => p.Id); // Definir la clave primaria
+
+            modelBuilder.Entity<Participante>()
+                .HasOne(p => p.Brief)
+                .WithMany() // Si quieres tener una colección en Brief, puedes usar .WithMany(b => b.Participantes)
+                .HasForeignKey(p => p.BriefId)
+                .OnDelete(DeleteBehavior.Cascade); // Configurar el comportamiento de eliminación
+
+            modelBuilder.Entity<Participante>()
+                .HasOne(p => p.Usuario)
+                .WithMany(u => u.Participantes) // Asegúrate de que la clase Usuario tenga una propiedad ICollection<Participante>
+                .HasForeignKey(p => p.UsuarioId)
+                .OnDelete(DeleteBehavior.Cascade); // Configurar el comportamiento de eliminación
+                                                   // Relación de Material con HistorialMaterial
+            modelBuilder.Entity<HistorialMaterial>()
+                .HasOne(h => h.Material)
+                .WithMany(m => m.Historiales)
+                .HasForeignKey(h => h.MaterialId);
+
+            // Relación de Material con RetrasoMaterial
+            modelBuilder.Entity<RetrasoMaterial>()
+                .HasOne(r => r.Material)
+                .WithMany(m => m.Retrasos)
+                .HasForeignKey(r => r.MaterialId);
+            // Relación de Material con Prioridad
+            modelBuilder.Entity<Material>()
+                .HasOne(m => m.Prioridad)
+                .WithMany(p => p.Materiales)
+                .HasForeignKey(m => m.PrioridadId);
+
+            // Relación de Material con PCN
+            modelBuilder.Entity<Material>()
+                .HasOne(m => m.PCN)
+                .WithMany(p => p.Materiales)
+                .HasForeignKey(m => m.PCNId);
+
+            // Relación de Material con Audiencia
+            modelBuilder.Entity<Material>()
+                .HasOne(m => m.Audiencia)
+                .WithMany(a => a.Materiales)
+                .HasForeignKey(m => m.AudienciaId);
+
+            // Relación de Material con Formato
+            modelBuilder.Entity<Material>()
+                .HasOne(m => m.Formato)
+                .WithMany(f => f.Materiales)
+                .HasForeignKey(m => m.FormatoId);
 
             base.OnModelCreating(modelBuilder);
+
         }
 
     }

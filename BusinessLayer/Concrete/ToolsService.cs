@@ -45,5 +45,51 @@ namespace BusinessLayer.Concrete
 
             return resp;
         }
+
+        public IEnumerable<Alerta> ObtenerAlertaUsuario(int id)
+        {
+            return _toolsDal.ObtenerAlertaUsuario(id);
+        }
+        public IEnumerable<Usuario> BuscarUsuario(string nombre)
+        {
+            return _toolsDal.BuscarUsuario(nombre);
+        }
+
+        public Participante AgregarParticipante(Participante _participante)
+        {
+            return _toolsDal.AgregarParticipante(_participante);
+        }
+
+        public List<Participante> ObtenerParticipantes(int BriefId)
+        {
+            return _toolsDal.ObtenerParticipantes(BriefId);
+        }
+
+        public List<Alerta> ObtenerAlertas(int IdUsuario)
+        {
+            return _toolsDal.ObtenerAlertas(IdUsuario);
+        }
+
+        public Alerta CrearAlerta(Alerta alerta)
+        {
+            return _toolsDal.CrearAlerta(alerta);
+        }
+
+        public int ConteoAlertas(int IdUsuario)
+        {
+           var contAlertas = ObtenerAlertas(IdUsuario).Count();
+            return contAlertas;
+        }
+
+        public List<TipoAlerta> ObtenerTiposAlerta()
+        {
+            return _toolsDal.ObtenerTiposAlerta();
+        }
+
+
+        public void UpdateAlerta(int Id)
+        {
+             _toolsDal.UpdateAlerta(Id);
+        }
     }
 }

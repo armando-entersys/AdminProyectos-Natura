@@ -37,10 +37,10 @@
                                     <span data-bind="text: fechaEntrega"></span>
                                 </div>
                                 <div class="row">
-                                    <div class="col-4">
+                                    <div class="col-4 transparent-div">
                                         l
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col-4 transparent-div">
                                         l
                                     </div>
                                     <div class="col-4">
@@ -76,30 +76,29 @@
                             <h1>Solicitud</h1>
                             <div class="mb-3" data-bind="validationElement: nombre">
                                 <label for="recipient-name" class="col-form-label">Nombre de solicitud:</label>
-                                <input type="text" class="form-control" id="nombre" maxlength="128" data-bind="value: nombre" />
-                                <span class="text-danger" data-bind="validationMessage: nombre"></span>
+                                <input disabled type="text" class="form-control" id="nombre" maxlength="128" data-bind="value: nombre" />
+                             
                             </div>
                             <div class="mb-3" data-bind="validationElement: descripcion">
                                 <label for="recipient-name" class="col-form-label">Descripción de la solicitud:</label>
-                                <input type="text" class="form-control" id="descripcion" maxlength="128" data-bind="value: descripcion">
+                                <input disabled type="text" class="form-control" id="descripcion" maxlength="128" data-bind="value: descripcion">
                             </div>
                             <div class="mb-3" data-bind="validationElement: objetivo">
                                 <label for="recipient-name" class="col-form-label">Objetivo de comunicación:</label>
-                                <input type="text" class="form-control" id="objetivo" maxlength="128" data-bind="value: objetivo">
+                                <input disabled type="text" class="form-control" id="objetivo" maxlength="128" data-bind="value: objetivo">
                             </div>
                             <div class="mb-3" data-bind="validationElement: dirigidoA">
                                 <label for="recipient-name" class="col-form-label">Publico al que va dirigido :</label>
-                                <input type="text" class="form-control" id="dirigidoA" maxlength="128" data-bind="value: dirigidoA">
+                                <input disabled type="text" class="form-control" id="dirigidoA" maxlength="128" data-bind="value: dirigidoA">
                             </div>
                             <div class="mb-3" data-bind="validationElement: fechaEntrega">
                                 <label for="recipient-name" class="col-form-label">Fecha deseada de publicación:</label>
-                                <input type="date" class="form-control" id="fechaEntrega" maxlength="128" data-bind="value: fechaEntrega">
+                                <input disabled type="date" class="form-control" id="fechaEntrega" maxlength="128" data-bind="value: fechaEntrega">
                             </div>
                           
                             <div class="mb-3" data-bind="validationElement: cargaArchivo">
                                 <label for="cargaArchivo" class="col-form-label">Subir referencia:</label>
-                                <input type="file" class="form-control" id="cargaArchivo" data-bind="event: { change: cargarArchivo }" accept=".pdf,.doc,.docx">
-                                <span class="text-danger" data-bind="validationMessage: cargaArchivo"></span>
+                                <input disabled type="file" class="form-control" id="cargaArchivo" data-bind="event: { change: cargarArchivo }" accept=".pdf,.doc,.docx">
                             </div>
                             <div class="mb-3" data-bind="visible: rutaArchivo">
                                 <label for="archivoCargado" class="col-form-label">Referencia:</label>
@@ -122,11 +121,11 @@
                             <div class="mb-3" data-bind="validationElement: planComunicacion">
                                 <label for="recipient-name" class="col-form-label">Requiere Plan de Comunicación:</label>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="planComunicacionOptions" id="planComunicacion1" value="Ciclal Regional" data-bind="checked: planComunicacion">
+                                    <input class="form-check-input" type="radio" name="planComunicacionOptions" id="planComunicacion1" value="Sí" data-bind="checked: planComunicacion">
                                     <label class="form-check-label" for="planComunicacion1">Sí</label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="planComunicacionOptions" id="planComunicacion2" value="Ciclal Local" data-bind="checked: planComunicacion">
+                                    <input class="form-check-input" type="radio" name="planComunicacionOptions" id="planComunicacion2" value="No" data-bind="checked: planComunicacion">
                                     <label class="form-check-label" for="planComunicacion2">No</label>
                                 </div>
                             </div>
@@ -155,6 +154,7 @@
                             <div class="mb-3" data-bind="validationElement: nombreMaterial">
                                 <label for="recipient-name" class="col-form-label">Nombre:</label>
                                 <input type="text" class="form-control" id="nombreMaterial" maxlength="128" data-bind="value: nombreMaterial">
+                             
                             </div>
                             <div class="mb-3" data-bind="validationElement: mensaje">
                                 <label for="recipient-name" class="col-form-label">Mensaje:</label>
@@ -162,7 +162,7 @@
                             </div>
                             <div class="mb-3" data-bind="validationElement: prioridad">
                                 <label class="col-form-label">Prioridad:</label>
-                                <select class="form-control" data-bind="options: catPrioridad, value: descripcion, optionsText: 'Descripcion', optionsCaption: 'Seleccione'"></select>
+                                <select class="form-control" data-bind="options: catPrioridad, value: prioridad, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
                             </div>
                             <div class="mb-3" data-bind="validationElement: ciclo">
                                 <label for="recipient-name" class="col-form-label">Ciclo:</label>
@@ -170,15 +170,15 @@
                             </div>
                             <div class="mb-3" data-bind="validationElement: pcn">
                                 <label class="col-form-label">PCN:</label>
-                                <select class="form-control" data-bind="options: catPCN, value: descripcion, optionsText: 'Descripcion', optionsCaption: 'Seleccione'"></select>
+                                <select class="form-control" data-bind="options: catPCN, value: pcn, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
                             </div>
                             <div class="mb-3" data-bind="validationElement: formato">
-                                <label class="col-form-label">PCN:</label>
-                                <select class="form-control" data-bind="options: catFormato, value: descripcion, optionsText: 'Descripcion', optionsCaption: 'Seleccione'"></select>
+                                <label class="col-form-label">Formato:</label>
+                                <select class="form-control" data-bind="options: catFormato, value: formato, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
                             </div>
                             <div class="mb-3" data-bind="validationElement: audiencia">
                                 <label class="col-form-label">Audicencia:</label>
-                                <select class="form-control" data-bind="options: catAudiencia, value: descripcion, optionsText: 'Descripcion', optionsCaption: 'Seleccione'"></select>
+                                <select class="form-control" data-bind="options: catAudiencia, value: audiencia, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
                             </div>
                             <div class="mb-3" data-bind="validationElement: fechaEntrega">
                                 <label for="recipient-name" class="col-form-label">Fecha Entrega:</label>
@@ -192,11 +192,11 @@
                                 <label for="recipient-name" class="col-form-label">Produccion:</label>
                                 <input type="text" class="form-control" id="produccion" maxlength="128" data-bind="value: produccion">
                             </div>
-                            <div class="mb-3" data-bind="validationElement: respondable">
+                            <div class="mb-3" data-bind="validationElement: responsable">
                                 <label for="recipient-name" class="col-form-label">Responsable:</label>
-                                <input type="text" class="form-control" id="respondable" maxlength="128" data-bind="value: respondable">
+                                <input type="text" class="form-control" id="responsable" maxlength="128" data-bind="value: responsable">
                             </div>
-                            <button type="button" class="btn btn-primary" data-bind="click:Guardar">
+                            <button type="button" class="btn btn-primary" data-bind="click:GuardarMaterial">
                                 <i class="lni lni-save"></i>
                                 <span>Agregar Material</span>
                             </button>
@@ -208,26 +208,34 @@
                                     <tr>
                                         <th scope="col">Id</th>
                                         <th scope="col">Nombre</th>
-                                        <th scope="col">Nombre</th>
+                                        <th scope="col">Fecha Entrega</th>
                                         <th scope="col">Detalles</th>
 
                                     </tr>
                                 </thead>
-                                <tbody data-bind="foreach: registros">
+                                <tbody data-bind="foreach: registrosMateriales">
                                     <tr>
                                         <td data-bind="text: id"></td>
                                         <td data-bind="text: nombre"></td>
-                                        <td data-bind="text: nombre"></td>
+                                        <td data-bind="text: fechaEntrega"></td>
                                         <td class="small">
-                                            <button type="button" class="btn btn-outline-primary" data-bind="click:$root.Editar">
+                                            <button type="button" class="btn btn-outline-primary" data-bind="click:$root.EliminarMaterial">
                                                 <i class="lni lni-pencil"></i>
-                                                <span>Editar</span>
+                                                <span>Eliminar Material</span>
                                             </button>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
                             <h2 style="color:#FFAA16;">Participantes del proyecto</h2>
+                            <div>
+                                <label for="buscarUsuario">Buscar usuario:</label>
+                                <input id="buscarUsuario" type="text" class="form-control" placeholder="Escribe el nombre del usuario..."
+                                       data-bind="value: buscarUsuario, valueUpdate: 'input', event: { keyup: buscarUsuarios }" />
+                                <ul data-bind="foreach: resultadosBusqueda" class="autocomplete-results" style="background-color:#fff">
+                                    <li data-bind="text: nombre, click: $root.seleccionarUsuario"></li>
+                                </ul>
+                            </div>
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
@@ -237,14 +245,14 @@
 
                                     </tr>
                                 </thead>
-                                <tbody data-bind="foreach: registros">
+                                <tbody data-bind="foreach: registrosParticipantes">
                                     <tr>
                                         <td data-bind="text: id"></td>
-                                        <td data-bind="text: nombre"></td>
+                                        <td data-bind="text: usuario.nombre"></td>
                                         <td class="small">
-                                            <button type="button" class="btn btn-outline-primary" data-bind="click:$root.Editar">
+                                            <button type="button" class="btn btn-outline-primary" data-bind="click:$root.EliminarParticipante">
                                                 <i class="lni lni-pencil"></i>
-                                                <span>Enviar Mensaje</span>
+                                                <span>Eliminar</span>
                                             </button>
                                         </td>
                                     </tr>
@@ -257,9 +265,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" data-bind="click:Guardar">
+                <button type="button" class="btn btn-primary">
                     <i class="lni lni-save"></i>
-                    <span>Guardar</span>
+                    <span>Aceptar</span>
                 </button>
             </div>
         </div>
@@ -278,5 +286,5 @@
 
     </script>
     <script src="~/js/brief/BriefAdmin.js"></script>
-
+   
 }

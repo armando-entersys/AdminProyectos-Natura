@@ -20,20 +20,22 @@ function AppViewModel() {
     self.columns2 = ko.observableArray();
 
     self.id = ko.observable(0);
-    self.nombre = ko.observable().extend({ required: true });
-    self.descripcion = ko.observable().extend({ required: true });
-    self.objetivo = ko.observable().extend({ required: true });
-    self.dirigidoA = ko.observable().extend({ required: true });
-    self.comentario = ko.observable().extend({ required: true });
-    self.rutaArchivo = ko.observable().extend({ required: true });
-    self.fechaEntrega = ko.observable().extend({ required: true });
+    self.nombre = ValidationModule.validations.requiredField();
+    self.descripcion = ValidationModule.validations.requiredField();
+    self.objetivo = ValidationModule.validations.requiredField();
+    self.dirigidoA = ValidationModule.validations.requiredField();
+    self.comentario = ValidationModule.validations.requiredField();
+    self.rutaArchivo = ValidationModule.validations.requiredField();
+    self.fechaEntrega = ValidationModule.validations.requiredField();
 
     self.catEstatusBrief = ko.observableArray();
-    self.EstatusBrief = ko.observable().extend({ required: true });
+    self.EstatusBrief = ValidationModule.validations.requiredField();
     self.catTipoBrief = ko.observableArray();
-    self.TipoBrief = ko.observable().extend({ required: true });
-    self.cargaArchivo = ko.observable().extend({ required: true });
+    self.TipoBrief = ValidationModule.validations.requiredField();
+    self.cargaArchivo = ko.observable();
     self.registros = ko.observableArray();
+
+    self.errors = ko.validation.group(self);
     self.inicializar = function () {
         $.ajax({
             url: "/Brief/GetAllbyUserId", // URL del método GetAll en tu API
@@ -106,12 +108,18 @@ function AppViewModel() {
 
     }
     self.Guardar = function () {
-        if (self.id() === 0) {
-            self.GuardarNuevo();
-        }
-        else {
-            self.GuardarEditar();
-        }
+        validarYProcesarFormulario(self.errors, function () {
+            $(document).ajaxStart(function () {
+                $('#loader').removeClass('d-none');
+            });
+
+            if (self.id() === 0) {
+                self.GuardarNuevo();
+            }
+            else {
+                self.GuardarEditar();
+            }
+        });  
 
     }
     self.Limpiar = function () {
@@ -162,6 +170,7 @@ function AppViewModel() {
        
     }
     self.GuardarEditar = function () {
+        $("#divEdicion").modal("hide");
         var formData = new FormData();
 
         formData.append("Id", self.id());
@@ -187,11 +196,14 @@ function AppViewModel() {
             data: formData,
             success: function (d) {
                 self.inicializar();
-                $("#divEdicion").modal("hide");
+              
                 $('#alertMessage').text(d.mensaje);
                 $('#alertModalLabel').text("Success");
                 $("#alertModal").modal("show");
                 self.Limpiar();
+                $(document).ajaxStop(function () {
+                    $('#loader').addClass('d-none');
+                });
             },
             error: function (xhr, status, error) {
                 console.error("Error al obtener los datos: ", error);
@@ -202,7 +214,7 @@ function AppViewModel() {
         });
     }
     self.GuardarNuevo = function () {
-       
+        $("#divEdicion").modal("hide");
         var formData = new FormData();
        
         formData.append("Nombre", self.nombre());
@@ -232,6 +244,9 @@ function AppViewModel() {
                 $('#alertModalLabel').text("Success");
                 $("#alertModal").modal("show");
                 self.Limpiar();
+                $(document).ajaxStop(function () {
+    $('#loader').addClass('d-none');
+});
             },
             error: function (xhr, status, error) {
                 console.error("Error al obtener los datos: ", error);

@@ -1,4 +1,5 @@
-﻿using EntityLayer.Concrete;
+﻿using DataAccessLayer.Concrete;
+using EntityLayer.Concrete;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,5 +24,20 @@ namespace BusinessLayer.Abstract
         void InsertMaterial(Material entity);
         Proyecto GetProyectoByBriefId(int id);
         List<Material> GetMaterialesByBriefId(int id);
+        void EliminarMaterial(int id);
+        void EliminarParticipante(int id);
+        ConteoProyectos ObtenerConteoProyectos(int UsuarioId);
+        ConteoProyectos ObtenerConteoMateriales(int UsuarioId);
+        int ObtenerConteoProyectoFecha(int UsuarioId);
+        List<Material> GetMaterialesByUser(int id);
+        List<Material> GetMaterialesFilter(Material material);
+        public IEnumerable<Audiencia> GetAllAudiencias();
+        public IEnumerable<Formato> GetAllFormatos();
+        public IEnumerable<PCN> GetAllPCN();
+        public IEnumerable<Prioridad> GetAllPrioridades();
+        ConteoMateriales ObtenerConteoEstatusMateriales(int UsuarioId);
+        IEnumerable<EstatusMaterial> GetAllEstatusMateriales();
+        void ActualizaHistorialMaterial(HistorialMaterial historialMaterial);
+        void ActualizaRetrasoMaterial(RetrasoMaterial retrasoMaterial);
     }
 }

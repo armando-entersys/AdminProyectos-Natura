@@ -63,6 +63,7 @@ body {
 #sidebar {
     width: 70px;
     min-width: 70px;
+    min-height: 100%;
     z-index: 1000;
     transition: all .25s ease-in-out;
     background-color: #EB6619;
@@ -180,3 +181,37 @@ a.sidebar-link:hover {
         background-color: #EB6619;
         border-color: #EB6619;
     }
+
+/* Clase de estilo para el borde de campos con error */
+.is-invalid {
+    border-color: #dc3545;
+}
+
+/* Clase de estilo para los mensajes de error */
+.text-danger {
+    color: #dc3545;
+}
+.card-Home {
+    background-color: #FFAA16;
+    color: #FFFFFF;
+}
+.titleCardHome {
+    font-size: 2.5rem !important;
+    font-weight: 100;
+}
+#loader .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    z-index: 1050; /* Asegura que esté por encima de otros elementos */
+}
+#loader-overlay {
+    z-index: 1040; /* Asegura que esté sobre el contenido pero debajo de modales si los tienes */
+}
+
+#loader .spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+.transparent-div {
+    opacity: 0; /* Ajusta el valor de opacidad entre 0 y 1 */
+}

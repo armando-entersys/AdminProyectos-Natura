@@ -1,8 +1,10 @@
+using Serilog;
 using BusinessLayer.Abstract;
 using BusinessLayer.Concrete;
 using DataAccessLayer.Abstract;
 using DataAccessLayer.Context;
 using DataAccessLayer.EntityFramework;
+using ElmahCore.Mvc;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +12,20 @@ using Microsoft.CodeAnalysis;
 using PresentationLayer.Models;
 using System.Text.Json.Serialization;
 
+// Configuración inicial de Serilog
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug() // Nivel mínimo de log (Debug para el desarrollo)
+    .WriteTo.Console() // Registrar logs en la consola
+    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day) // Guardar logs diarios en la carpeta Logs
+    .CreateLogger();
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+// Configurar Serilog como el sistema de logging principal
+builder.Host.UseSerilog();
 
+// Configuración de servicios
+builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<DataAccesContext>();
 
 builder.Services.AddScoped<IUsuarioDal, EfUsuario>();
@@ -31,13 +42,12 @@ builder.Services.AddScoped<IToolsService, ToolsService>();
 
 builder.Services.AddScoped<IBriefDal, EfBrief>();
 builder.Services.AddScoped<IBriefService, BriefService>();
-// Configurar EmailSettings
+
+// Configuración de EmailSettings
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.Configure<CategoriaCorreo>(builder.Configuration.GetSection("CategoriasDeCorreo"));
-// Registrar el servicio de envío de correos
-builder.Services.AddScoped<EmailSender>();
 
-// Registrar IEmailSender
+builder.Services.AddScoped<EmailSender>();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -46,21 +56,21 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
         options.SlidingExpiration = true;
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Solo para HTTPS
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Lax;
     });
 
 builder.Services.AddDistributedMemoryCache();
-
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
 builder.Services.AddAuthorization();
 
-// Configurar el ciclo de referencia
+// Configuración de JSON para evitar ciclos de referencia
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -69,63 +79,51 @@ builder.Services.AddControllers()
     });
 
 
+builder.Services.AddElmah(options =>
+{
+    options.Path = "/elmah";
+});
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configuración de middlewares
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseSession(); // Habilitar el middleware de sesión
-
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
-// Middleware personalizado para redirigir usuarios autenticados en la página de login
+
 app.Use(async (context, next) =>
 {
-    // Verifica si el usuario está autenticado
-    if (!context.User.Identity.IsAuthenticated)
+    if (!context.User.Identity.IsAuthenticated && !context.Request.Path.StartsWithSegments("/Login"))
     {
-        // Si no está autenticado y no intenta acceder a /Login
-        if (!context.Request.Path.StartsWithSegments("/Login"))
+        if (!context.Request.Path.StartsWithSegments("/Usuarios/SolicitudUsuario") &&
+            !context.Request.Path.StartsWithSegments("/Usuarios/CambioContrasena"))
         {
-            if (context.Request.Path.StartsWithSegments("/Usuarios/SolicitudUsuario")|| context.Request.Path.StartsWithSegments("/Usuarios/CambioContrasena"))
-            {
-                
-            }
-            else
-            {
-                context.Response.Redirect("/Login");
-                return;
-            }
-
-           
+            context.Response.Redirect("/Login");
+            return;
         }
     }
-    else
+    else if (context.User.Identity.IsAuthenticated && context.Request.Path.StartsWithSegments("/Login") &&
+             !context.Request.Path.Equals("/Login/Logout"))
     {
-        // Si el usuario está autenticado y está intentando acceder a /Login o /Login/Logout
-        if (context.Request.Path.StartsWithSegments("/Login"))
-        {
-            // No redirigir si es el método de Logout
-            if (!context.Request.Path.Equals("/Login/Logout"))
-            {
-                // Redirige al home si ya está autenticado
-                context.Response.Redirect("/Home");
-                return;
-            }
-        }
+        context.Response.Redirect("/Home");
+        return;
     }
 
     await next();
 });
+
 app.MapControllers();
+app.UseElmah();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Login}/{action=Index}/{id?}");

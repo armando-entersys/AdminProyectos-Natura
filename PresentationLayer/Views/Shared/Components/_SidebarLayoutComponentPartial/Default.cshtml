@@ -17,6 +17,7 @@
             {
                 foreach (var menu in ViewBag.Menus)
                 {
+                    accion = "Index";
                     if (!@menu.Ruta.Contains("/"))
                     {
                         controlador = @menu.Ruta;

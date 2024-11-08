@@ -9,7 +9,6 @@
 <html>
 @await Component.InvokeAsync("_HeaderLayoutComponentPartial")
 <body>
-
     <div class="container mt-5 pt-5">
 
         <div class="row justify-content-center">
@@ -27,15 +26,23 @@
                             <input class="form-control mb-3" type="text" placeholder="Apellido Paterno" required asp-for="ApellidoPaterno" required />
                             <input class="form-control mb-3" type="text" placeholder="Apellido Materno" required asp-for="ApellidoMaterno" required />
                             <input class="form-control mb-3" type="text" placeholder="Correo" required asp-for="Correo" required />
-                            <input class="form-control mb-3" type="text" placeholder="Contraseña" required asp-for="Contrasena" required />
-
+                           
+                           <input 
+                                class="form-control mb-3" 
+                                type="password" 
+                                placeholder="Contraseña" 
+                                required 
+                                asp-for="Contrasena"
+                                   pattern="@( "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$" )"
+                                   title="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, un número y un carácter especial."
+                            />
                             <button class="w-100 btn btn-lg btn-primary" type="submit">Registrarme</button>
-                            @if (ViewData["Mensaje"] != null)
+                            @if (@TempData["Mensaje"] != null)
                             {
 
                                 <div class="form-group">
                                     <div class="alert alert-danger" role="alert">
-                                        @ViewData["Mensaje"]
+                                        @TempData["Mensaje"]
                                     </div>
                                 </div>
                             }

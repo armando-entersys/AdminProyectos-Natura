@@ -12,41 +12,6 @@ function Column(id, name, tasks) {
     this.name = ko.observable(name);
     this.tasks = ko.observableArray(tasks);
 }
-var PrioridadPequena = { Id: 1, Descripcion: "Pequeña" };
-var PrioridadMediana = { Id: 2, Descripcion: "Mediana" };
-var PrioridadGrande = { Id: 3, Descripcion: "Grande" };
-var catPrioridad = [PrioridadPequena, PrioridadMediana, PrioridadGrande];
-
-var catPCN = [{ Id: 1, Descripcion: "Medio" }
-    , { Id: 2, Descripcion: "Facebook cocreando" }
-    , { Id: 3, Descripcion: "Mi natura digital" }
-    , { Id: 4, Descripcion: "Whatsapp" }
-    , { Id: 5, Descripcion: "Mailing" }
-    , { Id: 6, Descripcion: "Instagram" }
-    , { Id: 7, Descripcion: "Folleto digital" }];
-
-var catFormato = [{ Id: 1, Descripcion: "placa" }
-    , { Id: 1, Descripcion: "panel home" }
-    , { Id: 2, Descripcion: "panel captación" }
-    , { Id: 3, Descripcion: "vitrina" }
-    , { Id: 4, Descripcion: "history" }
-    , { Id: 5, Descripcion: "video" }
-    , { Id: 6, Descripcion: "card" }
-    , { Id: 7, Descripcion: "comunicado" }
-    , { Id: 8, Descripcion: "email " }
-    , { Id: 9, Descripcion: "guia interactiva" }
-    , { Id: 10, Descripcion: "pdf" }
-    , { Id: 11, Descripcion: "infografia" }
-    , { Id: 12, Descripcion: "landing page" }
-    , { Id: 13, Descripcion: "placa animada" }
-    , { Id: 14, Descripcion: "posteo" }
-    , { Id: 15, Descripcion: "video tictoc " }
-    , { Id: 16, Descripcion: "video" }];
-
-var catAudiencia = [{ Id: 1, Descripcion: "Consultor" }
-    , { Id: 2, Descripcion: "Cliente final" }
-    , { Id: 3, Descripcion: "Líderes" }
-    , { Id: 4, Descripcion: "Segmento especifico" }]
 
 function AppViewModel() {
     var self = this;
@@ -55,50 +20,57 @@ function AppViewModel() {
     self.columns2 = ko.observableArray();
 
     self.id = ko.observable(0);
-    self.nombre = ko.observable().extend({ required: true });
-    self.descripcion = ko.observable().extend({ required: true });
-    self.objetivo = ko.observable().extend({ required: true });
-    self.dirigidoA = ko.observable().extend({ required: true });
-    self.comentario = ko.observable().extend({ required: true });
-    self.rutaArchivo = ko.observable().extend({ required: true });
-    self.fechaEntrega = ko.observable().extend({ required: true });
+    self.nombre = ko.observable();
+    self.descripcion = ko.observable();
+    self.objetivo = ko.observable();
+    self.dirigidoA = ko.observable();
+    self.comentario = ko.observable();
+    self.rutaArchivo = ko.observable();
 
     self.catEstatusBrief = ko.observableArray();
-    self.EstatusBrief = ko.observable().extend({ required: true });
+    self.EstatusBrief = ko.observable();
     self.catTipoBrief = ko.observableArray();
-    self.TipoBrief = ko.observable().extend({ required: true });
+    self.TipoBrief = ko.observable();
     self.catClasificacionProyecto = ko.observableArray();
-    self.ClasificacionProyecto = ko.observable().extend({ required: true });
+    self.ClasificacionProyecto = ValidationModule.validations.requiredField();
     
-    self.cargaArchivo = ko.observable().extend({ required: true });
+    self.cargaArchivo = ko.observable();
     self.registros = ko.observableArray();
-    self.planComunicacion = ko.observable();
 
     self.determinarEstado = ko.observable();
     self.fechaPublicacion = ko.observable();
-    self.nombreMaterial = ko.observable();
 
-    self.mensaje = ko.observable();
+    self.nombreMaterial = ValidationModule.validations.requiredField();
+    self.mensaje = ValidationModule.validations.requiredField();
     self.catPrioridad = ko.observableArray();
-    self.prioridad = ko.observable();
-    self.ciclo = ko.observable();
+    self.prioridad = ValidationModule.validations.requiredField();
+    self.ciclo = ValidationModule.validations.requiredField();
     self.catPCN = ko.observableArray();
-    self.pnc = ko.observable();
-    self.formato = ko.observable();
+    self.pcn = ValidationModule.validations.requiredField();
+    self.formato = ValidationModule.validations.requiredField();
     self.catFormato = ko.observableArray();
-    self.audiencia = ko.observable();
+    self.audiencia = ValidationModule.validations.requiredField();
     self.catAudiencia = ko.observableArray();
 
-    self.fechaEntrega = ko.observable();
-    self.proceso = ko.observable();
-    self.produccion = ko.observable();
-    self.respondable = ko.observable();
+    self.fechaEntrega = ValidationModule.validations.requiredField();
+    self.proceso = ValidationModule.validations.requiredField();
+    self.produccion = ValidationModule.validations.requiredField();
+    self.responsable = ValidationModule.validations.requiredField();
 
-    self.determinarEstado = ko.observable();
-    self.planComunicacion = ko.observable();
-    self.fechaPublicacion = ko.observable();
-    self.comentarioProyecto = ko.observable();
-   
+    self.determinarEstado = ValidationModule.validations.requiredField();
+    self.planComunicacion = ValidationModule.validations.requiredField();
+    self.fechaPublicacion = ValidationModule.validations.requiredField();
+    self.comentarioProyecto = ValidationModule.validations.requiredField();
+
+    self.registrosMateriales = ko.observableArray();
+    self.registrosParticipantes = ko.observableArray();
+
+    // Observables y variables para autocompletado
+    self.buscarUsuario = ko.observable("");
+    self.resultadosBusqueda = ko.observableArray([]);
+
+
+    self.errors = ko.validation.group(self);
     self.inicializar = function () {
         $.ajax({
             url: "/Brief/GetAllColumns", // URL del método GetAll en tu API
@@ -134,32 +106,81 @@ function AppViewModel() {
                                 self.catTipoBrief.removeAll();
                                 self.catTipoBrief.push.apply(self.catTipoBrief, d.datos.$values);
 
-                                self.catPrioridad.removeAll();
-                                self.catPrioridad.push.apply(self.catPrioridad, catPrioridad);
-
-                                self.catPCN.removeAll();
-                                self.catPCN.push.apply(self.catPCN, catPCN);
-
-                                self.catFormato.removeAll();
-                                self.catFormato.push.apply(self.catFormato, catFormato);
-
-                                self.catAudiencia.removeAll();
-                                self.catAudiencia.push.apply(self.catAudiencia, catAudiencia);
                                 $.ajax({
-                                    url: "/Brief/GetAllClasificacionProyecto", // URL del método GetAll en tu API
+                                    url: "/Brief/GetAllPrioridad",
                                     type: "GET",
                                     contentType: "application/json",
                                     success: function (d) {
-                                        self.catClasificacionProyecto.removeAll();
-                                        self.catClasificacionProyecto.push.apply(self.catClasificacionProyecto, d.datos.$values);
-                                        $("#divEdicion").modal("hide");
+                                        self.catPrioridad.removeAll();
+                                        self.catPrioridad.push.apply(self.catPrioridad, d.datos.$values);
+                                        $.ajax({
+                                            url: "/Brief/GetAllPCN",
+                                            type: "GET",
+                                            contentType: "application/json",
+                                            success: function (d) {
+                                                self.catPCN.removeAll();
+                                                self.catPCN.push.apply(self.catPCN, d.datos.$values);
+                                                $.ajax({
+                                                    url: "/Brief/GetAllFormatos",
+                                                    type: "GET",
+                                                    contentType: "application/json",
+                                                    success: function (d) {
+                                                        self.catFormato.removeAll();
+                                                        self.catFormato.push.apply(self.catFormato, d.datos.$values);
+                                                        $.ajax({
+                                                            url: "/Brief/GetAllAudiencias",
+                                                            type: "GET",
+                                                            contentType: "application/json",
+                                                            success: function (d) {
+                                                                self.catAudiencia.removeAll();
+                                                                self.catAudiencia.push.apply(self.catAudiencia, d.datos.$values);
+                                                                $.ajax({
+                                                                    url: "/Brief/GetAllClasificacionProyecto", // URL del método GetAll en tu API
+                                                                    type: "GET",
+                                                                    contentType: "application/json",
+                                                                    success: function (d) {
+                                                                        self.catClasificacionProyecto.removeAll();
+                                                                        self.catClasificacionProyecto.push.apply(self.catClasificacionProyecto, d.datos.$values);
+                                                                        $("#divEdicion").modal("hide");
+                                                                    },
+                                                                    error: function (xhr, status, error) {
+                                                                        console.error("Error al obtener los datos: ", error);
+                                                                        alert("Error al obtener los datos: " + xhr.responseText);
+                                                                    }
+                                                                });
+                                                            },
+                                                            error: function (xhr, status, error) {
+                                                                console.error("Error al obtener los datos: ", xhr.responseText);
+                                                                $('#alertMessage').text("Error al obtener los datos: " + xhr.responseText);
+                                                                $('#alertModalLabel').text("Error");
+                                                                $("#alertModal").modal("show");
+                                                            }
+                                                        });
+                                                    },
+                                                    error: function (xhr, status, error) {
+                                                        console.error("Error al obtener los datos: ", xhr.responseText);
+                                                        $('#alertMessage').text("Error al obtener los datos: " + xhr.responseText);
+                                                        $('#alertModalLabel').text("Error");
+                                                        $("#alertModal").modal("show");
+                                                    }
+                                                });
+                                            },
+                                            error: function (xhr, status, error) {
+                                                console.error("Error al obtener los datos: ", xhr.responseText);
+                                                $('#alertMessage').text("Error al obtener los datos: " + xhr.responseText);
+                                                $('#alertModalLabel').text("Error");
+                                                $("#alertModal").modal("show");
+                                            }
+                                        });
+
                                     },
                                     error: function (xhr, status, error) {
-                                        console.error("Error al obtener los datos: ", error);
-                                        alert("Error al obtener los datos: " + xhr.responseText);
+                                        console.error("Error al obtener los datos: ", xhr.responseText);
+                                        $('#alertMessage').text("Error al obtener los datos: " + xhr.responseText);
+                                        $('#alertModalLabel').text("Error");
+                                        $("#alertModal").modal("show");
                                     }
                                 });
-                         
                             },
                             error: function (xhr, status, error) {
                                 console.error("Error al obtener los datos: ", error);
@@ -206,8 +227,24 @@ function AppViewModel() {
                     return r.id === d.datos.tipoBriefId;
                 });
                 self.TipoBrief(TipoBrief);
+                self.ObtenerProyecto(self.id());
+                self.ObtenerMateriales(self.id());
+                $.ajax({
+                    url: "/Usuarios/ObtenerParticipantes/" + d.datos.id, // URL del método GetAll en tu API
+                    type: "GET",
+                    contentType: "application/json",
+                    success: function (d) {
+                        self.registrosParticipantes.removeAll();
+                        self.registrosParticipantes.push.apply(self.registrosParticipantes, d.datos.$values);
+                        $("#divEdicion").modal("show");
 
-                $("#divEdicion").modal("show");
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error al obtener los datos: ", error);
+                        alert("Error al obtener los datos: " + xhr.responseText);
+                    }
+                });
+                
             },
             error: function (xhr, status, error) {
                 console.error("Error al obtener los datos: ", error);
@@ -285,77 +322,229 @@ function AppViewModel() {
         self.cargaArchivo("");
     }
     self.GuardarProyecto = function () {
-        var PlanComunicacion = false;
-        if (self.determinarEstado() === "Sí") {
-            PlanComunicacion = true;
-        }
-        var proyecto = {
-            BriefId: self.id(),
-            EstatusBriefId: self.EstatusBrief().id,
-            ClasificacionProyectoId: self.ClasificacionProyecto().id,
-            Comentario: self.comentarioProyecto(),
-            Estado: self.determinarEstado(),
-            RequierePlan: PlanComunicacion,
-            FechaPublicacion: self.fechaPublicacion()
-        };
-       
-       
-        $.ajax({
-            url: "/Brief/CreateProyecto",
-            type: "POST",
-            contentType: "application/json",  // Cambiado a JSON
-            data: JSON.stringify(proyecto),  // Convertir a JSON
-            success: function (d) {
-                self.inicializar();
-                $("#divEdicion").modal("hide");
-                $('#alertMessage').text(d.mensaje);
-            },
-            error: function (xhr, status, error) {
-                console.error("Error al obtener los datos: ", error);
-                $('#alertMessage').text("Error al obtener los datos: " + xhr.responseText);
-                $('#alertModalLabel').text("Error");
-                $("#alertModal").modal("show");
+            var PlanComunicacion = false;
+            if (self.determinarEstado() === "Sí") {
+                PlanComunicacion = true;
             }
-        });
+
+            var proyecto = {
+                BriefId: self.id(),
+                EstatusBriefId: self.EstatusBrief() ? self.EstatusBrief().id : null,
+                ClasificacionProyectoId: self.ClasificacionProyecto() ? self.ClasificacionProyecto().id : null,
+                Comentario: self.comentarioProyecto(),
+                Estado: self.determinarEstado(),
+                RequierePlan: PlanComunicacion,
+                FechaPublicacion: self.fechaPublicacion()
+            };
+
+            console.log("Datos del proyecto:", proyecto); // Añade esto para revisar en consola
+
+            $.ajax({
+                url: "/Brief/CreateProyecto",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(proyecto),
+                success: function (d) {
+                    $('#alertMessage').text(d.mensaje);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error al obtener los datos: ", xhr.responseText);
+                    $('#alertMessage').text("Error al obtener los datos: " + xhr.responseText);
+                    $('#alertModalLabel').text("Error");
+                    $("#alertModal").modal("show");
+                }
+            });
+       
+    }
+    self.LimpiarMaterial = function () {
+        self.nombreMaterial();
+        self.mensaje("");
+        self.ciclo("");
+        self.fechaEntrega("");
+        self.proceso("");
+        self.produccion("");
+        self.responsable("");
     }
     self.GuardarMaterial = function () {
+        validarYProcesarFormulario(self.errors, function () {
+            var Material = {
+                BriefId: self.id(),
+                Nombre: self.nombreMaterial(),
+                Mensaje: self.mensaje(),
+                PrioridadId: self.prioridad().id,
+                Ciclo: self.ciclo(),
+                PCNId: self.pcn().id,
+                AudienciaId: self.audiencia().id,
+                FormatoId: self.formato().id,
+                FechaEntrega: self.fechaEntrega(),
+                Proceso: self.proceso(),
+                Produccion: self.produccion(),
+                Responsable: self.responsable()
+            };
 
-        var formData = new FormData();
-        formData.append("BriefId", self.id().id);
-        formData.append("Nombre", self.nombreMaterial());
-        formData.append("Mensaje", self.mensaje());
-        formData.append("PrioridadId", self.prioridad().id);
-        formData.append("Ciclo", self.ciclo());
-        formData.append("PCNId", self.pcn().id);
-        formData.append("AudienciaId", self.audiencia().id);
-        formData.append("FormatoId", self.formato().id);
-        formData.append("FechaEntrega", self.fechaEntrega());
-        formData.append("Proceso", self.proceso());
-        formData.append("Produccion", self.produccion());
-        formData.append("Responsable", self.responsable());
-
+            $.ajax({
+                url: "/Brief/CreateMaterial", // URL del método en tu API
+                type: "POST",
+                contentType: "application/json", // Cambiado a JSON
+                data: JSON.stringify(Material),  // Serializamos los datos a JSON
+                success: function (d) {
+                    
+                    self.ObtenerMateriales(self.id());
+                    self.LimpiarMaterial();
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error al obtener los datos: ", error);
+                    $('#alertMessage').text("Error al obtener los datos: " + xhr.responseText);
+                    $('#alertModalLabel').text("Error");
+                    $("#alertModal").modal("show");
+                }
+            });
+        });  
+    }
+    self.ObtenerProyecto = function (id) {
         $.ajax({
-            url: "/Brief/CreateMaterial", // URL del método GetAll en tu API
-            type: "POST",
-            contentType: false,  // Important to avoid jQuery processing data
-            processData: false,  // Important to avoid jQuery processing data
-            data: formData,
+            url: "/Brief/ObtenerProyectoPorBrief/" + id, // URL del método GetAll en tu API
+            type: "GET",
+            contentType: "application/json",
             success: function (d) {
-                self.inicializar();
-                $("#divEdicion").modal("hide");
-                $('#alertMessage').text(d.mensaje);
-                $('#alertModalLabel').text("Success");
-                $("#alertModal").modal("show");
-                self.Limpiar();
+                if (d.datos != undefined) {
+                    var PlanComunicacion = "No";
+                    if (d.datos.requierePlan) {
+                        PlanComunicacion = "Sí";
+                    }
+                    var ClasificacionProyecto = self.catClasificacionProyecto().find(function (r) {
+                        return r.id === d.datos.clasificacionProyectoId;
+                    });
+                    self.ClasificacionProyecto(ClasificacionProyecto);
+                    self.planComunicacion(PlanComunicacion);
+                    self.determinarEstado(d.datos.estado);
+                    self.comentarioProyecto(d.datos.comentario);
+                    self.fechaPublicacion(new Date(d.datos.fechaPublicacion).toISOString().split('T')[0]);
+                }
+
+                $("#divEdicion").modal("show");
             },
             error: function (xhr, status, error) {
                 console.error("Error al obtener los datos: ", error);
-                $('#alertMessage').text("Error al obtener los datos: " + xhr.responseText);
-                $('#alertModalLabel').text("Error");
-                $("#alertModal").modal("show");
+                alert("Error al obtener los datos: " + xhr.responseText);
             }
         });
+
     }
+    self.ObtenerMateriales = function (id) {
+        $.ajax({
+            url: "/Brief/ObtenerMateriales/" + id, // URL del método GetAll en tu API
+            type: "GET",
+            contentType: "application/json",
+            success: function (d) {
+                self.registrosMateriales.removeAll();
+                self.registrosMateriales.push.apply(self.registrosMateriales, d.datos.$values);
+                
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al obtener los datos: ", error);
+                alert("Error al obtener los datos: " + xhr.responseText);
+            }
+        });
+
+    }
+    self.EliminarMaterial = function (material) {
+
+        $.ajax({
+            url: "/Brief/EliminarMaterial/" + material.id, // URL del método GetAll en tu API
+            type: "GET",
+            contentType: "application/json",
+            success: function (d) {
+                self.ObtenerMateriales(self.id());
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al obtener los datos: ", error);
+                alert("Error al obtener los datos: " + xhr.responseText);
+            }
+        });
+
+    }
+    self.EliminarParticipante = function (participante) {
+
+        $.ajax({
+            url: "/Brief/EliminarParticipante/" + participante.id, // URL del método GetAll en tu API
+            type: "GET",
+            contentType: "application/json",
+            success: function (d) {
+                self.ObtenerMateriales(self.id());
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al obtener los datos: ", error);
+                alert("Error al obtener los datos: " + xhr.responseText);
+            }
+        });
+
+    }
+
+    // Método de búsqueda de usuarios con Autocompletar
+    self.buscarUsuarios = function () {
+        if (self.buscarUsuario().length < 3) {
+            self.resultadosBusqueda([]); // Limpia resultados si menos de 3 caracteres
+            return;
+        }
+        var usuario = {
+            Nombre: self.buscarUsuario(),
+        }
+
+        $.ajax({
+            url: "/Usuarios/BuscarUsuario", // Ruta de tu API para buscar usuarios
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(usuario),
+            success: function (d) {
+                self.resultadosBusqueda(d.datos.$values); // Asigna resultados al array
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al buscar usuarios: ", error);
+            }
+        });
+    };
+
+    // Seleccionar usuario y agregar a Participante
+    self.seleccionarUsuario = function (usuario) {
+  
+        var participante = {
+            BriefId: self.id(),
+            UsuarioId : usuario.id
+        }
+        $.ajax({
+            url: "/Usuarios/AgregarParticipante", // Ruta de tu API para buscar usuarios
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(participante),
+            success: function (d) {
+                
+                self.buscarUsuario(""); // Limpia el campo de búsqueda
+                self.resultadosBusqueda([]); // Limpia resultados de autocompletado
+                $.ajax({
+                    url: "/Usuarios/ObtenerParticipantes/" + self.id(), // URL del método GetAll en tu API
+                    type: "GET",
+                    contentType: "application/json",
+                    success: function (d) {
+                        self.registrosParticipantes.removeAll();
+                        self.registrosParticipantes.push.apply(self.registrosParticipantes, d.datos.$values);
+                        $("#divEdicion").modal("show");
+
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error al obtener los datos: ", error);
+                        alert("Error al obtener los datos: " + xhr.responseText);
+                    }
+                });
+
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al buscar usuarios: ", error);
+            }
+        });
+       
+    };
+ 
 }
 
 // Inicializa SortableJS después de que Knockout haya sido inicializado

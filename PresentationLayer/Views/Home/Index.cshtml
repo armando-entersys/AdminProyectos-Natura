@@ -5,11 +5,386 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-min.js"></script>
 </div>
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-
+    <h1 class="display-5">Bienvenido @ViewBag.Name</h1>
 </div>
+@if (ViewBag.RolId == 1)
+{
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Alertas</h5>
+                    <div class="row" data-bind="foreach:registrosAlerta">
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title" data-bind="text:nombre"></h5>
+                                    <p class="card-text" data-bind="text:descripcion"></p>
+                                    <a class="btn btn-primary" data-bind="attr: { href: accion }">Accion</a>
+                                </div>
+                            </div>
+                        </div>
 
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Proyectos</h5>
+                    <div class="row text-center">
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:Hoy"></h2>
+                            </div>
+                            <h6 class="fw-bold">Hoy</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:EstaSemana"></h2>
+                            </div>
+                            <h6 class="fw-bold">Esta Semana</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:ProximaSemana"></h2>
+                            </div>
+                            <h6 class="fw-bold">Proxima Semana</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:TotalProyectos"></h2>
+                            </div>
+                            <h6 class="fw-bold">Total de Proyectos</h6>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Materiales</h5>
+                    <div class="row text-center">
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:Hoy_Material"></h2>
+                            </div>
+                            <h6 class="fw-bold">Hoy</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:EstaSemana_Material"></h2>
+                            </div>
+                            <h6 class="fw-bold">Esta Semana</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:ProximaSemana_Material"></h2>
+                            </div>
+                            <h6 class="fw-bold">Proxima Semana</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:TotalMaterial"></h2>
+                            </div>
+                            <h6 class="fw-bold">Total de Proyectos</h6>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Proyectos Finalizados</h5>
+                    <div class="row text-center">
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:ProyectoTiempo"></h2>
+                            </div>
+                            <h6 class="fw-bold">En tiempo</h6>
+                        </div>
+                        <div class="col-3">
+                        </div>
+                        <div class="col-3">
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:ProyectoExtra"></h2>
+                            </div>
+                            <h6 class="fw-bold">Extratemporal</h6>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@if (ViewBag.RolId == 2)
+{
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Alertas</h5>
+                    <div class="row" data-bind="foreach:registrosAlerta">
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title" data-bind="text:nombre"></h5>
+                                    <p class="card-text" data-bind="text:descripcion"></p>
+                                    <a class="btn btn-primary" data-bind="attr: { href: accion }">Accion</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Proximas Entregas</h5>
+                    <div class="row" data-bind="foreach:registrosAlerta">
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title" data-bind="text:nombre"></h5>
+                                    <p class="card-text" data-bind="text:descripcion"></p>
+                                    <a class="btn btn-primary" data-bind="attr: { href: accion }">Accion</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Proyectos Ciclal</h5>
+                    <div class="row text-center">
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:Hoy"></h2>
+                            </div>
+                            <h6 class="fw-bold">Hoy</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:EstaSemana"></h2>
+                            </div>
+                            <h6 class="fw-bold">Esta Semana</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:ProximaSemana"></h2>
+                            </div>
+                            <h6 class="fw-bold">Proxima Semana</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:TotalProyectos"></h2>
+                            </div>
+                            <h6 class="fw-bold">Total de Proyectos</h6>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Proyecto Emergencial</h5>
+                    <div class="row text-center">
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:Hoy_Material"></h2>
+                            </div>
+                            <h6 class="fw-bold">Hoy</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:EstaSemana_Material"></h2>
+                            </div>
+                            <h6 class="fw-bold">Esta Semana</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:ProximaSemana_Material"></h2>
+                            </div>
+                            <h6 class="fw-bold">Proxima Semana</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:TotalMaterial"></h2>
+                            </div>
+                            <h6 class="fw-bold">Total de Proyectos</h6>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Proyectos Finalizados</h5>
+                    <div class="row text-center">
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:ProyectoTiempo"></h2>
+                            </div>
+                            <h6 class="fw-bold">En tiempo</h6>
+                        </div>
+                        <div class="col-3">
+                        </div>
+                        <div class="col-3">
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:ProyectoExtra"></h2>
+                            </div>
+                            <h6 class="fw-bold">Extratemporal</h6>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@if (ViewBag.RolId == 3)
+{
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Alertas</h5>
+                    <div class="row" data-bind="foreach:registrosAlerta">
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title" data-bind="text:nombre"></h5>
+                                    <p class="card-text" data-bind="text:descripcion"></p>
+                                    <a class="btn btn-primary" data-bind="attr: { href: accion }">Accion</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Proximas Entregas</h5>
+                    <div class="row" data-bind="foreach:registrosAlerta">
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title" data-bind="text:nombre"></h5>
+                                    <p class="card-text" data-bind="text:descripcion"></p>
+                                    <a class="btn btn-primary" data-bind="attr: { href: accion }">Accion</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Proyectos Ciclal</h5>
+                    <div class="row text-center">
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:Hoy"></h2>
+                            </div>
+                            <h6 class="fw-bold">Hoy</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:EstaSemana"></h2>
+                            </div>
+                            <h6 class="fw-bold">Esta Semana</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:ProximaSemana"></h2>
+                            </div>
+                            <h6 class="fw-bold">Proxima Semana</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:TotalProyectos"></h2>
+                            </div>
+                            <h6 class="fw-bold">Total de Proyectos</h6>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Proyecto Emergencial</h5>
+                    <div class="row text-center">
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:Hoy_Material"></h2>
+                            </div>
+                            <h6 class="fw-bold">Hoy</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:EstaSemana_Material"></h2>
+                            </div>
+                            <h6 class="fw-bold">Esta Semana</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:ProximaSemana_Material"></h2>
+                            </div>
+                            <h6 class="fw-bold">Proxima Semana</h6>
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:TotalMaterial"></h2>
+                            </div>
+                            <h6 class="fw-bold">Total de Proyectos</h6>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Proyectos Finalizados</h5>
+                    <div class="row text-center">
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:ProyectoTiempo"></h2>
+                            </div>
+                            <h6 class="fw-bold">En tiempo</h6>
+                        </div>
+                        <div class="col-3">
+                        </div>
+                        <div class="col-3">
+                        </div>
+                        <div class="col-3">
+                            <div class="card card-Home">
+                                <h2 class="card-title titleCardHome" data-bind="text:ProyectoExtra"></h2>
+                            </div>
+                            <h6 class="fw-bold">Extratemporal</h6>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @section Scripts {
-  
-    <script src="~/js/home/index.js"></script>
+    <script>
+        // Pasar los valores de ViewBag a variables JavaScript
+        var RolId = @Html.Raw(ViewBag.RolId);
+        var UsuarioId = @Html.Raw(ViewBag.UsuarioId); // Pasar los valores de ViewBag a variables JavaScript
+
+    </script>
+    <script src="~/js/home/Home.js"></script>
 }

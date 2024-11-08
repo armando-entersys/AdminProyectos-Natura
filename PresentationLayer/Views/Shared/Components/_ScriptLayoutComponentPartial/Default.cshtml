@@ -1,7 +1,6 @@
 ﻿
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/knockout@3.5.1/build/knockout-min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
 <script>
     function showAlertModal(message) {
@@ -9,4 +8,38 @@
         var alertModal = new bootstrap.Modal(document.getElementById('alertModal'), {});
         alertModal.show();
     }
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $('#loader-overlay').removeClass('d-none'); // Muestra el overlay y el loader
+        });
+
+        $(document).ajaxStop(function () {
+            $('#loader-overlay').addClass('d-none'); // Oculta el overlay y el loader
+        });
+    });
+    window.validarYProcesarFormulario = function (errorsObservable, callback) {
+    if (errorsObservable().length === 0) {
+        callback(); // Ejecuta la función de guardado o el código deseado si no hay errores
+    } else {
+        // Muestra los mensajes de error
+        errorsObservable.showAllMessages();
+
+        // Función para comprobar si un elemento es visible
+        function isElementVisible(el) {
+            return el && el.offsetParent !== null && 
+                   getComputedStyle(el).visibility !== 'hidden' && 
+                   getComputedStyle(el).opacity !== '0';
+        }
+
+        // Encuentra el primer elemento visible con error
+        var firstErrorElement = document.querySelector('.text-danger:not([style*="display: none"]), .has-error input, .has-error select, .has-error textarea');
+
+        if (firstErrorElement && isElementVisible(firstErrorElement)) {
+            firstErrorElement.focus(); // Enfoca el primer elemento visible con error
+            firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' }); // Desplaza la vista hasta el elemento
+        } else {
+            console.log('No hay un elemento visible con error.');
+        }
+    }
+};
 </script>
