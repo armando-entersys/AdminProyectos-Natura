@@ -28,12 +28,11 @@ namespace DataAccessLayer.Repositories
         public IEnumerable<Usuario> GetUsuarioBySolicitud()
         {
             return _context.Usuarios
-                                 .Where(m => m.SolicitudRegistro == true)
+                                 .Where(m => m.SolicitudRegistro == true && m.Estatus == false)
                                  .ToList();
         }
         public Usuario CambioSolicitudUsuario(int id,bool estatus)
         {
-
             Usuario usuario = _context.Usuarios.Where(q => q.Id == id).FirstOrDefault();
             usuario.Estatus = estatus;
             usuario.FechaModificacion = DateTime.Now;
@@ -44,9 +43,18 @@ namespace DataAccessLayer.Repositories
         {
            return _context.Alertas.Where(q => q.IdUsuario == id).ToList();
         }
-        public IEnumerable<Usuario> BuscarUsuario(string nombre) 
+        public IEnumerable<Usuario> BuscarUsuario(string nombre, int rolId) 
         {
-            var usuarios = _context.Usuarios.Where(q => q.RolId == 2 && q.Nombre.ToUpper().Contains(nombre)).ToList();
+            var usuarios = new List<Usuario>();
+            if (rolId != 0)
+            {
+                usuarios = _context.Usuarios.Where(q => q.RolId == rolId && q.Nombre.ToUpper().Contains(nombre)).ToList();
+
+            }
+            else
+            {
+                usuarios = _context.Usuarios.Where(q => q.Nombre.ToUpper().Contains(nombre)).ToList();
+            }
 
             return usuarios;
 
@@ -95,8 +103,12 @@ namespace DataAccessLayer.Repositories
         }
         public Alerta CrearAlerta(Alerta alerta)
         {
+            if(alerta.IdUsuario == 0)
+            {
+                alerta.IdUsuario = _context.Usuarios.Where(q => q.RolId == 1).Select(p => p.Id).FirstOrDefault();
+            }
             var Alerta = _context.Add(alerta);
-            _context.SaveChanges(true);
+            _context.SaveChanges();
             return alerta;
         }
         public List<TipoAlerta> ObtenerTiposAlerta()

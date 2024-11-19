@@ -3,12 +3,14 @@ using BusinessLayer.Concrete;
 using DataAccessLayer.Concrete;
 using DataAccessLayer.EntityFramework;
 using EntityLayer.Concrete;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Security.Claims;
 
 namespace PresentationLayer.Controllers
 {
+    [Authorize]
     public class InvitacionesController : Controller
     {
         private readonly IAuthService _authService;
@@ -78,12 +80,13 @@ namespace PresentationLayer.Controllers
             respuestaServicio res = new respuestaServicio();
             res = _toolService.CambioSolicitud(id,true);
             Usuario usuario = _usuarioService.TGetById(id);
-            usuario.CambioContrasena = true;
+            usuario.CambioContrasena = false;
             _usuarioService.TUpdate(usuario);
 
+            var urlBase = $"{Request.Scheme}://{Request.Host}";
             var valoresDinamicos = new Dictionary<string, string>
             {
-                { "link", _hostingEnvironment.WebRootPath + "Usuarios//CambioContrasena/" + id } 
+                { "link", urlBase + "/Login" } 
             };
             var Destinatarios = new List<string>();
             Destinatarios.Add(usuario.Correo);
@@ -91,6 +94,25 @@ namespace PresentationLayer.Controllers
             _emailSender.SendEmail(Destinatarios, "UsuarioAceptado", valoresDinamicos);
             return Ok(res);
         }
-       
+        [HttpGet]
+        public ActionResult Rechazar(int id)
+        {
+            respuestaServicio res = new respuestaServicio();
+            res = _toolService.CambioSolicitud(id, false);
+            Usuario usuario = _usuarioService.TGetById(id);
+            usuario.CambioContrasena = false;
+            _usuarioService.TDelete(usuario.Id);
+
+            var valoresDinamicos = new Dictionary<string, string>
+            {
+                { "link","#" }
+            };
+            var Destinatarios = new List<string>();
+            Destinatarios.Add(usuario.Correo);
+
+            _emailSender.SendEmail(Destinatarios, "UsuarioRechazo", valoresDinamicos);
+            return Ok(res);
+        }
+
     }
 }

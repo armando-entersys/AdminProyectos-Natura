@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.Abstract;
 using BusinessLayer.Concrete;
 using EntityLayer.Concrete;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PresentationLayer.Models;
 using System;
@@ -11,6 +12,7 @@ using System.Xml.Linq;
 
 namespace PresentationLayer.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly IAuthService _authService;
@@ -26,7 +28,18 @@ namespace PresentationLayer.Controllers
             _toolsService = toolsService;
 
         }
-
+        [Authorize]
+        public IActionResult TestAuth()
+        {
+            if (HttpContext.User.Identity.IsAuthenticated)
+            {
+                return Content("Usuario autenticado");
+            }
+            else
+            {
+                return Content("No autenticado");
+            }
+        }
         public ActionResult Index()
         {
             IEnumerable<Menu> menus = null;

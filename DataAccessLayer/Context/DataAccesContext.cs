@@ -143,7 +143,12 @@ namespace DataAccessLayer.Context
                 .WithMany(f => f.Materiales)
                 .HasForeignKey(m => m.FormatoId);
 
-            base.OnModelCreating(modelBuilder);
+            // Relación entre HistorialMaterial y Usuario
+            modelBuilder.Entity<HistorialMaterial>()
+                .HasOne(h => h.Usuario) // HistorialMaterial tiene un Usuario
+                .WithMany()             // Un Usuario puede tener muchos HistorialMaterial
+                .HasForeignKey(h => h.UsuarioId) // Clave foránea en HistorialMaterial
+                .OnDelete(DeleteBehavior.Restrict); // Evitar eliminación en cascada
 
         }
 

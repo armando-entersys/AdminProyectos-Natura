@@ -4,12 +4,12 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1 class="py-3" >Brief</h1>
+<h1 class="py-3" >Proyectos</h1>
 <div class="row py-3">
     <div class="col" data-bind="visible:isRoleVisible([2])">
         <button type="button" class="btn btn-outline-primary" data-bind="click:Agregar">
             <i class="lni circle-plus"></i>
-            <span>Agregar Brief</span>
+            <span>Agregar Proyecto</span>
         </button>
     </div>
     <div class="col">
@@ -52,14 +52,13 @@
             </div>
             <div class="modal-body">
                 <div id="formulario">
-                    <div class="mb-3" data-bind="validationElement: EstatusBrief">
-                        <label class="col-form-label">Estatus Brief:</label>
-                        <select class="form-control" data-bind="options: catEstatusBrief, value: EstatusBrief, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                    <div  class="mb-3" data-bind="validationElement: EstatusBrief">
+                        <label class="col-form-label">Estatus Proyecto:</label>
+                        <select disabled class="form-control" data-bind="options: catEstatusBrief, value: EstatusBrief, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
                     </div>
                     <div class="mb-3" data-bind="validationElement: nombre">
                         <label for="recipient-name" class="col-form-label">Nombre:</label>
                         <input type="text" class="form-control" id="nombre" maxlength="128" data-bind="value: nombre" />
-                        <span class="text-danger" data-bind="validationMessage: nombre"></span>
                     </div>
                     <div class="mb-3" data-bind="validationElement: descripcion">
                         <label for="recipient-name" class="col-form-label">Descripción:</label>
@@ -77,14 +76,15 @@
                         <label for="recipient-name" class="col-form-label">Fecha de entrega deseada:</label>
                         <input type="date" class="form-control" id="fechaEntrega" maxlength="128" data-bind="value: fechaEntrega">
                     </div>
-                    <div class="mb-3" data-bind="validationElement: comentario">
-                        <label for="recipient-name" class="col-form-label">Comentario:</label>
-                        <input type="text" class="form-control" id="comentario" maxlength="128" data-bind="value: comentario">
-                    </div>
                    
                     <div class="mb-3" data-bind="validationElement: TipoBrief">
-                        <label class="col-form-label">Rol:</label>
+                        <label class="col-form-label">Tipo:</label>
                         <select class="form-control" data-bind="options: catTipoBrief, value: TipoBrief, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                    </div>
+                    <div class="mb-3" data-bind="validationElement: linksReferencias">
+                        <label for="recipient-name" class="col-form-label">Link de Referencia:</label>
+                        <input type="text" class="form-control" maxlength="128" data-bind="value: linksReferencias" />
+                        
                     </div>
                     <div class="mb-3" data-bind="validationElement: cargaArchivo">
                         <label for="cargaArchivo" class="col-form-label">Cargar Documento:</label>

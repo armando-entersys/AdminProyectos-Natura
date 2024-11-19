@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="ElmahCore" Version="2.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client.Core" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.33">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

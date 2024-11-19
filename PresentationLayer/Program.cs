@@ -50,14 +50,13 @@ builder.Services.Configure<CategoriaCorreo>(builder.Configuration.GetSection("Ca
 builder.Services.AddScoped<EmailSender>();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options => {
-        options.LoginPath = "/";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-        options.SlidingExpiration = true;
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.Lax;
+builder.Services.AddAuthentication("MyCookieAuthenticationScheme")
+    .AddCookie("MyCookieAuthenticationScheme", options =>
+    {
+        options.LoginPath = "/Login/Index"; // Redirigir a esta ruta cuando no esté autenticado
+        options.AccessDeniedPath = "/Login/AccessDenied"; // Opcional: ruta para acceso denegado
+        options.ExpireTimeSpan = TimeSpan.FromHours(1); // Duración de la sesión (1 hora)
+        options.SlidingExpiration = true; // Renueva la expiración si el usuario está activo
     });
 
 builder.Services.AddDistributedMemoryCache();
@@ -99,7 +98,7 @@ app.UseRouting();
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
-
+/*
 app.Use(async (context, next) =>
 {
     if (!context.User.Identity.IsAuthenticated && !context.Request.Path.StartsWithSegments("/Login"))
@@ -120,12 +119,12 @@ app.Use(async (context, next) =>
 
     await next();
 });
-
+*/
 app.MapControllers();
 app.UseElmah();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Login}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

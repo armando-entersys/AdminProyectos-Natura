@@ -6,12 +6,14 @@ function AppViewModel() {
     var self = this;
 
     self.registros = ko.observableArray();
+    self.registrosHistorico = ko.observableArray();
     self.catEstatusMateriales = ko.observableArray();
     self.EstatusMateriales = ko.observable();
 
     self.revision = ko.observable();
     self.produccion = ko.observable();
     self.faltaInfo = ko.observable();
+    self.aprobado = ko.observable();
     self.programado = ko.observable();
     self.entregado = ko.observable();
     self.inicioCiclo = ko.observable();
@@ -19,11 +21,16 @@ function AppViewModel() {
     // Observables para filtros
     self.filtroNombreProyecto = ko.observable("");
     self.filtroFechaEntrega = ko.observable("");
-
+    self.envioCorreo = ko.observable("No");
     self.id = ko.observable();
     self.Comentario = ko.observable("").extend({ rateLimit: { timeout: 300, method: "notifyWhenChangesStop" } });
 
     self.fechaEntrega = ko.observable();
+    // Observables y variables para autocompletado
+    self.buscarUsuario = ko.observable("");
+    self.resultadosBusqueda = ko.observableArray([]);
+    self.registrosUsuariosCorreo = ko.observableArray();
+
     // Custom binding handler to prevent cursor reset
     ko.bindingHandlers.textareaCursor = {
         init: function (element, valueAccessor) {
@@ -85,6 +92,7 @@ function AppViewModel() {
             }
         }
     };
+    let comentarioEditor;
     self.inicializar = function () {
         $.ajax({
             url: "/Materiales/ObtenerMateriales", // URL del método GetAll en tu API
@@ -101,10 +109,11 @@ function AppViewModel() {
                         self.revision(d.datos.revision);
                         self.produccion(d.datos.produccion);
                         self.faltaInfo(d.datos.faltaInfo);
+                        self.aprobado(d.datos.aprobado);
                         self.programado(d.datos.programado);
                         self.entregado(d.datos.entregado);
                         self.inicioCiclo(d.datos.inicioCiclo);
-                        self.noCompartio(d.datos.noCompartio);
+                        
                         $.ajax({
                             url: "/Materiales/ObtenerEstatusMateriales", // URL del método GetAll en tu API
                             type: "GET",
@@ -112,37 +121,32 @@ function AppViewModel() {
                             success: function (d) {
                                 self.catEstatusMateriales.removeAll();
                                 self.catEstatusMateriales.push.apply(self.catEstatusMateriales, d.datos.$values);
-                                // Inicializar CKEditor después de que el DOM esté listo
-                                // Inicializar CKEditor después de que el DOM esté listo y los datos se hayan cargado
-                                setTimeout(() => {
-                                    ClassicEditor
-                                        .create(document.querySelector('#comentario-editor'), {
-                                            toolbar: [
-                                                'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'undo', 'redo', '|', 'imageUpload'
-                                            ],
-                                            simpleUpload: {
-                                                uploadUrl: '/tu-servidor-de-carga', // URL para manejar la carga de imágenes
-                                                headers: {
-                                                    'X-CSRF-TOKEN': 'tu-csrf-token'
-                                                }
+
+                                
+                                ClassicEditor
+                                    .create(document.querySelector('#comentario-editor'), {
+                                        toolbar: [
+                                            'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'undo', 'redo', '|', 'imageUpload'
+                                        ],
+                                        simpleUpload: {
+                                            uploadUrl: '/Materiales/UploadImage',
+                                            headers: {
+                                                'X-CSRF-TOKEN': 'tu-csrf-token'
                                             }
-                                        })
-                                        .then(editor => {
-                                            // Sincronizar el contenido de CKEditor con el observable de Knockout
-                                            editor.model.document.on('change:data', () => {
-                                                self.Comentario(editor.getData());
-                                            });
-
-                                            // Escuchar cambios del observable y actualizar CKEditor
-                                            self.Comentario.subscribe(newValue => {
-                                                editor.setData(newValue);
-                                            });
-                                        })
-                                        .catch(error => {
-                                            console.error("Error al inicializar CKEditor: ", error);
+                                        }
+                                    })
+                                    .then(editor => {
+                                        comentarioEditor = editor; // Asigna el editor a la variable global
+                                        editor.model.document.on('change:data', () => {
+                                            self.Comentario(editor.getData());
                                         });
-                                }, 100);
-
+                                        self.Comentario.subscribe(newValue => {
+                                            editor.setData(newValue);
+                                        });
+                                    })
+                                    .catch(error => {
+                                        console.error("Error al inicializar CKEditor: ", error);
+                                    });
                             },
                             error: function (xhr, status, error) {
                                 console.error("Error al obtener los datos: ", error);
@@ -163,6 +167,7 @@ function AppViewModel() {
         });
            
     }
+
     self.inicializar();
     function updateComentario(textarea) {
         var viewModel = ko.dataFor(textarea);
@@ -174,7 +179,7 @@ function AppViewModel() {
         var filtroFecha = self.filtroFechaEntrega();
 
         return ko.utils.arrayFilter(self.registros(), function (registro) {
-            var nombreProyecto = registro.brief.nombre.toLowerCase();
+            var nombreProyecto = registro.brief.nombre;
             var fechaEntrega = registro.fechaEntrega;
 
             // Filtros: por nombre de proyecto y por fecha de entrega
@@ -184,35 +189,94 @@ function AppViewModel() {
             return cumpleNombre && cumpleFecha;
         });
     });
-
+    
     self.Editar = function (material) {
+        self.Comentario("");
         self.id(material.id);
-        self.fechaEntrega(material.fechaEntrega);
+        self.fechaEntrega(new Date(material.fechaEntrega).toISOString().split('T')[0]);
+        self.registrosUsuariosCorreo.removeAll(); 
         var EstatusMateriales = self.catEstatusMateriales().find(function (r) {
-            return r.id === material.estatusMaterialesId;
+            return r.id === material.estatusMaterialId;
         });
         self.EstatusMateriales(EstatusMateriales);
+
+        $.ajax({
+            url: "/Materiales/ObtenerHistorial/" + material.id,
+            type: "GET",
+            contentType: "application/json",
+            success: function (d) {
+                self.registrosHistorico.removeAll();
+                self.registrosHistorico.push.apply(self.registrosHistorico, d.datos.$values);
+                
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al actualizar el comentario: ", error);
+                alert("Error al actualizar el comentario: " + xhr.responseText);
+            }
+        });
 
         $("#divEdicion").modal("show");
     }
     self.GuardarComentario = function () {
         // Obtener el valor del editor y establecerlo en el observable `Comentario`
-        var comentarioHTML = CKEDITOR.instances['comentario-editor'].getData();
-        self.Comentario(comentarioHTML);
+        var comentarioContenido = comentarioEditor.getData();
+        self.Comentario(comentarioContenido);
 
+        var envioCorreo = self.envioCorreo() !== "No";
+       
         var historialMaterial = {
             MaterialId: self.id(),
             Comentarios: self.Comentario(),
-            FechaRegistro: self.fechaEntrega()
+            FechaRegistro: self.fechaEntrega(),
+            EstatusMaterialId: self.EstatusMateriales().id
         }
-
+        var historialMaterialRequest = {
+            HistorialMaterial: historialMaterial,
+            EnvioCorreo: envioCorreo,
+            Usuarios: self.registrosUsuariosCorreo()
+        }
+        
+        
         $.ajax({
-            url: "/Materiales/ActualizarMaterial",
+            url: "/Materiales/AgregarHistorialMaterial", 
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify(historialMaterial),
+            data: JSON.stringify(historialMaterialRequest),
             success: function (d) {
-                alert("Comentario actualizado correctamente");
+               
+                $.ajax({
+                    url: "/Materiales/ObtenerHistorial/" + self.id(),
+                    type: "GET",
+                    contentType: "application/json",
+                    success: function (d) {
+                        alert("Comentario actualizado correctamente");
+                        self.registrosHistorico.removeAll();
+                        self.registrosHistorico.push.apply(self.registrosHistorico, d.datos.$values);
+                        $.ajax({
+                            url: "/Materiales/ObtenerConteoEstatusMateriales", // URL del método GetAll en tu API
+                            type: "GET",
+                            contentType: "application/json",
+                            success: function (d) {
+                                self.revision(d.datos.revision);
+                                self.produccion(d.datos.produccion);
+                                self.faltaInfo(d.datos.faltaInfo);
+                                self.aprobado(d.datos.aprobado);
+                                self.programado(d.datos.programado);
+                                self.entregado(d.datos.entregado);
+                                self.inicioCiclo(d.datos.inicioCiclo);
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error al obtener los datos: ", error);
+                                alert("Error al obtener los datos: " + xhr.responseText);
+                            }
+                        });
+
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error al actualizar el comentario: ", error);
+                        alert("Error al actualizar el comentario: " + xhr.responseText);
+                    }
+                });
             },
             error: function (xhr, status, error) {
                 console.error("Error al actualizar el comentario: ", error);
@@ -257,7 +321,39 @@ function AppViewModel() {
             }
         });
     }
+    // Método de búsqueda de usuarios con Autocompletar
+    self.buscarUsuarios = function () {
+        if (self.buscarUsuario().length < 3) {
+            self.resultadosBusqueda([]); // Limpia resultados si menos de 3 caracteres
+            return;
+        }
+        var usuario = {
+            Nombre: self.buscarUsuario(),
+        }
 
+        $.ajax({
+            url: "/Usuarios/BuscarAllUsuarios", // Ruta de tu API para buscar usuarios
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(usuario),
+            success: function (d) {
+                self.resultadosBusqueda(d.datos.$values); // Asigna resultados al array
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al buscar usuarios: ", error);
+            }
+        });
+    };
+
+    // Seleccionar usuario y agregar a Participante
+    self.seleccionarUsuario = function (usuario) {
+
+        self.registrosUsuariosCorreo.push(usuario);
+        self.buscarUsuario(""); // Limpia el campo de búsqueda
+        self.resultadosBusqueda([]); // Limpia resultados de autocompletado
+        
+
+    };
 }
 
 // Activar Knockout.js

@@ -19,19 +19,17 @@ namespace DataAccessLayer.Repositories
         {
             _context = context;
         }
-
         public async Task<Usuario> Autenticar(string correo, string contrasena)
         {
             Usuario usuario = await _context.Usuarios.Where(q => q.Correo == correo && q.Contrasena == contrasena).FirstOrDefaultAsync();
-            if(usuario != null)
+            if (usuario != null)
             {
                 usuario.UserRol = new Rol();
                 usuario.UserRol = await _context.Roles.Where(q => q.Id == usuario.RolId).FirstOrDefaultAsync();
-                usuario.UserRol.Menus = _context.Menus.Where(q=> q.RolId ==  usuario.RolId).ToList();
+                usuario.UserRol.Menus = _context.Menus.Where(q => q.RolId == usuario.RolId).ToList();
             }
-             return usuario;
+            return usuario;
         }
-
         public async Task<Usuario> Registro(string correo,string Nombre)
         {
             Usuario usuario =  _context.Usuarios.Where(q => q.Correo == correo).FirstOrDefault();
@@ -67,8 +65,55 @@ namespace DataAccessLayer.Repositories
             }
             return resp;
         }
+        public respuestaServicio CambioPasswordEmail(string correo)
+        {
+            respuestaServicio resp = new respuestaServicio();
+            Usuario usuarioBD = _context.Usuarios.Where(q => q.Correo == correo).FirstOrDefault();
+            if (usuarioBD != null)
+            {
+                usuarioBD.CambioContrasena = true;
+                _context.Update(usuarioBD);
+                _context.SaveChanges();
+                resp.Datos = usuarioBD;
+                resp.Exito = true;
+                resp.Mensaje = "Solicitud exitosa";
 
+            }
+            else
+            {
+                resp.Exito = false;
+                resp.Mensaje = "Correo no registrado";
+            }
+            return resp;
+        }
+        public respuestaServicio CambiarPasswordUsuario(Usuario usuario)
+        {
+            respuestaServicio resp = new respuestaServicio();
+            Usuario usuarioBD = _context.Usuarios.Where(q => q.Id == usuario.Id).FirstOrDefault();
+            if (usuarioBD != null)
+            {
+                usuarioBD.CambioContrasena = false;
+                usuarioBD.Contrasena = usuario.Contrasena;
+                _context.Update(usuarioBD);
+                _context.SaveChanges();
+                resp.Datos = usuarioBD;
+                resp.Exito = true;
+                resp.Mensaje = "Solicitud exitosa";
 
+            }
+            else
+            {
+                resp.Exito = false;
+                resp.Mensaje = "Correo no registrado";
+            }
+            return resp;
+        }
+        public Usuario ObtenerUsuarioByRol(int RolId)
+        {
+            var Usuario = _context.Usuarios.Where(q => q.RolId == RolId).FirstOrDefault();
+
+            return Usuario;
+        }
     }
 
 }

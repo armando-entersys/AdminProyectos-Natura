@@ -1,12 +1,14 @@
 ﻿using BusinessLayer.Abstract;
 using BusinessLayer.Concrete;
 using EntityLayer.Concrete;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PresentationLayer.Models;
 using System.Security.Claims;
 
 namespace PresentationLayer.Controllers
 {
+    [Authorize]
     public class AlertasController : Controller
     {
         private readonly IAuthService _authService;

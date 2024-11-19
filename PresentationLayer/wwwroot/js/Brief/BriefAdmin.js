@@ -26,6 +26,7 @@ function AppViewModel() {
     self.dirigidoA = ko.observable();
     self.comentario = ko.observable();
     self.rutaArchivo = ko.observable();
+    self.linksReferencias = ko.observable();
 
     self.catEstatusBrief = ko.observableArray();
     self.EstatusBrief = ko.observable();
@@ -218,7 +219,7 @@ function AppViewModel() {
                 self.comentario(d.datos.comentario);
                 self.rutaArchivo(d.datos.rutaArchivo);
                 self.fechaEntrega(new Date(d.datos.fechaEntrega).toISOString().split('T')[0]);
-
+                self.linksReferencias(d.datos.linksReferencias);
                 var EstatusBrief = self.catEstatusBrief().find(function (r) {
                     return r.id === d.datos.estatusBriefId;
                 });
@@ -346,6 +347,7 @@ function AppViewModel() {
                 data: JSON.stringify(proyecto),
                 success: function (d) {
                     $('#alertMessage').text(d.mensaje);
+                    alert(d.mensaje);
                 },
                 error: function (xhr, status, error) {
                     console.error("Error al obtener los datos: ", xhr.responseText);

@@ -156,5 +156,15 @@ namespace BusinessLayer.Concrete
         {
             _briefDal.ActualizaRetrasoMaterial(retrasoMaterial);
         }
+
+        public IEnumerable<HistorialMaterial> GetAllHistorialMateriales(int MaterialId)
+        {
+            return _briefDal.GetAllHistorialMateriales(MaterialId);
+        }
+
+        public Material GetMaterial(int id)
+        {
+            return _briefDal.GetMaterial(id);
+        }
     }
 }

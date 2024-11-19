@@ -1,10 +1,12 @@
 ﻿using BusinessLayer.Abstract;
 using EntityLayer.Concrete;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace PresentationLayer.Controllers
 {
+    [Authorize]
     public class CalendarioController : Controller
     {
         private readonly IAuthService _authService;

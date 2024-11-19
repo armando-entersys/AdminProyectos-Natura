@@ -176,7 +176,7 @@ a.sidebar-link:hover {
     background-color: #FFAA16;
     border-color: #FFAA16;
 }
-    .btn-check:active + .btn-primary, .btn-check:checked + .btn-primary, .btn-primary.active, .btn-primary:active, .show > .btn-primary.dropdown-toggle {
+.btn-check:active + .btn-primary, .btn-check:checked + .btn-primary, .btn-primary.active, .btn-primary:active, .show > .btn-primary.dropdown-toggle {
         color: #fff;
         background-color: #EB6619;
         border-color: #EB6619;
@@ -214,4 +214,14 @@ a.sidebar-link:hover {
 }
 .transparent-div {
     opacity: 0; /* Ajusta el valor de opacidad entre 0 y 1 */
+}
+div[disabled] {
+    pointer-events: none;
+    // <---- key point opacity: 0.7;
+}
+.btn-check:focus + .btn-primary, .btn-primary:focus {
+    color: #fff;
+    background-color: #FFAA16 !important;
+    border-color: #FFAA16 !important;
+    box-shadow: 0 0 0 .25rem rgba(49, 132, 253, .5);
 }

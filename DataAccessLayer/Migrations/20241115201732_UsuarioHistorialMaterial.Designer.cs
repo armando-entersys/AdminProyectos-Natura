@@ -4,6 +4,7 @@ using DataAccessLayer.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(DataAccesContext))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20241115201732_UsuarioHistorialMaterial")]
+    partial class UsuarioHistorialMaterial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -251,13 +253,13 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("MaterialId")
                         .HasColumnType("int");
 
-
                     b.Property<int>("UsuarioId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("MaterialId");
+
 
                     b.HasIndex("UsuarioId");
 

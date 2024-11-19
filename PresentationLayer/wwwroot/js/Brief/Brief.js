@@ -29,11 +29,12 @@ function AppViewModel() {
     self.fechaEntrega = ValidationModule.validations.requiredField();
 
     self.catEstatusBrief = ko.observableArray();
-    self.EstatusBrief = ValidationModule.validations.requiredField();
+    self.EstatusBrief = ko.observable();
     self.catTipoBrief = ko.observableArray();
     self.TipoBrief = ValidationModule.validations.requiredField();
     self.cargaArchivo = ko.observable();
     self.registros = ko.observableArray();
+    self.linksReferencias = ValidationModule.validations.requiredField();
 
     self.errors = ko.validation.group(self);
     self.inicializar = function () {
@@ -103,23 +104,22 @@ function AppViewModel() {
         }
     };
     self.Agregar = function () {
-
+        self.Limpiar();
+        var EstatusBrief = self.catEstatusBrief().find(function (r) {
+            return r.id === 1;
+        });
+        self.EstatusBrief(EstatusBrief);
         $("#divEdicion").modal("show");
 
     }
     self.Guardar = function () {
-        validarYProcesarFormulario(self.errors, function () {
-            $(document).ajaxStart(function () {
-                $('#loader').removeClass('d-none');
-            });
-
-            if (self.id() === 0) {
-                self.GuardarNuevo();
-            }
-            else {
-                self.GuardarEditar();
-            }
-        });  
+        
+        if (self.id() === 0) {
+            self.GuardarNuevo();
+        }
+        else {
+            self.GuardarEditar();
+        }
 
     }
     self.Limpiar = function () {
@@ -128,11 +128,11 @@ function AppViewModel() {
         self.descripcion("");
         self.objetivo("");
         self.dirigidoA("");
-        self.comentario("");
         self.rutaArchivo("");
         self.fechaEntrega("");
         self.rutaArchivo("");
         self.cargaArchivo("");
+        self.linksReferencias("");
     }
     self.Editar = function (brief) {
         self.Limpiar();
@@ -147,10 +147,9 @@ function AppViewModel() {
                 self.descripcion(d.datos.descripcion);
                 self.objetivo(d.datos.objetivo);
                 self.dirigidoA(d.datos.dirigidoA);
-                self.comentario(d.datos.comentario);
                 self.rutaArchivo(d.datos.rutaArchivo);
                 self.fechaEntrega(new Date(d.datos.fechaEntrega).toISOString().split('T')[0]);
-
+                self.linksReferencias(d.datos.linksReferencias);
                 var EstatusBrief = self.catEstatusBrief().find(function (r) {
                     return r.id === d.datos.estatusBriefId;
                 });
@@ -178,11 +177,12 @@ function AppViewModel() {
         formData.append("Descripcion", self.descripcion());
         formData.append("Objetivo", self.objetivo());
         formData.append("DirigidoA", self.dirigidoA());
-        formData.append("Comentario", self.comentario());
         formData.append("FechaEntrega", self.fechaEntrega());
         formData.append("EstatusBriefId", self.EstatusBrief().id);
         formData.append("TipoBriefId", self.TipoBrief().id);
+        formData.append("LinksReferencias", self.linksReferencias());
 
+        
         // Solo agregar el archivo si se ha seleccionado uno
         if (self.cargaArchivo()) {
             formData.append("Archivo", self.cargaArchivo());
@@ -214,6 +214,7 @@ function AppViewModel() {
         });
     }
     self.GuardarNuevo = function () {
+
         $("#divEdicion").modal("hide");
         var formData = new FormData();
        
@@ -221,10 +222,10 @@ function AppViewModel() {
         formData.append("Descripcion", self.descripcion());
         formData.append("Objetivo", self.objetivo());
         formData.append("DirigidoA", self.dirigidoA());
-        formData.append("Comentario", self.comentario());
         formData.append("FechaEntrega", self.fechaEntrega());
         formData.append("EstatusBriefId", self.EstatusBrief().id);
         formData.append("TipoBriefId", self.TipoBrief().id);
+        formData.append("LinksReferencias", self.linksReferencias());
 
         // Solo agregar el archivo si se ha seleccionado uno
         if (self.cargaArchivo()) {
@@ -244,9 +245,6 @@ function AppViewModel() {
                 $('#alertModalLabel').text("Success");
                 $("#alertModal").modal("show");
                 self.Limpiar();
-                $(document).ajaxStop(function () {
-    $('#loader').addClass('d-none');
-});
             },
             error: function (xhr, status, error) {
                 console.error("Error al obtener los datos: ", error);
@@ -256,6 +254,7 @@ function AppViewModel() {
             }
         });
     }
+
 }
 
 // Inicializa SortableJS después de que Knockout haya sido inicializado

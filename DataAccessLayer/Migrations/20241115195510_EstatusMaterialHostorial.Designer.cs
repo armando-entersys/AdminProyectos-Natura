@@ -4,6 +4,7 @@ using DataAccessLayer.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(DataAccesContext))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20241115195510_EstatusMaterialHostorial")]
+    partial class EstatusMaterialHostorial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -251,15 +253,9 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("MaterialId")
                         .HasColumnType("int");
 
-
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("MaterialId");
-
-                    b.HasIndex("UsuarioId");
 
                     b.ToTable("HistorialMateriales");
                 });
@@ -653,20 +649,12 @@ namespace DataAccessLayer.Migrations
             modelBuilder.Entity("EntityLayer.Concrete.HistorialMaterial", b =>
                 {
                     b.HasOne("EntityLayer.Concrete.Material", "Material")
-                        .WithMany()
+                        .WithMany("Historiales")
                         .HasForeignKey("MaterialId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("EntityLayer.Concrete.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Material");
-
-                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.Material", b =>

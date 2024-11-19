@@ -105,12 +105,21 @@ namespace DataAccessLayer.Repositories
 
         public void Update(Brief entity)
         {
-            var existingEntity = _context.Set<Brief>().Find(entity.Id);  // Carga la entidad original
-            if (existingEntity != null)
+            try
             {
-                _context.Entry(existingEntity).CurrentValues.SetValues(entity);  // Solo copia los valores modificados
-                _context.SaveChanges();
+                var existingEntity = _context.Set<Brief>().Find(entity.Id);  // Carga la entidad original
+                if (existingEntity != null)
+                {
+                    _context.Entry(existingEntity).CurrentValues.SetValues(entity);  // Solo copia los valores modificados
+                    _context.SaveChanges();
+                }
             }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+          
         }
         public IEnumerable<EstatusBrief> GetAllEstatusBrief()
         {
@@ -126,7 +135,23 @@ namespace DataAccessLayer.Repositories
         }
         public void InsertProyecto(Proyecto entity)
         {
-            _context.Set<Proyecto>().Add(entity);
+            var proyecto = _context.Proyectos.Where(q => q.BriefId == entity.BriefId).FirstOrDefault();
+            
+            if(proyecto != null)
+            {
+                proyecto.RequierePlan = entity.RequierePlan;
+                proyecto.ClasificacionProyectoId = entity.ClasificacionProyectoId;
+                proyecto.FechaPublicacion = entity.FechaPublicacion;
+                proyecto.FechaModificacion = DateTime.Now;
+                proyecto.Comentario = entity.Comentario;
+                proyecto.Estado = entity.Estado;
+                _context.Update(proyecto);
+            }
+            else
+            {
+                _context.Set<Proyecto>().Add(entity);
+                
+            }
             _context.SaveChanges();
         }
         public void InsertMaterial(Material entity)
@@ -306,7 +331,8 @@ namespace DataAccessLayer.Repositories
                                  FechaRegistro = p.FechaRegistro,
                                  FechaModificacion = p.FechaModificacion,
                                  Brief = _context.Briefs.Where(q => q.Id == p.BriefId).FirstOrDefault(),
-                                 EstatusMaterial = _context.EstatusMateriales.Where(u => u.Id == p.EstatusMaterialId).FirstOrDefault()
+                                 EstatusMaterial = _context.EstatusMateriales.Where(u => u.Id == p.EstatusMaterialId).FirstOrDefault(),
+                                 EstatusMaterialId = p.EstatusMaterialId
                              }).ToList();
 
             if (usuarioAdmin != null)
@@ -328,11 +354,39 @@ namespace DataAccessLayer.Repositories
                     FechaRegistro = p.FechaRegistro,
                     FechaModificacion = p.FechaModificacion,
                     Brief = _context.Briefs.Where(q => q.Id == p.BriefId).FirstOrDefault(),
+                    EstatusMaterialId = p.EstatusMaterialId,
                     EstatusMaterial = _context.EstatusMateriales.Where(u => u.Id == p.EstatusMaterialId).FirstOrDefault()
                 }).ToList();
             }
             return materiales;
         }
+        public Material GetMaterial(int id)
+        {
+            var material = _context.Materiales.Where(q => q.Id == id)
+                             .Select(p => new Material
+                             {
+                                 Id = p.Id,
+                                 Nombre = p.Nombre,
+                                 Mensaje = p.Mensaje,
+                                 Prioridad = _context.Prioridad.Where(u => u.Id == p.PrioridadId).FirstOrDefault(),
+                                 Ciclo = p.Ciclo,
+                                 PCN = _context.PCN.Where(u => u.Id == p.PCNId).FirstOrDefault(),
+                                 Audiencia = _context.Audiencia.Where(u => u.Id == p.AudienciaId).FirstOrDefault(),
+                                 Formato = _context.Formato.Where(u => u.Id == p.FormatoId).FirstOrDefault(),
+                                 FechaEntrega = p.FechaEntrega,
+                                 Proceso = p.Proceso,
+                                 Produccion = p.Produccion,
+                                 Responsable = p.Responsable,
+                                 FechaRegistro = p.FechaRegistro,
+                                 FechaModificacion = p.FechaModificacion,
+                                 Brief = _context.Briefs.Where(q => q.Id == p.BriefId).FirstOrDefault(),
+                                 EstatusMaterial = _context.EstatusMateriales.Where(u => u.Id == p.EstatusMaterialId).FirstOrDefault(),
+                                 EstatusMaterialId = p.EstatusMaterialId
+                             }).FirstOrDefault();
+
+            return material;
+        }
+
         public List<Material> GetMaterialesFilter(Material material)
         {
             var usuarioAdmin = _context.Usuarios.Where(q => q.Id == material.Id && q.RolId == 1).FirstOrDefault();
@@ -354,6 +408,7 @@ namespace DataAccessLayer.Repositories
                                  FechaRegistro = p.FechaRegistro,
                                  FechaModificacion = p.FechaModificacion,
                                  Brief = _context.Briefs.Where(q => q.Id == p.BriefId).FirstOrDefault(),
+                                 EstatusMaterialId = p.EstatusMaterialId,
                                  EstatusMaterial = _context.EstatusMateriales.Where(u => u.Id == p.EstatusMaterialId).FirstOrDefault()
                              }).ToList();
 
@@ -376,6 +431,7 @@ namespace DataAccessLayer.Repositories
                     FechaRegistro = p.FechaRegistro,
                     FechaModificacion = p.FechaModificacion,
                     Brief = _context.Briefs.Where(q => q.Id == p.BriefId).FirstOrDefault(),
+                    EstatusMaterialId = p.EstatusMaterialId,
                     EstatusMaterial = _context.EstatusMateriales.Where(u => u.Id == p.EstatusMaterialId).FirstOrDefault()
                 }).ToList();
             }
@@ -413,19 +469,19 @@ namespace DataAccessLayer.Repositories
             var usuarioAdmin = _context.Usuarios.Where(q => q.Id == UsuarioId).FirstOrDefault();
             var materiales = _context.Materiales.Where(q => q.Brief.UsuarioId == UsuarioId).ToList();
             ConteoMateriales conteoMateriales = new ConteoMateriales();
-            if (usuarioAdmin == null)
+            if (usuarioAdmin != null)
             {
                 materiales = _context.Materiales.ToList();
             }
 
-            conteoMateriales.Registros = materiales.Where(q => q.EstatusMaterialId == 1).Count();
-            conteoMateriales.Revision = materiales.Where(q => q.EstatusMaterialId == 2).Count();
-            conteoMateriales.Produccion = materiales.Where(q => q.EstatusMaterialId == 3).Count();
-            conteoMateriales.FaltaInfo = materiales.Where(q => q.EstatusMaterialId == 4).Count();
-            conteoMateriales.Programado = materiales.Where(q => q.EstatusMaterialId == 5).Count();
-            conteoMateriales.Entregado = materiales.Where(q => q.EstatusMaterialId == 6).Count();
-            conteoMateriales.InicioCiclo = materiales.Where(q => q.EstatusMaterialId == 7).Count();
-            conteoMateriales.NoCompartio = materiales.Where(q => q.EstatusMaterialId == 8).Count();
+            conteoMateriales.Registros = materiales.Count();
+            conteoMateriales.Revision = materiales.Where(q => q.EstatusMaterialId == 1).Count();
+            conteoMateriales.FaltaInfo = materiales.Where(q => q.EstatusMaterialId == 2).Count();
+            conteoMateriales.Aprobado = materiales.Where(q => q.EstatusMaterialId == 3).Count();
+            conteoMateriales.Programado = materiales.Where(q => q.EstatusMaterialId == 4).Count();
+            conteoMateriales.Entregado = materiales.Where(q => q.EstatusMaterialId == 5).Count();
+            conteoMateriales.InicioCiclo = materiales.Where(q => q.EstatusMaterialId == 6).Count();
+
 
             return conteoMateriales;
         }
@@ -436,12 +492,31 @@ namespace DataAccessLayer.Repositories
         public void ActualizaHistorialMaterial(HistorialMaterial historialMaterial)
         {
             _context.Add(historialMaterial);
+            var material = _context.Materiales.Where(q => q.Id == historialMaterial.MaterialId).FirstOrDefault();
+            material.EstatusMaterialId = historialMaterial.EstatusMaterialId;
+            _context.Update(material);
             _context.SaveChanges();
         }
         public void ActualizaRetrasoMaterial(RetrasoMaterial retrasoMaterial)
         {
             _context.Add(retrasoMaterial);
             _context.SaveChanges();
+        }
+        public IEnumerable<HistorialMaterial> GetAllHistorialMateriales(int MaterialId)
+        {
+
+            return _context.HistorialMateriales.Where(q => q.MaterialId == MaterialId)
+                                               .Select(p => new HistorialMaterial
+                                               {
+                                                   Id = p.Id,
+                                                   Comentarios = p.Comentarios,
+                                                   FechaRegistro = p.FechaRegistro,
+                                                   EstatusMaterialId = p.EstatusMaterialId,
+                                                   UsuarioId = p.UsuarioId,
+                                                   Usuario = _context.Usuarios.Where(w => w.Id == p.UsuarioId).FirstOrDefault(),
+                                                   MaterialId = p.MaterialId
+                                               })
+                                               .ToList();
         }
     }
 }

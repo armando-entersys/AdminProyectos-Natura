@@ -3,52 +3,48 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<script src="https://cdn.ckeditor.com/ckeditor5/35.0.1/classic/ckeditor.js"></script>
+
+
 <h3>Gestión de Material</h3>
 
 <div class="row text-center">
     <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
-        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:green; width: 100px; height: 100px;">
+        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:#22D548; width: 100px; height: 100px;">
             <h2 data-bind="text:revision" style="margin: 0;"></h2>
             <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Revisión</p>
         </div>
     </div>
     <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
-        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:blue; width: 100px; height: 100px;">
-            <h2 data-bind="text:produccion" style="margin: 0;"></h2>
-            <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Producción</p>
-        </div>
-    </div>
-    <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
-        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:orange; width: 100px; height: 100px;">
+        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:#FF450B; width: 100px; height: 100px;">
             <h2 data-bind="text:faltaInfo" style="margin: 0;"></h2>
             <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Falta Información</p>
         </div>
     </div>
     <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
-        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:blue; width: 100px; height: 100px;">
+        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:#84B8FF; width: 100px; height: 100px;">
+            <h2 data-bind="text:aprobado" style="margin: 0;"></h2>
+            <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Aprobado</p>
+        </div>
+    </div>
+    <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
+        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:#4DBEFF; width: 100px; height: 100px;">
             <h2 data-bind="text:programado" style="margin: 0;"></h2>
             <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Programado</p>
         </div>
     </div>
     <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
-        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:purple; width: 100px; height: 100px;">
+        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:#9F81FD; width: 100px; height: 100px;">
             <h2 data-bind="text:entregado" style="margin: 0;"></h2>
             <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Entregado</p>
         </div>
     </div>
     <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
-        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:yellow; width: 100px; height: 100px;">
+        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:#EFF200; width: 100px; height: 100px;">
             <h2 data-bind="text:inicioCiclo" style="margin: 0;"></h2>
             <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Inicio de ciclo</p>
         </div>
     </div>
-    <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
-        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:red; width: 100px; height: 100px;">
-            <h2 data-bind="text:noCompartio" style="margin: 0;"></h2>
-            <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">No se compartió</p>
-        </div>
-    </div>
+   
 </div>
 
 <div class="row mb-3">
@@ -114,19 +110,24 @@
     <div class="modal-dialog modal-fullscreen-xxl-down">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="Modal">Solicitud Brief</h5>
+                <h5 class="modal-title" id="Modal">Editar Material</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="background-color: rgba(0, 0, 0, .03);">
                 <div class="row">
-                    <div class="col">
-                        <div>
-
+                    <div class="col-4" style="background-color:#FFFFFF;">
+                        
+                        <div data-bind="foreach: registrosHistorico">
+                            <hr class="border border-3 border-primary w-100 mx-auto my-4">
+                            <p data-bind="html: comentarios"> </p>
+                            <p data-bind="html: fechaRegistro"> </p>
+                            <p data-bind="html: usuario.nombre + ' ' + usuario.apellidoPaterno"> </p>
+                            <hr class="border border-3 border-primary w-100 mx-auto my-4">
                         </div>
                     </div>
                     <div class="col">
                         <div id="formularioAdmin" class="p-3">
-                            <h1>Panel Edición Administrador</h1>
+                            <h1>Cambio Estatus</h1>
 
                             <div class="mb-3" data-bind="validationElement: EstatusMateriales">
                                 <label class="col-form-label">Clasificación:</label>
@@ -140,6 +141,50 @@
                                 <label for="recipient-name" class="col-form-label">Cambiar Fecha Entrega:</label>
                                 <input type="date" class="form-control" id="fechaEntrega" maxlength="128" data-bind="value: fechaEntrega">
                             </div>
+                            <div class="mb-3" data-bind="validationElement: envioCorreo">
+                                <label for="recipient-name" class="col-form-label">Notifica por Correo:</label>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="envioCorreoOptions" id="envioCorreo1" value="Sí" data-bind="checked: envioCorreo">
+                                    <label class="form-check-label" for="envioCorreo1">Sí</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="envioCorreoOptions" id="envioCorreo2" value="No" data-bind="checked: envioCorreo">
+                                    <label class="form-check-label" for="envioCorreo2">No</label>
+                                </div>
+                            </div>
+                            <div>
+                                <h2 style="color:#FFAA16;">Usuarios</h2>
+                                <div>
+                                    <label for="buscarUsuario">Buscar usuario:</label>
+                                    <input id="buscarUsuario" type="text" class="form-control" placeholder="Escribe el nombre del usuario..."
+                                           data-bind="value: buscarUsuario, valueUpdate: 'input', event: { keyup: buscarUsuarios }" />
+                                    <ul data-bind="foreach: resultadosBusqueda" class="autocomplete-results" style="background-color:#fff">
+                                        <li data-bind="text: nombre, click: $root.seleccionarUsuario"></li>
+                                    </ul>
+                                </div>
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Id</th>
+                                            <th scope="col">Nombre</th>
+                                            <th scope="col">Detalles</th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody data-bind="foreach: registrosUsuariosCorreo">
+                                        <tr>
+                                            <td data-bind="text: id"></td>
+                                            <td data-bind="text: nombre"></td>
+                                            <td class="small">
+                                                <button type="button" class="btn btn-outline-primary" data-bind="click:$root.EliminarParticipante">
+                                                    <i class="lni lni-pencil"></i>
+                                                    <span>Eliminar</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                             <button type="button" class="btn btn-primary" data-bind="click:GuardarComentario">
                                 <i class="lni lni-save"></i>
                                 <span>Guardar</span>
@@ -152,7 +197,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
                     <i class="lni lni-save"></i>
                     <span>Aceptar</span>
                 </button>
@@ -163,6 +208,7 @@
 
 
     @section Scripts {
+        <script src="https://cdn.ckeditor.com/ckeditor5/35.3.1/classic/ckeditor.js"></script>
 
         <script src="~/js/Material/Material.js"></script>
     }

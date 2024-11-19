@@ -13,8 +13,8 @@ namespace DataAccessLayer.Concrete
         public int Produccion { get; set; }
         public int FaltaInfo { get; set; }
         public int Programado { get; set; }
+        public int Aprobado { get; set; }
         public int Entregado { get; set; }
         public int InicioCiclo { get; set; }
-        public int NoCompartio { get; set; }
     }
 }

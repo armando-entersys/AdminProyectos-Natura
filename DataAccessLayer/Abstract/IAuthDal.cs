@@ -14,5 +14,8 @@ namespace DataAccessLayer.Abstract
         Task<Usuario> Registro(string correo, string Nombre);
         IEnumerable<Menu> GetMenusByRole(int rolId);
         respuestaServicio SolicitudUsuario(Usuario usuario);
+        respuestaServicio CambioPasswordEmail(string correo);
+        respuestaServicio CambiarPasswordUsuario(Usuario usuario);
+        Usuario ObtenerUsuarioByRol(int RolId);
     }
 }

@@ -2,6 +2,7 @@
 using BusinessLayer.Concrete;
 using DataAccessLayer.EntityFramework;
 using EntityLayer.Concrete;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PresentationLayer.Models;
@@ -10,7 +11,7 @@ using System.Security.Claims;
 
 namespace PresentationLayer.Controllers
 {
-
+    [Authorize]
     public class BriefController : Controller
     {
         private readonly IAuthService _authService;
@@ -18,13 +19,17 @@ namespace PresentationLayer.Controllers
         private readonly IBriefService _briefService;
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IToolsService _toolsService;
-        public BriefController(IEmailSender emailSender, IBriefService briefService, IAuthService authService, IWebHostEnvironment hostingEnvironment, IToolsService toolsService)
+        private readonly IUsuarioService _usuarioService;
+
+        public BriefController(IEmailSender emailSender, IBriefService briefService, IAuthService authService, 
+                                IWebHostEnvironment hostingEnvironment, IToolsService toolsService, IUsuarioService usuarioService)
         {
             _emailSender = emailSender;
             _briefService = briefService;
             _authService = authService;
             _hostingEnvironment = hostingEnvironment;
             _toolsService = toolsService;
+            _usuarioService = usuarioService;
         }
         // GET: BriefController
         public ActionResult Index()
@@ -161,14 +166,71 @@ namespace PresentationLayer.Controllers
             brief.Nombre = BriefOrg.Nombre;
             brief.Objetivo = BriefOrg.Objetivo;
             brief.RutaArchivo = BriefOrg.RutaArchivo;
+            brief.LinksReferencias = BriefOrg.LinksReferencias;
             brief.DirigidoA = BriefOrg.DirigidoA;
             brief.Descripcion = BriefOrg.Descripcion;
             brief.FechaEntrega = BriefOrg.FechaEntrega;
             brief.FechaRegistro = BriefOrg.FechaRegistro;
             brief.FechaModificacion = DateTime.Now;
             brief.TipoBriefId = BriefOrg.TipoBriefId;
-
+        
             _briefService.Update(brief);
+
+            var Destinatarios = new List<string>();
+
+            if (brief.EstatusBriefId == 1)
+            {
+                Destinatarios = _toolsService.GetUsuarioByRol(1).Select(q => q.Correo).ToList();
+                Destinatarios.AddRange(_toolsService.ObtenerParticipantes(brief.Id).Select(q => q.Usuario.Correo).ToList());
+            }
+            if (brief.EstatusBriefId == 2)
+            {
+                Destinatarios = _toolsService.GetUsuarioByRol(3).Select(q => q.Correo).ToList();
+
+                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
+            }
+            if (brief.EstatusBriefId == 3)
+            {
+                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
+            }
+            if (brief.EstatusBriefId == 4)
+            {
+                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
+            }
+            if (brief.EstatusBriefId == 5)
+            {
+                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
+            }
+            if (brief.EstatusBriefId == 6)
+            {
+                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
+            }
+            if (brief.EstatusBriefId == 7)
+            {
+                Destinatarios = _toolsService.GetUsuarioByRol(3).Select(q => q.Correo).ToList();
+                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
+            }
+            if (brief.EstatusBriefId == 8)
+            {
+                Destinatarios = _toolsService.GetUsuarioByRol(3).Select(q => q.Correo).ToList();
+                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
+            }
+            var estatusBriefs = _briefService.GetAllEstatusBrief();
+            brief.EstatusBrief = estatusBriefs.Where(q => q.Id == brief.EstatusBriefId).FirstOrDefault();
+            var urlBase = $"{Request.Scheme}://{Request.Host}";
+            // Diccionario con los valores dinámicos a reemplazar
+            var valoresDinamicos = new Dictionary<string, string>()
+            {
+                { "estatus", brief.EstatusBrief.Descripcion},
+                { "nombreProyecto", brief.Nombre },
+                { "link", urlBase + "/BriefAdmin"  }
+
+            };
+           
+
+            _emailSender.SendEmail(Destinatarios, "ActualizaEstatusProyecto", valoresDinamicos);
+
+
             res.Datos = brief;
             res.Mensaje = "Actualizado exitosamente";
             res.Exito = true;
@@ -209,6 +271,7 @@ namespace PresentationLayer.Controllers
                 Objetivo = Addbrief.Objetivo,
                 DirigidoA = Addbrief.DirigidoA,
                 Comentario = Addbrief.Comentario,
+                LinksReferencias = Addbrief.LinksReferencias,
                 RutaArchivo = Addbrief.RutaArchivo,
                 TipoBriefId = Addbrief.TipoBriefId,
                 FechaEntrega = Addbrief.FechaEntrega,
@@ -220,13 +283,13 @@ namespace PresentationLayer.Controllers
 
             _briefService.Insert(brief);
             //Envio Correo
-
+            var urlBase = $"{Request.Scheme}://{Request.Host}";
             // Diccionario con los valores dinámicos a reemplazar
             var valoresDinamicos = new Dictionary<string, string>()
             {
                 { "nombre", User.FindFirst(ClaimTypes.Name)?.Value },
-                { "nombreBreaf", brief.Nombre },
-                { "link", brief.Id.ToString() }
+                { "nombreProyecto", brief.Nombre },
+                { "link", urlBase + "/BriefAdmin" }
             };
             var Destinatarios = _toolsService.GetUsuarioByRol(1).Select(q => q.Correo).ToList();
 
@@ -281,19 +344,22 @@ namespace PresentationLayer.Controllers
                 TipoBriefId = Addbrief.TipoBriefId,
                 FechaEntrega = Addbrief.FechaEntrega,
                 EstatusBriefId = Addbrief.EstatusBriefId,
-                FechaModificacion = DateTime.Now
-
+                FechaModificacion = DateTime.Now,
+                LinksReferencias = Addbrief.LinksReferencias
+                
                 // Puedes asignar más propiedades de `Addbrief` si es necesario
             };
 
             _briefService.Update(brief);
             //Envio Correo
-
+            var urlBase = $"{Request.Scheme}://{Request.Host}";
             // Diccionario con los valores dinámicos a reemplazar
             var valoresDinamicos = new Dictionary<string, string>()
             {
                 { "nombre", User.FindFirst(ClaimTypes.Name)?.Value },
-                { "nombreBreaf", brief.Nombre }
+                { "nombreProyecto", brief.Nombre },
+                { "link", urlBase + "/BriefAdmin"  }
+
             };
             var Destinatarios = _toolsService.GetUsuarioByRol(1).Select(q => q.Correo).ToList();
 
@@ -355,7 +421,7 @@ namespace PresentationLayer.Controllers
             }
             catch (Exception ex)
             {
-                res.Mensaje = "Error al Crear el Usuario";
+                res.Mensaje = "Error al guardar";
                 res.Exito = false;
             }
 
@@ -451,7 +517,6 @@ namespace PresentationLayer.Controllers
             return Ok(res);
 
         }
-
         [HttpGet]
         public ActionResult ObtenerConteoPorProyectos()
         {

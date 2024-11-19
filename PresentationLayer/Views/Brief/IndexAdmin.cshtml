@@ -2,8 +2,24 @@
     ViewData["Title"] = "Briefs";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+    .custom-width {
+        width: 100%;
+        overflow-x: auto;
+    }
 
-<h1 class="py-3">Proyecto</h1>
+    .row.flex-nowrap {
+        display: flex;
+        flex-wrap: nowrap;
+    }
+
+    .col {
+        min-width: 22%; /* Ajusta el tamaño mínimo de cada columna */
+        max-width: 22%;
+        margin-right: 10px;
+    }
+</style>
+<h1 class="py-3">Proyectos</h1>
 <div class="row py-3">
     <div class="col" data-bind="visible:isRoleVisible([2])">
        
@@ -12,51 +28,43 @@
     </div>
 
 </div>
-
-<div class="custom-width overflow-auto">
-    <div class="row" data-bind="foreach: columns">
-        <div class="col" style="flex: 0 0 22%; max-width: 22%;">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title" data-bind="text: name"></h5>
-                </div>
-                <div class="card-body">
-                    <div class="list-group sortable" data-bind="foreach: tasks, attr: { id: id }">
-                        <div class="list-group-item" data-bind="attr: { 'data-task-id': id }">
+<div class="row flex-nowrap" data-bind="foreach: columns" style="overflow-x: auto; white-space: nowrap;">
+    <div class="col" style="flex: 0 0 22%; max-width: 22%;">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title" data-bind="text: name"></h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group sortable" data-bind="foreach: tasks, attr: { id: id }">
+                    <div class="list-group-item" data-bind="attr: { 'data-task-id': id }">
+                        <div>
                             <div>
-                                <div>
-                                    <i class="lni lni-folder"></i>
-                                    <span data-bind="text: title"></span>
-                                </div>
-                                <div>
-                                    <i class="lni lni-user"></i>
-                                    <span data-bind="text: nombreUsuario"></span>
-                                </div>
-                                <div>
-                                    <i class="lni lni-calendar"></i>
-                                    <span data-bind="text: fechaEntrega"></span>
-                                </div>
-                                <div class="row">
-                                    <div class="col-4 transparent-div">
-                                        l
-                                    </div>
-                                    <div class="col-4 transparent-div">
-                                        l
-                                    </div>
-                                    <div class="col-4">
-                                        <div>
-                                            <i data-bind="click:$root.Editar" class="lni lni-search-alt"></i>
-                                        </div>
-                                    </div>
-                                </div>
-
+                                <i class="lni lni-folder"></i>
+                                <span data-bind="text: title"></span>
                             </div>
-
+                            <div>
+                                <i class="lni lni-user"></i>
+                                <span data-bind="text: nombreUsuario"></span>
+                            </div>
+                            <div>
+                                <i class="lni lni-calendar"></i>
+                                <span data-bind="text: fechaEntrega"></span>
+                            </div>
+                            <div class="row">
+                                <div class="col-4 transparent-div">
+                                    l
+                                </div>
+                                <div class="col-4 transparent-div">
+                                    l
+                                </div>
+                                <div class="col-4">
+                                    <div>
+                                        <i data-bind="click:$root.Editar" class="lni lni-search-alt"></i>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <!-- Menú desplegable con el ícono de 3 puntos -->
-
                     </div>
-
                 </div>
             </div>
         </div>
@@ -66,12 +74,12 @@
     <div class="modal-dialog modal-fullscreen-xxl-down" >
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="Modal">Solicitud Brief</h5>
+                <h5 class="modal-title" id="Modal">Solicitud Proyecto</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="background-color: rgba(0, 0, 0, .03);">
                 <div class="row">   
-                    <div class="col">
+                    <div class="col-6">
                         <div id="formulario" style="background-color: #FFFFFF;" class="p-3" >
                             <h1>Solicitud</h1>
                             <div class="mb-3" data-bind="validationElement: nombre">
@@ -81,21 +89,24 @@
                             </div>
                             <div class="mb-3" data-bind="validationElement: descripcion">
                                 <label for="recipient-name" class="col-form-label">Descripción de la solicitud:</label>
-                                <input disabled type="text" class="form-control" id="descripcion" maxlength="128" data-bind="value: descripcion">
+                                <input disabled type="text" class="form-control" id="descripcion"  data-bind="value: descripcion">
                             </div>
                             <div class="mb-3" data-bind="validationElement: objetivo">
-                                <label for="recipient-name" class="col-form-label">Objetivo de comunicación:</label>
-                                <input disabled type="text" class="form-control" id="objetivo" maxlength="128" data-bind="value: objetivo">
+                                <label for="recipient-name" class="col-form-label">Objetivo de comunicación (128 caracteres):</label>
+                                <input disabled type="text" class="form-control" maxlength="128" id="objetivo" data-bind="value: objetivo">
                             </div>
                             <div class="mb-3" data-bind="validationElement: dirigidoA">
-                                <label for="recipient-name" class="col-form-label">Publico al que va dirigido :</label>
+                                <label for="recipient-name" class="col-form-label">Publico al que va dirigido (128 caracteres) :</label>
                                 <input disabled type="text" class="form-control" id="dirigidoA" maxlength="128" data-bind="value: dirigidoA">
                             </div>
                             <div class="mb-3" data-bind="validationElement: fechaEntrega">
                                 <label for="recipient-name" class="col-form-label">Fecha deseada de publicación:</label>
-                                <input disabled type="date" class="form-control" id="fechaEntrega" maxlength="128" data-bind="value: fechaEntrega">
+                                <input disabled type="date" class="form-control" id="fechaEntrega" data-bind="value: fechaEntrega">
                             </div>
-                          
+                            <div class="mb-3" data-bind="validationElement: linkReferencias">
+                                <label for="recipient-name" class="col-form-label">Link de Referencia:</label>
+                                <input disabled type="text" class="form-control" id="linkReferencias" data-bind="value: linkReferencias" />
+                            </div>
                             <div class="mb-3" data-bind="validationElement: cargaArchivo">
                                 <label for="cargaArchivo" class="col-form-label">Subir referencia:</label>
                                 <input disabled type="file" class="form-control" id="cargaArchivo" data-bind="event: { change: cargarArchivo }" accept=".pdf,.doc,.docx">
@@ -106,7 +117,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col-6">
                         <div id="formularioAdmin" class="p-3">
                             <h1>Panel Edición Administrador</h1>
 
@@ -138,6 +149,10 @@
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="determinarEstadoOptions" id="determinarEstado2" value="Ciclal Local" data-bind="checked: determinarEstado">
                                     <label class="form-check-label" for="determinarEstado2">Ciclal Local</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="determinarEstadoOptions" id="determinarEstado3" value="Ciclal Local" data-bind="checked: determinarEstado">
+                                    <label class="form-check-label" for="determinarEstado3">Inicio de Ciclo</label>
                                 </div>
                             </div>
                             <div class="mb-3" data-bind="validationElement: fechaPublicacion">
@@ -265,7 +280,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
                     <i class="lni lni-save"></i>
                     <span>Aceptar</span>
                 </button>

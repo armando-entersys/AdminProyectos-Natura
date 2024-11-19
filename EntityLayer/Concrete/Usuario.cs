@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer.Concrete
 {
@@ -14,11 +15,16 @@ namespace EntityLayer.Concrete
         public string ApellidoPaterno { get; set; }
         public string ApellidoMaterno { get; set; }
         public string Correo { get; set; }
+
         [Required(ErrorMessage = "La contraseña es obligatoria.")]
-        [StringLength(100, ErrorMessage = "La contraseña debe tener al menos {2} y un máximo de {1} caracteres.", MinimumLength = 8)]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
-        ErrorMessage = "La contraseña debe tener al menos una letra mayúscula, una minúscula, un número y un carácter especial.")]
-        public string? Contrasena { get; set; }
+        [MinLength(8, ErrorMessage = "La contraseña debe tener al menos 8 caracteres.")]
+        [RegularExpression("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+         ErrorMessage = "La contraseña debe tener al menos 8 caracteres, una letra mayúscula, un número y un carácter especial.")]
+        public string Contrasena { get; set; }
+
+        [NotMapped]
+        [Compare("Contrasena", ErrorMessage = "Las contraseñas no coinciden.")]
+        public string ConfirmarContrasena { get; set; }
         public int RolId { get; set; }
         public Rol UserRol { get; set; }
         public bool Estatus { get; set; }

@@ -142,26 +142,68 @@ namespace PresentationLayer.Controllers
         [HttpPost]
         public IActionResult SolicitudUsuario(string Nombre, string Correo,string ApellidoPaterno, string ApellidoMaterno, string Contrasena)
         {
-            Usuario usuario = new Usuario();
-            usuario.Correo = Correo;
-            usuario.Nombre = Nombre;
-            usuario.ApellidoPaterno = ApellidoPaterno;
-            usuario.ApellidoMaterno = ApellidoMaterno;
-            usuario.Contrasena = Contrasena;
-            usuario.RolId = 2;
-            usuario.Estatus = false;
-            usuario.SolicitudRegistro = true;
-            usuario.FechaRegistro = DateTime.Now;
-            usuario.FechaModificacion = DateTime.Now;
+            var urlBase = $"{Request.Scheme}://{Request.Host}";
+
+            Usuario usuario = new()
+            {
+                Correo = Correo,
+                Nombre = Nombre,
+                ApellidoPaterno = ApellidoPaterno,
+                ApellidoMaterno = ApellidoMaterno,
+                Contrasena = Contrasena,
+                RolId = 2,
+                Estatus = false,
+                SolicitudRegistro = true,
+                FechaRegistro = DateTime.Now,
+                FechaModificacion = DateTime.Now
+            };
 
             var resp =_authService.SolicitudUsuario(usuario);
-            if(!resp.Exito)
+
+            if (!resp.Exito)
             {
                 TempData["Mensaje"] = resp.Mensaje;
                 return RedirectToAction("Registro", "Login");
             }
             else
             {
+                // Diccionario con los valores dinámicos a reemplazar
+                var valoresDinamicos = new Dictionary<string, string>()
+                {
+                    { "nombre", usuario.Nombre },
+                    { "link", urlBase + "/Login" }
+                };
+                List<string> Destinatarios = new List<string>();
+                Destinatarios.Add(Correo);
+
+                _emailSender.SendEmail(Destinatarios, "RegistroUsuario", valoresDinamicos);
+
+                var valoresDinamicosAdmin = new Dictionary<string, string>()
+                {
+                    { "nombre", usuario.Nombre + " " + usuario.ApellidoPaterno },
+                    { "correo", usuario.Correo },
+                    { "link", urlBase + "/Invitaciones" }
+                };
+
+                var usuarioAdmin = _authService.ObtenerUsuarioByRol(1);
+
+                Alerta alerta = new()
+                {
+                    IdUsuario = usuarioAdmin.Id,
+                    Nombre = "Solicitud Usuario Nuevo",
+                    Descripcion = "Se creo una solicitud para el usuario " + Nombre,
+                    FechaCreacion = DateTime.Now,
+                    Accion = urlBase + "/Invitaciones",
+                    IdTipoAlerta = 2,
+                    lectura = false
+                };
+                _toolService.CrearAlerta(alerta);
+
+                List<string> DestinatariosAdmin = new List<string>();
+                DestinatariosAdmin.Add(usuarioAdmin.Correo);
+
+                _emailSender.SendEmail(DestinatariosAdmin, "RegistroUsuarioAdmin", valoresDinamicosAdmin);
+
                 TempData["Mensaje"] = resp.Mensaje;
                 return RedirectToAction("Index", "Login");
             }
@@ -200,7 +242,16 @@ namespace PresentationLayer.Controllers
         public ActionResult BuscarUsuario([FromBody] Usuario usuario)
         {
             respuestaServicio res = new respuestaServicio();
-            var usuarios = _toolService.BuscarUsuario(usuario.Nombre.ToUpper());
+            var usuarios = _toolService.BuscarUsuario(usuario.Nombre.ToUpper(),2);
+            res.Datos = usuarios;
+            res.Exito = true;
+            return Ok(res);
+        }
+        [HttpPost]
+        public ActionResult BuscarAllUsuarios([FromBody] Usuario usuario)
+        {
+            respuestaServicio res = new respuestaServicio();
+            var usuarios = _toolService.BuscarUsuario(usuario.Nombre.ToUpper(),0);
             res.Datos = usuarios;
             res.Exito = true;
             return Ok(res);

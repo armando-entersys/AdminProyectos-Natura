@@ -18,28 +18,34 @@
         });
     });
     window.validarYProcesarFormulario = function (errorsObservable, callback) {
-    if (errorsObservable().length === 0) {
-        callback(); // Ejecuta la función de guardado o el código deseado si no hay errores
-    } else {
-        // Muestra los mensajes de error
-        errorsObservable.showAllMessages();
+        console.log('Errores observables:', errorsObservable()); // Muestra todos los errores
 
-        // Función para comprobar si un elemento es visible
-        function isElementVisible(el) {
-            return el && el.offsetParent !== null && 
-                   getComputedStyle(el).visibility !== 'hidden' && 
-                   getComputedStyle(el).opacity !== '0';
-        }
-
-        // Encuentra el primer elemento visible con error
-        var firstErrorElement = document.querySelector('.text-danger:not([style*="display: none"]), .has-error input, .has-error select, .has-error textarea');
-
-        if (firstErrorElement && isElementVisible(firstErrorElement)) {
-            firstErrorElement.focus(); // Enfoca el primer elemento visible con error
-            firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' }); // Desplaza la vista hasta el elemento
+        if (errorsObservable().length === 0) {
+            callback(); // Ejecuta la función de guardado si no hay errores
         } else {
-            console.log('No hay un elemento visible con error.');
+            // Muestra los mensajes de error
+            errorsObservable.showAllMessages();
+
+            function isElementVisible(el) {
+                return el && el.offsetParent !== null &&
+                    getComputedStyle(el).visibility !== 'hidden' &&
+                    getComputedStyle(el).opacity !== '0';
+            }
+
+            // Encuentra y muestra en consola los elementos visibles con error
+            var errorElements = document.querySelectorAll('.text-danger:not([style*="display: none"]), .has-error input, .has-error select, .has-error textarea');
+            console.log('Elementos con error visibles:', errorElements);
+
+            var firstErrorElement = Array.from(errorElements).find(isElementVisible);
+            console.log('Primer elemento con error encontrado:', firstErrorElement);
+            console.log('Elementos con error visibles:', errorElements);
+            if (firstErrorElement) {
+                firstErrorElement.focus();
+                firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+            
+                console.log('No hay un elemento visible con error.');
+            }
         }
-    }
-};
+    };
 </script>

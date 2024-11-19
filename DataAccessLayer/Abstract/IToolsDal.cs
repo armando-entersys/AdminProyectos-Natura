@@ -14,7 +14,7 @@ namespace DataAccessLayer.Abstract
         IEnumerable<Usuario> GetUsuarioBySolicitud();
         Usuario CambioSolicitudUsuario(int id, bool estatus);
         IEnumerable<Alerta> ObtenerAlertaUsuario(int id);
-        IEnumerable<Usuario> BuscarUsuario(string nombre);
+        IEnumerable<Usuario> BuscarUsuario(string nombre, int rolId);
         Participante AgregarParticipante(Participante _participante);
         List<Participante> ObtenerParticipantes(int BriefId);
         List<Alerta> ObtenerAlertas(int IdUsuario);

@@ -50,9 +50,9 @@ namespace BusinessLayer.Concrete
         {
             return _toolsDal.ObtenerAlertaUsuario(id);
         }
-        public IEnumerable<Usuario> BuscarUsuario(string nombre)
+        public IEnumerable<Usuario> BuscarUsuario(string nombre, int rolId)
         {
-            return _toolsDal.BuscarUsuario(nombre);
+            return _toolsDal.BuscarUsuario(nombre,rolId);
         }
 
         public Participante AgregarParticipante(Participante _participante)

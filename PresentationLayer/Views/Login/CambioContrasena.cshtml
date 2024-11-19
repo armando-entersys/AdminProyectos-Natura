@@ -17,19 +17,32 @@
 
                 <div class="card">
                     <div class="card-header">
-                        Registrate
+                        Cambiar Contraseña
                     </div>
                     <div class="card-body">
 
-                        <form asp-controller="Usuarios" asp-action="CambioContrasena" method="post" enctype="multipart/form-data">
-                            <div asp-validation-summary="All" class="text-danger"></div>
+                        <form asp-controller="Login" asp-action="CambiarPasswordUsuario" method="post">
+                            <!-- Campo oculto para el ID del usuario -->
+                            <input type="hidden" asp-for="Id" />
 
-                            <input class="form-control mb-3" type="text" placeholder="Id" required asp-for="Id" />
+                            <input class="form-control mb-3"
+                                   type="password"
+                                   id="newPassword"
+                                   placeholder="Contraseña nueva"
+                                   required
+                                   asp-for="Contrasena"
+                                   pattern="@( "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$" )"
+                                   title="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, un número y un carácter especial." />
 
-                            <input class="form-control mb-3" type="password" placeholder="Contraseña" required asp-for="Contrasena" />
-                            <span asp-validation-for="Contrasena" class="text-danger"></span>
+                            <input class="form-control mb-3"
+                                   type="password"
+                                   id="confirmPassword"
+                                   placeholder="Repetir Contraseña"
+                                   required
+                                   pattern="@( "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$" )"
+                                   title="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, un número y un carácter especial." />
 
-                            <button class="w-100 btn btn-lg btn-primary" type="submit">Registrarme</button>
+                            <button class="w-100 btn btn-lg btn-primary" type="submit" onclick="return validatePasswords()">Cambiar Contraseña</button>
 
                             @if (ViewData["Mensaje"] != null)
                             {
@@ -42,7 +55,6 @@
                         </form>
 
                     </div>
-
                 </div>
                 @{
                     var mensajeExito = TempData["MensajeExito"] as string;
@@ -53,11 +65,10 @@
                     <div class="alert alert-success" role="alert">
                         @mensajeExito
                     </div>
-                    <!-- Script para redirigir automáticamente después de unos segundos -->
                     <script type="text/javascript">
                         setTimeout(function () {
                             window.location.href = '@Url.Action("Index", "Login")';
-                        }, 5000); // Redirige después de 5 segundos (5000 milisegundos)
+                        }, 5000);
                     </script>
                 }
             </div>
@@ -65,8 +76,18 @@
 
     </div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript">
+        function validatePasswords() {
+            var password = document.getElementById("newPassword").value;
+            var confirmPassword = document.getElementById("confirmPassword").value;
+
+            if (password !== confirmPassword) {
+                alert("Las contraseñas no coinciden.");
+                return false;
+            }
+            return true;
+        }
+    </script>
 </body>
 </html>

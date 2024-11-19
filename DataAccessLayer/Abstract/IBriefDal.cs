@@ -30,6 +30,7 @@ namespace DataAccessLayer.Abstract
         ConteoProyectos ObtenerConteoMateriales(int UsuarioId);
         int ObtenerConteoProyectoFecha(int UsuarioId);
         List<Material> GetMaterialesByUser(int id);
+        Material GetMaterial(int id);
         List<Material> GetMaterialesFilter(Material material);
         public IEnumerable<Audiencia> GetAllAudiencias();
         public IEnumerable<Formato> GetAllFormatos();
@@ -39,5 +40,6 @@ namespace DataAccessLayer.Abstract
         IEnumerable<EstatusMaterial> GetAllEstatusMateriales();
         void ActualizaHistorialMaterial(HistorialMaterial historialMaterial);
         void ActualizaRetrasoMaterial(RetrasoMaterial retrasoMaterial);
+        IEnumerable<HistorialMaterial> GetAllHistorialMateriales(int MaterialId);
     }
 }

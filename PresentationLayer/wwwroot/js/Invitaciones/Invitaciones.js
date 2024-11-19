@@ -41,8 +41,6 @@
             contentType: "application/json",
             success: function (d) {
                 self.inicializar();
-                $("#divEdicion").modal("hide");
-
                 $('#alertMessage').text(d.mensaje);
              
             },
@@ -54,26 +52,14 @@
             }
         });
     }
-    self.Rechazar = function () {
-        var usuario = {
-            Id: self.id(),
-            Nombre: self.nombre(),
-            ApellidoPaterno: self.apellidoPaterno(),
-            ApellidoMaterno: self.apellidoMaterno(),
-            Correo: self.correo(),
-            Estatus: self.Estatus().IdEstatus,
-            RolId: self.Rol().id
-        }
+    self.Rechazar = function (usuario) {
         $.ajax({
-            url: "/Invitaciones/Rechazar/" + self.id(), // URL del método GetAll en tu API
+            url: "/Invitaciones/Rechazar/" + usuario.id, // URL del método GetAll en tu API
             type: "GET",
             contentType: "application/json",
             success: function (d) {
                 self.inicializar();
-                $("#divEdicion").modal("hide");
-
                 $('#alertMessage').text(d.mensaje);
-                self.Limpiar();
             },
             error: function (xhr, status, error) {
                 console.error("Error al obtener los datos: ", error);
