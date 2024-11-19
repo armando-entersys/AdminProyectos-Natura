@@ -83,6 +83,23 @@
     self.isRoleVisible = function (allowedRoles) {
         return allowedRoles.includes(RolId);
     };
+    self.Editar = function (alerta) {
+        $.ajax({
+            url: "/Alertas/ActualizarAlerta/" + alerta.id, // URL del método GetAll en tu API
+            type: "GET",
+            contentType: "application/json",
+            success: function (d) {
+                // Redirigir a la página especificada en alerta.accion
+                if (alerta.accion) {
+                    window.location.href = alerta.accion;
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al obtener los datos: ", error);
+                alert("Error al obtener los datos: " + xhr.responseText);
+            }
+        });
+    }
 }
 
 // Activar Knockout.js

@@ -91,5 +91,10 @@ namespace BusinessLayer.Concrete
         {
              _toolsDal.UpdateAlerta(Id);
         }
+
+        public int GetUnreadAlertsCount(int usuarioId)
+        {
+            return _toolsDal.GetUnreadAlertsCount(usuarioId);
+        }
     }
 }

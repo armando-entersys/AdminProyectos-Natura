@@ -21,5 +21,6 @@ namespace DataAccessLayer.Abstract
         Alerta CrearAlerta(Alerta alerta);
         List<TipoAlerta> ObtenerTiposAlerta();
         void UpdateAlerta(int Id);
+        int GetUnreadAlertsCount(int usuarioId);
     }
 }

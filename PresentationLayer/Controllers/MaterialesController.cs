@@ -17,14 +17,15 @@ namespace PresentationLayer.Controllers
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IBriefService _briefService;
         private readonly IUsuarioService _usuarioService;
-
-        public MaterialesController(IEmailSender emailSender, IAuthService authService, IWebHostEnvironment hostingEnvironment, IBriefService briefService, IUsuarioService usuarioService)
+        private readonly IToolsService _toolsService;
+        public MaterialesController(IEmailSender emailSender, IAuthService authService, IWebHostEnvironment hostingEnvironment, IBriefService briefService, IUsuarioService usuarioService, IToolsService toolsService)
         {
             _emailSender = emailSender;
             _authService = authService;
             _hostingEnvironment = hostingEnvironment;
             _briefService = briefService;
             _usuarioService = usuarioService;
+            _toolsService = toolsService;
         }
         public IActionResult Index()
         {
@@ -38,6 +39,7 @@ namespace PresentationLayer.Controllers
                 ViewBag.UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
                 ViewBag.Menus = _authService.GetMenusByRole(ViewBag.RolId);
+                ViewBag.ConteoAlertas = _toolsService.GetUnreadAlertsCount(ViewBag.UsuarioId);
             }
             else
             {

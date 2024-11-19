@@ -3,6 +3,7 @@ using DataAccessLayer.Concrete;
 using DataAccessLayer.Context;
 using DataAccessLayer.EntityFramework;
 using EntityLayer.Concrete;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -96,10 +97,27 @@ namespace DataAccessLayer.Repositories
                                               lectura = p.lectura,
                                               Accion = p.Accion,
                                               FechaCreacion = p.FechaCreacion,
-                                              TipoAlerta = _context.TipoAlerta.Where(u => u.Id == p.Id).FirstOrDefault()
+                                              IdTipoAlerta = p.IdTipoAlerta,
+                                              TipoAlerta = _context.TipoAlerta.Where(u => u.Id == p.IdTipoAlerta).FirstOrDefault()
                                           }) .ToList();
 
             return Alertas;
+        }
+        public int GetUnreadAlertsCount(int usuarioId)
+        {
+            try
+            {
+                // Realizar la consulta a la base de datos para contar las alertas no leídas
+                var unreadAlertsCount = _context.Alertas
+                                                  .Where(a => a.IdUsuario == usuarioId && !a.lectura)
+                                                  .Count();
+                return unreadAlertsCount;
+            }
+            catch (Exception ex)
+            {
+                // Manejar la excepción de la base de datos si ocurre
+                throw new Exception("Error al obtener el conteo de alertas no leídas", ex);
+            }
         }
         public Alerta CrearAlerta(Alerta alerta)
         {

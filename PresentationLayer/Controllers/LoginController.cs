@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
 
 namespace PresentationLayer.Controllers
@@ -16,10 +17,13 @@ namespace PresentationLayer.Controllers
     {
         private readonly IAuthService _authService;
         private readonly IEmailSender _emailSender;
-        public LoginController(IAuthService authService, IEmailSender emailSender)
+        private readonly IToolsService _toolService;
+
+        public LoginController(IAuthService authService, IEmailSender emailSender, IToolsService toolService)
         {
             _authService = authService;
             _emailSender = emailSender;
+            _toolService = toolService;
         }
         public IActionResult Registro()
         {

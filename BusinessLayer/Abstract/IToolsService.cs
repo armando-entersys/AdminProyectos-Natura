@@ -22,5 +22,6 @@ namespace BusinessLayer.Abstract
         int ConteoAlertas(int IdUsuario);
         List<TipoAlerta> ObtenerTiposAlerta();
         void UpdateAlerta(int Id);
+        int GetUnreadAlertsCount(int usuarioId);
     }
 }

@@ -38,6 +38,7 @@ namespace PresentationLayer.Controllers
                 ViewBag.UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
                 ViewBag.Menus = _authService.GetMenusByRole(ViewBag.RolId);
+                ViewBag.ConteoAlertas = _toolService.GetUnreadAlertsCount(ViewBag.UsuarioId);
             }
             else
             {

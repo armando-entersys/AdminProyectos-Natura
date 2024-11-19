@@ -4,7 +4,9 @@ using DataAccessLayer.EntityFramework;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using PresentationLayer.Hubs;
 using PresentationLayer.Models;
 using System.Security.Claims;
 
@@ -20,9 +22,10 @@ namespace PresentationLayer.Controllers
         private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly IToolsService _toolsService;
         private readonly IUsuarioService _usuarioService;
-
+        private readonly IHubContext<NotificationHub> _hubContext;
         public BriefController(IEmailSender emailSender, IBriefService briefService, IAuthService authService, 
-                                IWebHostEnvironment hostingEnvironment, IToolsService toolsService, IUsuarioService usuarioService)
+                                IWebHostEnvironment hostingEnvironment, IToolsService toolsService, 
+                                IUsuarioService usuarioService, IHubContext<NotificationHub> hubContext)
         {
             _emailSender = emailSender;
             _briefService = briefService;
@@ -30,6 +33,7 @@ namespace PresentationLayer.Controllers
             _hostingEnvironment = hostingEnvironment;
             _toolsService = toolsService;
             _usuarioService = usuarioService;
+            _hubContext = hubContext;
         }
         // GET: BriefController
         public ActionResult Index()
@@ -44,6 +48,7 @@ namespace PresentationLayer.Controllers
                 ViewBag.UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
                 ViewBag.Menus = _authService.GetMenusByRole(ViewBag.RolId);
+                ViewBag.ConteoAlertas = _toolsService.GetUnreadAlertsCount(ViewBag.UsuarioId);
             }
             else
             {
@@ -173,7 +178,7 @@ namespace PresentationLayer.Controllers
             brief.FechaRegistro = BriefOrg.FechaRegistro;
             brief.FechaModificacion = DateTime.Now;
             brief.TipoBriefId = BriefOrg.TipoBriefId;
-        
+
             _briefService.Update(brief);
 
             var Destinatarios = new List<string>();
@@ -226,10 +231,20 @@ namespace PresentationLayer.Controllers
                 { "link", urlBase + "/BriefAdmin"  }
 
             };
-           
+
 
             _emailSender.SendEmail(Destinatarios, "ActualizaEstatusProyecto", valoresDinamicos);
-
+            Alerta alerta = new Alerta
+            {
+                Id = 1,
+                Descripcion = "Desc",
+                Nombre = "Nombre",
+                IdTipoAlerta = 1,
+                Accion = "localhost",
+                FechaCreacion = DateTime.Now,
+                lectura = false
+            };
+            _hubContext.Clients.All.SendAsync("ReceiveAlert", alerta);
 
             res.Datos = brief;
             res.Mensaje = "Actualizado exitosamente";
@@ -436,17 +451,30 @@ namespace PresentationLayer.Controllers
             material.EstatusMaterialId = 1;
             try
             {
+                var UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                
                 _briefService.InsertMaterial(material);
                 var brief = _briefService.GetById(material.BriefId);
                 Alerta alertaUsuario = new Alerta
                 {
                     IdUsuario = brief.Id,
                     Nombre = "Nuevo Material",
-                    Descripcion = "Se agrego un material al brief " + brief.Nombre
+                    Descripcion = "Se agrego un material al brief " + brief.Nombre,
+                    IdTipoAlerta = 4
 
                 };
 
                 _toolsService.CrearAlerta(alertaUsuario);
+                Alerta alertaAdmin = new Alerta
+                {
+                    IdUsuario = UsuarioId,
+                    Nombre = "Nuevo Material",
+                    Descripcion = "Se agrego un material al brief " + brief.Nombre,
+                    IdTipoAlerta = 4
+
+                };
+
+                _toolsService.CrearAlerta(alertaAdmin);
 
                 res.Mensaje = "Creado exitosamente";
                 res.Exito = true;

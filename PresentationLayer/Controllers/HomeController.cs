@@ -53,14 +53,12 @@ namespace PresentationLayer.Controllers
 
                 ViewBag.Menus = _authService.GetMenusByRole(ViewBag.RolId);
                 ViewBag.Alertas = _toolsService.ObtenerAlertaUsuario(ViewBag.UsuarioId);
+                ViewBag.ConteoAlertas = _toolsService.GetUnreadAlertsCount(ViewBag.UsuarioId);
             }
             else
             {
                 RedirectToAction("Index", "Login");
             }
-            // Obtener el rol del usuario actual
-
-
 
             return View();
         }

@@ -11,6 +11,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using PresentationLayer.Models;
 using System.Text.Json.Serialization;
+using PresentationLayer.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using PresentationLayer.Controllers;
+using PresentationLayer.Services;
 
 // Configuración inicial de Serilog
 Log.Logger = new LoggerConfiguration()
@@ -83,6 +87,9 @@ builder.Services.AddElmah(options =>
     options.Path = "/elmah";
 });
 
+// Agrega SignalR al contenedor de servicios
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 var app = builder.Build();
 
 // Configuración de middlewares
@@ -122,7 +129,7 @@ app.Use(async (context, next) =>
 */
 app.MapControllers();
 app.UseElmah();
-
+app.MapHub<NotificationHub>("/notificationHub");
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

@@ -8,7 +8,7 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th scope="col">Id</th>
+                    <th scope="col">Modulo</th>
                     <th scope="col">Nombre</th>
                     <th scope="col">Descripción</th>
                     <th scope="col">Detalles</th>
@@ -21,10 +21,11 @@
                     <td data-bind="text: nombre"></td>
                     <td data-bind="text: descripcion"></td>
                     <td class="small">
-                        <button type="button" class="btn btn-outline-primary" data-bind="click:$root.Editar">
+                        <a class="btn btn-outline-primary" data-bind="click:$root.Editar">
                             <i class="lni lni-pencil"></i>
                             <span>Ver</span>
-                        </button>
+                        </a>
+                        
                     </td>
                 </tr>
             </tbody>

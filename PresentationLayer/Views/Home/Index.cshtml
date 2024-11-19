@@ -20,7 +20,7 @@
                                 <div class="card-body">
                                     <h5 class="card-title" data-bind="text:nombre"></h5>
                                     <p class="card-text" data-bind="text:descripcion"></p>
-                                    <a class="btn btn-primary" data-bind="attr: { href: accion }">Accion</a>
+                                    <a class="btn btn-primary" data-bind="click:$root.Editar">Accion</a>
                                 </div>
                             </div>
                         </div>
@@ -134,7 +134,7 @@
                                 <div class="card-body">
                                     <h5 class="card-title" data-bind="text:nombre"></h5>
                                     <p class="card-text" data-bind="text:descripcion"></p>
-                                    <a class="btn btn-primary" data-bind="attr: { href: accion }">Accion</a>
+                                    <a class="btn btn-primary" data-bind="click:$root.Editar">Accion</a>
                                 </div>
                             </div>
                         </div>
@@ -144,17 +144,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Proximas Entregas</h5>
-                    <div class="row" data-bind="foreach:registrosAlerta">
-                        <div class="col-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title" data-bind="text:nombre"></h5>
-                                    <p class="card-text" data-bind="text:descripcion"></p>
-                                    <a class="btn btn-primary" data-bind="attr: { href: accion }">Accion</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                   
                 </div>
             </div>
         </div>
@@ -263,7 +253,7 @@
                                 <div class="card-body">
                                     <h5 class="card-title" data-bind="text:nombre"></h5>
                                     <p class="card-text" data-bind="text:descripcion"></p>
-                                    <a class="btn btn-primary" data-bind="attr: { href: accion }">Accion</a>
+                                    <a class="btn btn-primary" data-bind="click:$root.Editar">Accion</a>
                                 </div>
                             </div>
                         </div>
@@ -273,17 +263,7 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Proximas Entregas</h5>
-                    <div class="row" data-bind="foreach:registrosAlerta">
-                        <div class="col-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title" data-bind="text:nombre"></h5>
-                                    <p class="card-text" data-bind="text:descripcion"></p>
-                                    <a class="btn btn-primary" data-bind="attr: { href: accion }">Accion</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                  
                 </div>
             </div>
         </div>

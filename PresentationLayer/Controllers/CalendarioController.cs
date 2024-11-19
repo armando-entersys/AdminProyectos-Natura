@@ -1,4 +1,5 @@
 ﻿using BusinessLayer.Abstract;
+using BusinessLayer.Concrete;
 using EntityLayer.Concrete;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,12 +14,14 @@ namespace PresentationLayer.Controllers
         private readonly IEmailSender _emailSender;
         private readonly IBriefService _briefService;
         private readonly IWebHostEnvironment _hostingEnvironment;
-        public CalendarioController(IEmailSender emailSender, IBriefService briefService, IAuthService authService, IWebHostEnvironment hostingEnvironment)
+        private readonly IToolsService _toolsService;
+        public CalendarioController(IEmailSender emailSender, IBriefService briefService, IAuthService authService, IWebHostEnvironment hostingEnvironment, IToolsService toolsService)
         {
             _emailSender = emailSender;
             _briefService = briefService;
             _authService = authService;
             _hostingEnvironment = hostingEnvironment;
+            _toolsService = toolsService;
         }
         public ActionResult Index()
         {
@@ -32,6 +35,7 @@ namespace PresentationLayer.Controllers
                 ViewBag.UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
                 ViewBag.Menus = _authService.GetMenusByRole(ViewBag.RolId);
+                ViewBag.ConteoAlertas = _toolsService.GetUnreadAlertsCount(ViewBag.UsuarioId);
             }
             else
             {

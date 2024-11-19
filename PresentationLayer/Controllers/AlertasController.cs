@@ -37,6 +37,7 @@ namespace PresentationLayer.Controllers
                 ViewBag.UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
                 ViewBag.Menus = _authService.GetMenusByRole(ViewBag.RolId);
+                ViewBag.ConteoAlertas = _toolService.GetUnreadAlertsCount(ViewBag.UsuarioId);
             }
             else
             {
@@ -99,6 +100,45 @@ namespace PresentationLayer.Controllers
             }
             return Ok(res);
 
+        }
+    }
+
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AlertsController : ControllerBase
+    {
+        private readonly IToolsService _toolService;
+        public AlertsController(IToolsService toolService)
+        {
+            _toolService = toolService;
+        }
+
+        public ActionResult GetUnreadAlertsCount()
+        {
+            respuestaServicio res = new respuestaServicio();
+
+            try
+            {
+                // Obtener el ID del usuario desde los claims (similar a ObtenerAlertas)
+                var UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+                // Llamar al servicio que obtiene el conteo de alertas no leídas para el usuario
+                var unreadCount = _toolService.GetUnreadAlertsCount(UsuarioId);
+
+                // Construir la respuesta
+                res.Datos = unreadCount;
+                res.Mensaje = "Solicitud Exitosa";
+                res.Exito = true;
+            }
+            catch (Exception ex)
+            {
+                // Si ocurre un error, capturarlo y devolver la respuesta con error
+                res.Mensaje = "Petición fallida";
+                res.Exito = false;
+            }
+
+            // Retornar la respuesta al cliente
+            return Ok(res);
         }
     }
 }
