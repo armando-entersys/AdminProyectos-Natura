@@ -12,5 +12,8 @@ namespace DataAccessLayer.Concrete
         public int EstaSemana { get; set; }
         public int ProximaSemana { get; set; }
         public int TotalProyectos { get; set; }
+        public int ProyectoTiempo { get; set; }
+        public int ProyectoExtra { get; set; }
+
     }
 }

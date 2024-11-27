@@ -3,6 +3,14 @@
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
 <script>
+    var baseUrl = document.querySelector('base').getAttribute('href');
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!settings.url.startsWith(baseUrl)) {
+                settings.url = baseUrl + settings.url;
+            }
+        }
+    });
     function showAlertModal(message) {
         $('#alertMessage').text(message);
         var alertModal = new bootstrap.Modal(document.getElementById('alertModal'), {});

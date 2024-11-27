@@ -20,7 +20,6 @@ namespace DataAccessLayer.Context
         public DbSet<TipoBrief> TiposBrief { get; set; }
         public DbSet<Material> Materiales { get; set; }
         public DbSet<Proyecto> Proyectos { get; set; }
-        public DbSet<ClasificacionProyecto> clasificacionProyectos { get; set; }
         public DbSet<Participante> Participantes { get; set; }
         public DbSet<EstatusMaterial> EstatusMateriales { get; set; }
         public DbSet<TipoAlerta> TipoAlerta { get; set; }
@@ -83,11 +82,6 @@ namespace DataAccessLayer.Context
                 .WithOne(b => b.Proyecto)
                 .HasForeignKey<Proyecto>(p => p.BriefId);
 
-            modelBuilder.Entity<Proyecto>()
-            .HasOne(p => p.ClasificacionProyecto)
-            .WithMany(c => c.Proyectos)
-            .HasForeignKey(p => p.ClasificacionProyectoId);
-
             // Configuración de la relación
             modelBuilder.Entity<Alerta>()
                 .HasOne(a => a.TipoAlerta)
@@ -108,11 +102,12 @@ namespace DataAccessLayer.Context
                 .WithMany(u => u.Participantes) // Asegúrate de que la clase Usuario tenga una propiedad ICollection<Participante>
                 .HasForeignKey(p => p.UsuarioId)
                 .OnDelete(DeleteBehavior.Cascade); // Configurar el comportamiento de eliminación
-                                                   // Relación de Material con HistorialMaterial
+
             modelBuilder.Entity<HistorialMaterial>()
-                .HasOne(h => h.Material)
-                .WithMany(m => m.Historiales)
-                .HasForeignKey(h => h.MaterialId);
+                .HasOne(h => h.Material) // HistorialMaterial tiene un Material
+                .WithMany(m => m.Historiales) // Material tiene muchos HistorialMaterial
+                .HasForeignKey(h => h.MaterialId) // Llave foránea en HistorialMaterial
+                .OnDelete(DeleteBehavior.Cascade); // Configuración de eliminación en cascada
 
             // Relación de Material con RetrasoMaterial
             modelBuilder.Entity<RetrasoMaterial>()

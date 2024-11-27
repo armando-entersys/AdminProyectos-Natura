@@ -13,13 +13,12 @@ namespace BusinessLayer.Abstract
         void Delete(int id);
         List<Brief> GetAll();
         List<Column<Brief>> GetColumnsByUserId(int id);
-        IEnumerable<Brief> GetAllbyUserId(int usuarioId);
+        IEnumerable<Brief> GetAllbyUserId(int usuarioId, bool onlybrief);
         Brief GetById(int id);
         void Insert(Brief entity);
         void Update(Brief entity);
         IEnumerable<EstatusBrief> GetAllEstatusBrief();
         IEnumerable<TipoBrief> GetAllTipoBrief();
-        IEnumerable<ClasificacionProyecto> GetAllClasificacionProyecto();
         void InsertProyecto(Proyecto entity);
         void InsertMaterial(Material entity);
         Proyecto GetProyectoByBriefId(int id);

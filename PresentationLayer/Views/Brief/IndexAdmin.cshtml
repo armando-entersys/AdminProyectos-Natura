@@ -40,11 +40,11 @@
                         <div>
                             <div>
                                 <i class="lni lni-folder"></i>
-                                <span data-bind="text: title"></span>
+                                <span data-bind="text: title" style="display: inline-block; max-width: calc(100% - 30px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></span>
                             </div>
                             <div>
                                 <i class="lni lni-user"></i>
-                                <span data-bind="text: nombreUsuario"></span>
+                                <span data-bind="text: nombreUsuario" style="display: inline-block; max-width: calc(100% - 30px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></span>
                             </div>
                             <div>
                                 <i class="lni lni-calendar"></i>
@@ -59,7 +59,7 @@
                                 </div>
                                 <div class="col-4">
                                     <div>
-                                        <i data-bind="click:$root.Editar" class="lni lni-search-alt"></i>
+                                        <i data-bind="click:$root.Editar" class="lni lni-search-text"></i>
                                     </div>
                                 </div>
                             </div>
@@ -71,7 +71,7 @@
     </div>
 </div>
 <div class="modal fade" id="divEdicion" tabindex="-1" aria-labelledby="Modal" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen-xxl-down" >
+    <div class="modal-dialog modal-fullscreen" >
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="Modal">Solicitud Proyecto</h5>
@@ -85,7 +85,6 @@
                             <div class="mb-3" data-bind="validationElement: nombre">
                                 <label for="recipient-name" class="col-form-label">Nombre de solicitud:</label>
                                 <input disabled type="text" class="form-control" id="nombre" maxlength="128" data-bind="value: nombre" />
-                             
                             </div>
                             <div class="mb-3" data-bind="validationElement: descripcion">
                                 <label for="recipient-name" class="col-form-label">Descripción de la solicitud:</label>
@@ -103,9 +102,9 @@
                                 <label for="recipient-name" class="col-form-label">Fecha deseada de publicación:</label>
                                 <input disabled type="date" class="form-control" id="fechaEntrega" data-bind="value: fechaEntrega">
                             </div>
-                            <div class="mb-3" data-bind="validationElement: linkReferencias">
+                            <div class="mb-3" data-bind="validationElement: linksReferencias">
                                 <label for="recipient-name" class="col-form-label">Link de Referencia:</label>
-                                <input disabled type="text" class="form-control" id="linkReferencias" data-bind="value: linkReferencias" />
+                                <a data-bind="attr: { href: linksReferencias }, text: linksReferencias" class="form-control" target="_blank">Link Referencia</a>
                             </div>
                             <div class="mb-3" data-bind="validationElement: cargaArchivo">
                                 <label for="cargaArchivo" class="col-form-label">Subir referencia:</label>
@@ -120,11 +119,6 @@
                     <div class="col-6">
                         <div id="formularioAdmin" class="p-3">
                             <h1>Panel Edición Administrador</h1>
-
-                            <div class="mb-3" data-bind="validationElement: ClasificacionProyecto">
-                                <label class="col-form-label">Clasificación:</label>
-                                <select class="form-control" data-bind="options: catClasificacionProyecto, value: ClasificacionProyecto, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
-                            </div>
                             <div class="mb-3" data-bind="validationElement: comentarioProyecto">
                                 <label for="recipient-name" class="col-form-label">Comentario:</label>
                                 <input type="text" class="form-control" id="comentarioProyecto" maxlength="128" data-bind="value: comentarioProyecto">
@@ -157,7 +151,7 @@
                             </div>
                             <div class="mb-3" data-bind="validationElement: fechaPublicacion">
                                 <label for="recipient-name" class="col-form-label">Fecha Publicacion:</label>
-                                <input type="date" class="form-control" id="fechaEntrega" maxlength="128" data-bind="value: fechaPublicacion">
+                                <input type="date" class="form-control" id="fechaEntrega" data-bind="value: fechaPublicacion, attr: { min: minDate }">
                             </div>
                             <button type="button" class="btn btn-primary" data-bind="click:GuardarProyecto">
                                 <i class="lni lni-save"></i>
@@ -199,17 +193,13 @@
                                 <label for="recipient-name" class="col-form-label">Fecha Entrega:</label>
                                 <input type="date" class="form-control" id="fechaEntrega" maxlength="128" data-bind="value: fechaEntrega">
                             </div>
-                            <div class="mb-3" data-bind="validationElement: proceso">
-                                <label for="recipient-name" class="col-form-label">Proceso:</label>
-                                <input type="text" class="form-control" id="proceso" maxlength="128" data-bind="value: proceso">
-                            </div>
-                            <div class="mb-3" data-bind="validationElement: produccion">
-                                <label for="recipient-name" class="col-form-label">Produccion:</label>
-                                <input type="text" class="form-control" id="produccion" maxlength="128" data-bind="value: produccion">
-                            </div>
                             <div class="mb-3" data-bind="validationElement: responsable">
                                 <label for="recipient-name" class="col-form-label">Responsable:</label>
                                 <input type="text" class="form-control" id="responsable" maxlength="128" data-bind="value: responsable">
+                            </div>
+                            <div class="mb-3" data-bind="validationElement: area">
+                                <label for="recipient-name" class="col-form-label">Area:</label>
+                                <input type="text" class="form-control" id="area" maxlength="128" data-bind="value: area">
                             </div>
                             <button type="button" class="btn btn-primary" data-bind="click:GuardarMaterial">
                                 <i class="lni lni-save"></i>
@@ -298,7 +288,11 @@
     <script>
         // Pasar los valores de ViewBag a variables JavaScript
         var RolId = @Html.Raw(ViewBag.RolId);
+        // Obtener la fecha de hoy en formato YYYY-MM-DD
+        const today = new Date().toISOString().split('T')[0];
 
+        // Establecer la fecha mínima en el input
+        document.getElementById('fechaEntrega').setAttribute('min', today);
     </script>
     <script src="~/js/brief/BriefAdmin.js"></script>
    

@@ -77,7 +77,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
     });
 
@@ -105,31 +105,11 @@ app.UseRouting();
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
-/*
-app.Use(async (context, next) =>
-{
-    if (!context.User.Identity.IsAuthenticated && !context.Request.Path.StartsWithSegments("/Login"))
-    {
-        if (!context.Request.Path.StartsWithSegments("/Usuarios/SolicitudUsuario") &&
-            !context.Request.Path.StartsWithSegments("/Usuarios/CambioContrasena"))
-        {
-            context.Response.Redirect("/Login");
-            return;
-        }
-    }
-    else if (context.User.Identity.IsAuthenticated && context.Request.Path.StartsWithSegments("/Login") &&
-             !context.Request.Path.Equals("/Login/Logout"))
-    {
-        context.Response.Redirect("/Home");
-        return;
-    }
 
-    await next();
-});
-*/
 app.MapControllers();
 app.UseElmah();
 app.MapHub<NotificationHub>("/notificationHub");
+app.UsePathBase("/");
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

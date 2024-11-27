@@ -68,6 +68,7 @@ namespace PresentationLayer.Controllers
                 ViewBag.UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
                 ViewBag.Menus = _authService.GetMenusByRole(ViewBag.RolId);
+                ViewBag.ConteoAlertas = _toolsService.GetUnreadAlertsCount(ViewBag.UsuarioId);
             }
             else
             {
@@ -91,7 +92,17 @@ namespace PresentationLayer.Controllers
         {
             int UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             respuestaServicio res = new respuestaServicio();
-            res.Datos = _briefService.GetAllbyUserId(UsuarioId);
+            res.Datos = _briefService.GetAllbyUserId(UsuarioId,true);
+            res.Exito = true;
+
+            return Ok(res);
+        }
+        [HttpGet]
+        public IActionResult GetAllbyUserBrief()
+        {
+            int UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            respuestaServicio res = new respuestaServicio();
+            res.Datos = _briefService.GetAllbyUserId(UsuarioId,false);
             res.Exito = true;
 
             return Ok(res);
@@ -181,7 +192,11 @@ namespace PresentationLayer.Controllers
 
             _briefService.Update(brief);
 
+            var estatusBriesfs = _briefService.GetAllEstatusBrief();
+            brief.EstatusBrief = estatusBriesfs.Where(q => q.Id == brief.EstatusBriefId).FirstOrDefault();
+
             var Destinatarios = new List<string>();
+            var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
 
             if (brief.EstatusBriefId == 1)
             {
@@ -193,10 +208,27 @@ namespace PresentationLayer.Controllers
                 Destinatarios = _toolsService.GetUsuarioByRol(3).Select(q => q.Correo).ToList();
 
                 Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
+
+                var usuariosProduccion = _toolsService.GetUsuarioByRol(3).Select(q => q.Id).ToList();
+                foreach (var item in usuariosProduccion)
+                {
+                    _toolsService.CrearAlerta(new Alerta
+                    {
+                        IdUsuario = item,
+                        Nombre = "Cambio Estatus Proyecto " + brief.Nombre,
+                        Descripcion = "Cambio de estatus a " + brief.EstatusBrief.Descripcion,
+                        IdTipoAlerta = 3,
+                        Accion = urlBase + "/Brief"
+
+                    });
+                }
+                
+
             }
             if (brief.EstatusBriefId == 3)
             {
                 Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
+
             }
             if (brief.EstatusBriefId == 4)
             {
@@ -220,31 +252,32 @@ namespace PresentationLayer.Controllers
                 Destinatarios = _toolsService.GetUsuarioByRol(3).Select(q => q.Correo).ToList();
                 Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
             }
+            _toolsService.CrearAlerta(new Alerta
+            {
+                IdUsuario = brief.UsuarioId,
+                Nombre = "Cambio Estatus Proyecto " + brief.Nombre,
+                Descripcion = "Cambio de estatus a " + brief.EstatusBrief.Descripcion,
+                IdTipoAlerta = 3,
+                Accion = urlBase + "/Brief"
+
+            });
+
             var estatusBriefs = _briefService.GetAllEstatusBrief();
             brief.EstatusBrief = estatusBriefs.Where(q => q.Id == brief.EstatusBriefId).FirstOrDefault();
-            var urlBase = $"{Request.Scheme}://{Request.Host}";
+          
+
             // Diccionario con los valores dinámicos a reemplazar
             var valoresDinamicos = new Dictionary<string, string>()
             {
                 { "estatus", brief.EstatusBrief.Descripcion},
                 { "nombreProyecto", brief.Nombre },
-                { "link", urlBase + "/BriefAdmin"  }
+                { "link", urlBase + "/Brief"  }
 
             };
 
 
             _emailSender.SendEmail(Destinatarios, "ActualizaEstatusProyecto", valoresDinamicos);
-            Alerta alerta = new Alerta
-            {
-                Id = 1,
-                Descripcion = "Desc",
-                Nombre = "Nombre",
-                IdTipoAlerta = 1,
-                Accion = "localhost",
-                FechaCreacion = DateTime.Now,
-                lectura = false
-            };
-            _hubContext.Clients.All.SendAsync("ReceiveAlert", alerta);
+            
 
             res.Datos = brief;
             res.Mensaje = "Actualizado exitosamente";
@@ -276,7 +309,7 @@ namespace PresentationLayer.Controllers
                     Addbrief.Archivo.CopyTo(stream);
                 }
             }
-
+            Addbrief.Comentario = "";
             Brief brief = new Brief
             {
                 Id = Addbrief.Id,
@@ -298,18 +331,34 @@ namespace PresentationLayer.Controllers
 
             _briefService.Insert(brief);
             //Envio Correo
-            var urlBase = $"{Request.Scheme}://{Request.Host}";
+            var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
             // Diccionario con los valores dinámicos a reemplazar
             var valoresDinamicos = new Dictionary<string, string>()
             {
                 { "nombre", User.FindFirst(ClaimTypes.Name)?.Value },
                 { "nombreProyecto", brief.Nombre },
-                { "link", urlBase + "/BriefAdmin" }
+                { "link", urlBase + "/Brief/IndexAdmin" }
             };
             var Destinatarios = _toolsService.GetUsuarioByRol(1).Select(q => q.Correo).ToList();
 
             _emailSender.SendEmail(Destinatarios, "NuevoProyecto", valoresDinamicos);
+            
+            var usuariosAdmin = _toolsService.GetUsuarioByRol(1).Select(q => q.Id).ToList();
+            foreach(var item in usuariosAdmin)
+            {
+                Alerta alertaUsuario = new Alerta
+                {
+                    IdUsuario = item,
+                    Nombre = "Nuevo Proyecto",
+                    Descripcion = "Se agrego un nuevo proyecto " + brief.Nombre,
+                    IdTipoAlerta = 1,
+                    Accion = urlBase + "/Brief/IndexAdmin"
 
+                };
+
+                _toolsService.CrearAlerta(alertaUsuario);
+            }
+           
 
             res.Datos = brief;
             res.Mensaje = "Se ha recibido correctamente tu solicitud. En breve recibirás una notificación del estatus de tu solicitud.";
@@ -354,7 +403,7 @@ namespace PresentationLayer.Controllers
                 Descripcion = Addbrief.Descripcion,
                 Objetivo = Addbrief.Objetivo,
                 DirigidoA = Addbrief.DirigidoA,
-                Comentario = Addbrief.Comentario,
+                Comentario = briefOld.Comentario,
                 RutaArchivo = Addbrief.RutaArchivo,
                 TipoBriefId = Addbrief.TipoBriefId,
                 FechaEntrega = Addbrief.FechaEntrega,
@@ -367,7 +416,7 @@ namespace PresentationLayer.Controllers
 
             _briefService.Update(brief);
             //Envio Correo
-            var urlBase = $"{Request.Scheme}://{Request.Host}";
+            var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
             // Diccionario con los valores dinámicos a reemplazar
             var valoresDinamicos = new Dictionary<string, string>()
             {
@@ -410,16 +459,6 @@ namespace PresentationLayer.Controllers
 
             return Ok(res);
         }
-        [HttpGet]
-        public IActionResult GetAllClasificacionProyecto()
-        {
-            respuestaServicio res = new respuestaServicio();
-            res.Datos = _briefService.GetAllClasificacionProyecto();
-            res.Exito = true;
-
-
-            return Ok(res);
-        }
 
         [HttpPost]
         public ActionResult CreateProyecto([FromBody] Proyecto proyecto)
@@ -446,6 +485,7 @@ namespace PresentationLayer.Controllers
         public ActionResult CreateMaterial([FromBody] Material material)
         {
             respuestaServicio res = new respuestaServicio();
+            var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
 
             material.FechaModificacion = DateTime.Now;
             material.EstatusMaterialId = 1;
@@ -460,7 +500,8 @@ namespace PresentationLayer.Controllers
                     IdUsuario = brief.Id,
                     Nombre = "Nuevo Material",
                     Descripcion = "Se agrego un material al brief " + brief.Nombre,
-                    IdTipoAlerta = 4
+                    IdTipoAlerta = 4,
+                    Accion = urlBase + "/Materiales"
 
                 };
 
@@ -470,7 +511,8 @@ namespace PresentationLayer.Controllers
                     IdUsuario = UsuarioId,
                     Nombre = "Nuevo Material",
                     Descripcion = "Se agrego un material al brief " + brief.Nombre,
-                    IdTipoAlerta = 4
+                    IdTipoAlerta = 4,
+                    Accion = urlBase + "/Materiales"
 
                 };
 

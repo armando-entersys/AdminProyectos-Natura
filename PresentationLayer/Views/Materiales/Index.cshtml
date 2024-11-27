@@ -3,45 +3,44 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
 <h3>Gestión de Material</h3>
 
 <div class="row text-center">
     <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
-        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:#22D548; width: 100px; height: 100px;">
-            <h2 data-bind="text:revision" style="margin: 0;"></h2>
+        <div class="p-3 d-flex flex-column justify-content-center align-items-center rounded"
+             style="background:#22D548; width: 100px; height: 100px; border-radius: 10px; overflow: hidden; text-align: center;">
+            <h2 data-bind="text:revision" style="margin: 0; word-wrap: break-word; max-width: 100%; font-size: 1.5em;"></h2>
             <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Revisión</p>
         </div>
     </div>
     <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
-        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:#FF450B; width: 100px; height: 100px;">
-            <h2 data-bind="text:faltaInfo" style="margin: 0;"></h2>
+        <div class="p-3 d-flex flex-column justify-content-center align-items-center rounded"
+             style="background:#FF450B; width: 100px; height: 100px; border-radius: 10px; overflow: hidden; text-align: center;">
+            <h2 data-bind="text:faltaInfo" style="margin: 0; word-wrap: break-word; max-width: 100%; font-size: 1.5em;"></h2>
             <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Falta Información</p>
         </div>
     </div>
     <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
-        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:#84B8FF; width: 100px; height: 100px;">
-            <h2 data-bind="text:aprobado" style="margin: 0;"></h2>
+        <div class="p-3 d-flex flex-column justify-content-center align-items-center rounded"
+             style="background:#84B8FF; width: 100px; height: 100px; border-radius: 10px; overflow: hidden; text-align: center;">
+            <h2 data-bind="text:aprobado" style="margin: 0; word-wrap: break-word; max-width: 100%; font-size: 1.5em;"></h2>
             <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Aprobado</p>
         </div>
     </div>
     <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
-        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:#4DBEFF; width: 100px; height: 100px;">
-            <h2 data-bind="text:programado" style="margin: 0;"></h2>
+        <div class="p-3 d-flex flex-column justify-content-center align-items-center rounded"
+             style="background:#4DBEFF; width: 100px; height: 100px; border-radius: 10px; overflow: hidden; text-align: center;">
+            <h2 data-bind="text:programado" style="margin: 0; word-wrap: break-word; max-width: 100%; font-size: 1.5em;"></h2>
             <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Programado</p>
         </div>
     </div>
     <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
-        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:#9F81FD; width: 100px; height: 100px;">
-            <h2 data-bind="text:entregado" style="margin: 0;"></h2>
+        <div class="p-3 d-flex flex-column justify-content-center align-items-center rounded"
+             style="background:#9F81FD; width: 100px; height: 100px; border-radius: 10px; overflow: hidden; text-align: center;">
+            <h2 data-bind="text:entregado" style="margin: 0; word-wrap: break-word; max-width: 100%; font-size: 1.5em;"></h2>
             <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Entregado</p>
-        </div>
-    </div>
-    <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
-        <div class="p-3 d-flex flex-column justify-content-center align-items-center" style="background:#EFF200; width: 100px; height: 100px;">
-            <h2 data-bind="text:inicioCiclo" style="margin: 0;"></h2>
-            <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Inicio de ciclo</p>
         </div>
     </div>
    
@@ -55,14 +54,32 @@
                data-bind="value: filtroNombreProyecto, valueUpdate: 'input'" />
     </div>
     <div class="col">
+        <input type="text"
+               class="form-control"
+               placeholder="Buscar por Area"
+               data-bind="value: filtroArea, valueUpdate: 'input'" />
+    </div>
+    <div class="col">
+        <input type="text"
+               class="form-control"
+               placeholder="Buscar por Responsable"
+               data-bind="value: filtroResponsable, valueUpdate: 'input'" />
+    </div>
+    <div class="col">
+        <!-- Fecha Inicio -->
         <input type="date"
                class="form-control"
-               placeholder="Filtrar por fecha de entrega"
-               data-bind="value: filtroFechaEntrega, valueUpdate: 'input'" />
+               placeholder="Filtrar por fecha inicio"
+               data-bind="value: filtroFechaInicio, valueUpdate: 'input'" />
     </div>
-    <div class="col-auto">
-        <button class="btn btn-primary" data-bind="click: buscar">Buscar</button>
+    <div class="col">
+        <!-- Fecha Fin -->
+        <input type="date"
+               class="form-control"
+               placeholder="Filtrar por fecha fin"
+               data-bind="value: filtroFechaFin, valueUpdate: 'input'" />
     </div>
+  
 </div>
 
 <div class="row">
@@ -76,8 +93,8 @@
                     <th scope="col">Estatus</th>
                     <th scope="col">Nombre del proyecto</th>
                     <th scope="col">Audiencia</th>
-                    <th scope="col">Producción</th>
                     <th scope="col">Responsable</th>
+                    <th scope="col">Area</th>
                     <th scope="col">Fecha Entrega</th>
                     <th scope="col">Acciones</th>
 
@@ -91,12 +108,12 @@
                     <td data-bind="text: estatusMaterial.descripcion"></td>
                     <td data-bind="text: brief.nombre"></td>
                     <td data-bind="text: audiencia.descripcion"></td>
-                    <td data-bind="text: produccion"></td>
                     <td data-bind="text: responsable"></td>
+                    <td data-bind="text: area"></td>
                     <td data-bind="text: fechaEntrega"></td>
                     <td class="small">
                         <button type="button" class="btn btn-outline-primary" data-bind="click:$root.Editar">
-                            <i class="lni lni-pencil"></i>
+                            <i class="lni lni-pencil-1"></i>
                             <span>Editar</span>
                         </button>
                     </td>
@@ -107,7 +124,7 @@
 </div>
 
 <div class="modal fade" id="divEdicion" tabindex="-1" aria-labelledby="Modal" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen-xxl-down">
+    <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="Modal">Editar Material</h5>
@@ -115,7 +132,8 @@
             </div>
             <div class="modal-body" style="background-color: rgba(0, 0, 0, .03);">
                 <div class="row">
-                    <div class="col-4" style="background-color:#FFFFFF;">
+                    <h1>Historico</h1>
+                    <div class="col-4" style="background-color:#FFFFFF;max-height: 400px; overflow-y: auto;">
                         
                         <div data-bind="foreach: registrosHistorico">
                             <hr class="border border-3 border-primary w-100 mx-auto my-4">
@@ -126,7 +144,7 @@
                         </div>
                     </div>
                     <div class="col">
-                        <div id="formularioAdmin" class="p-3">
+                        <div id="formulario" class="p-3">
                             <h1>Cambio Estatus</h1>
 
                             <div class="mb-3" data-bind="validationElement: EstatusMateriales">
@@ -135,11 +153,12 @@
                             </div>
                             <div class="mb-3" data-bind="validationElement: Comentario">
                                 <label for="comentario-editor" class="col-form-label">Comentario:</label>
-                                <textarea class="form-control" id="comentario-editor" maxlength="128" data-bind="stableTextInput: Comentario"></textarea>
+                                <div id="comentario-editor" class="form-control" contenteditable="true" style="min-height: 100px; border: 1px solid #ccc;" maxlength="128"></div>
+
                             </div>
-                            <div class="mb-3" data-bind="validationElement: fechaEntrega">
+                            <div class="mb-3" data-bind="validationElement: fechaEntrega, visible:isRoleVisible([1])">
                                 <label for="recipient-name" class="col-form-label">Cambiar Fecha Entrega:</label>
-                                <input type="date" class="form-control" id="fechaEntrega" maxlength="128" data-bind="value: fechaEntrega">
+                                <input type="date" class="form-control" id="fechaEntrega" data-bind="value: fechaEntrega, attr: { min: minDate }">
                             </div>
                             <div class="mb-3" data-bind="validationElement: envioCorreo">
                                 <label for="recipient-name" class="col-form-label">Notifica por Correo:</label>
@@ -185,10 +204,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <button type="button" class="btn btn-primary" data-bind="click:GuardarComentario">
-                                <i class="lni lni-save"></i>
-                                <span>Guardar</span>
-                            </button>
+                            
                         </div>
            
                     </div>
@@ -197,9 +213,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-primary" data-bind="click:GuardarComentario">
                     <i class="lni lni-save"></i>
-                    <span>Aceptar</span>
+                    <span>Guardar</span>
                 </button>
             </div>
         </div>
@@ -207,8 +223,15 @@
 </div>
 
 
-    @section Scripts {
-        <script src="https://cdn.ckeditor.com/ckeditor5/35.3.1/classic/ckeditor.js"></script>
+@section Scripts {
+    <script>
+        // Pasar los valores de ViewBag a variables JavaScript
+        var RolId = @Html.Raw(ViewBag.RolId);
 
-        <script src="~/js/Material/Material.js"></script>
-    }
+    </script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/35.3.1/classic/ckeditor.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    
+    <script src="~/js/Material/Material.js"></script>
+
+}

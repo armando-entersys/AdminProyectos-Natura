@@ -39,27 +39,27 @@ function AppViewModel() {
     self.errors = ko.validation.group(self);
     self.inicializar = function () {
         $.ajax({
-            url: "/Brief/GetAllbyUserId", // URL del método GetAll en tu API
+            url: "Brief/GetAllbyUserBrief", // URL del método GetAll en tu API
             type: "GET",
             contentType: "application/json",
             success: function (d) {
                 self.registros.removeAll();
-                self.registros.push.apply(self.registros, d.datos.$values);
+                self.registros.push.apply(self.registros, d.datos);
                 $.ajax({
-                    url: "/Brief/GetAllEstatusBrief", // URL del método GetAll en tu API
+                    url: "Brief/GetAllEstatusBrief", // URL del método GetAll en tu API
                     type: "GET",
                     contentType: "application/json",
                     success: function (d) {
                         self.catEstatusBrief.removeAll();
-                        self.catEstatusBrief.push.apply(self.catEstatusBrief, d.datos.$values);
+                        self.catEstatusBrief.push.apply(self.catEstatusBrief, d.datos);
                         $("#divEdicion").modal("hide");
                         $.ajax({
-                            url: "/Brief/GetAllTipoBrief", // URL del método GetAll en tu API
+                            url: "Brief/GetAllTipoBrief", // URL del método GetAll en tu API
                             type: "GET",
                             contentType: "application/json",
                             success: function (d) {
                                 self.catTipoBrief.removeAll();
-                                self.catTipoBrief.push.apply(self.catTipoBrief, d.datos.$values);
+                                self.catTipoBrief.push.apply(self.catTipoBrief, d.datos);
                                 $("#divEdicion").modal("hide");
                             },
                             error: function (xhr, status, error) {
@@ -139,7 +139,7 @@ function AppViewModel() {
        
         self.id(brief.id);
         $.ajax({
-            url: "/Brief/Details/" + self.id(), // URL del método GetAll en tu API
+            url: "Brief/Details/" + self.id(), // URL del método GetAll en tu API
             type: "GET",
             contentType: "application/json",
             success: function (d) {
@@ -189,7 +189,7 @@ function AppViewModel() {
         }
 
         $.ajax({
-            url: "/Brief/EditBrief", // URL del método GetAll en tu API
+            url: "Brief/EditBrief", // URL del método GetAll en tu API
             type: "POST",
             contentType: false,  // Important to avoid jQuery processing data
             processData: false,  // Important to avoid jQuery processing data
@@ -233,7 +233,7 @@ function AppViewModel() {
         }
        
         $.ajax({
-            url: "/Brief/AddBrief", // URL del método GetAll en tu API
+            url: "Brief/AddBrief", // URL del método GetAll en tu API
             type: "POST",
             contentType: false,  // Important to avoid jQuery processing data
             processData: false,  // Important to avoid jQuery processing data

@@ -142,6 +142,7 @@ namespace PresentationLayer.Controllers
                 var UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
                 historialMaterialRequest.HistorialMaterial.UsuarioId = UsuarioId;
                 var id = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var usuarioLogueado =_usuarioService.TGetById(id);  
                _briefService.ActualizaHistorialMaterial(historialMaterialRequest.HistorialMaterial);
 
                 if (historialMaterialRequest.EnvioCorreo)
@@ -154,22 +155,23 @@ namespace PresentationLayer.Controllers
                         var usuario = _usuarioService.TGetById(item.Id);
                         Destinatarios.Add(usuario.Correo);
                     }
-                   
+                    Destinatarios.AddRange(_toolsService.GetUsuarioByRol(3).Select(q => q.Correo).ToList());
 
 
-                    var urlBase = $"{Request.Scheme}://{Request.Host}";
+                    var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
                     // Diccionario con los valores dinámicos a reemplazar
                     var valoresDinamicos = new Dictionary<string, string>()
                 {
+                    { "nombreMaterial", material.Nombre},
+                    { "usuario",usuarioLogueado.Nombre },
                     { "estatus", EstatusMaterial.Descripcion},
-                    { "nombreMaterial", material.Nombre },
+                    { "comentario", historialMaterialRequest.HistorialMaterial.Comentarios },
                     { "link", urlBase + "/Materiales"  }
                 };
                     _emailSender.SendEmail(Destinatarios, "ComentarioMaterial", valoresDinamicos);
                 }
-                
-               
 
+                res.Mensaje = "Solicitud Exitosa";
                 res.Exito = true;
             }
             catch (Exception ex)

@@ -1,7 +1,9 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 @await Component.InvokeAsync("_HeaderLayoutComponentPartial")
+
 <body>
+    
     <div class="wrapper">
         @await Component.InvokeAsync("_SidebarLayoutComponentPartial")
         <div class="main p-3">
@@ -41,6 +43,7 @@ _               </div>
             &copy; 2024 - Administrador de proyectos Natura
         </div>
     </footer>
+    
     @await Component.InvokeAsync("_ScriptLayoutComponentPartial")
     @await RenderSectionAsync("Scripts", required: false)
 </body>

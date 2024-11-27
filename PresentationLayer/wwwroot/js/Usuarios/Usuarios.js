@@ -22,23 +22,23 @@ function AppViewModel() {
 
     self.inicializar = function () {
         $.ajax({
-            url: "/Usuarios/GetAll", // URL del método GetAll en tu API
+            url: "Usuarios/GetAll", // URL del método GetAll en tu API
             type: "GET",
             contentType: "application/json",
             success: function (d) {
                 self.registros.removeAll();
-                self.registros.push.apply(self.registros, d.datos.$values);
+                self.registros.push.apply(self.registros, d.datos);
                 self.catEstatus.removeAll();
                 self.catEstatus.push.apply(self.catEstatus, catEstatus);
                 $("#divEdicion").modal("hide");
                 //self.Limpiar();
                 $.ajax({
-                    url: "/Usuarios/GetAllRoles", // URL del método GetAll en tu API
+                    url: "Usuarios/GetAllRoles", // URL del método GetAll en tu API
                     type: "GET",
                     contentType: "application/json",
                     success: function (d) {
                         self.catRoles.removeAll();
-                        self.catRoles.push.apply(self.catRoles, d.datos.$values);
+                        self.catRoles.push.apply(self.catRoles, d.datos);
                         $("#divEdicion").modal("hide");
                         self.Limpiar();
                     },
@@ -59,6 +59,7 @@ function AppViewModel() {
 
     self.Limpiar = function () {
         self.id(0);
+        self.nombre("");
         self.correo("");
         self.apellidoPaterno("");
         self.apellidoMaterno("");
@@ -89,6 +90,7 @@ function AppViewModel() {
         self.Estatus(Estatus);
     }
     self.GuardarEditar = function () {
+
         var usuario = {
             Id : self.id(),
             Nombre: self.nombre(),
@@ -96,10 +98,11 @@ function AppViewModel() {
             ApellidoMaterno: self.apellidoMaterno(),
             Correo: self.correo(),
             Estatus: self.Estatus().IdEstatus,
-            RolId: self.Rol().id
+            RolId: self.Rol().id,
+            Contrasena: self.contrasena()
         }
         $.ajax({
-            url: "/Usuarios/Edit", // URL del método GetAll en tu API
+            url: "Usuarios/Edit", // URL del método GetAll en tu API
             type: "PUT",
             contentType: "application/json",
             data: JSON.stringify(usuario),
@@ -131,10 +134,11 @@ function AppViewModel() {
             ApellidoMaterno : self.apellidoMaterno(),
             Correo: self.correo(),
             Estatus: self.Estatus().IdEstatus,
-            RolId : self.Rol().id
+            RolId: self.Rol().id,
+            Contrasena: self.contrasena()
         }
         $.ajax({
-            url: "/Usuarios/Create", // URL del método GetAll en tu API
+            url: "Usuarios/Create", // URL del método GetAll en tu API
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(usuario),

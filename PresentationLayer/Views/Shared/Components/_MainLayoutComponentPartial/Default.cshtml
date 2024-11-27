@@ -1,45 +1,64 @@
-﻿<!-- Bootstrap Icons -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+﻿
+<style>
+    .custom-btn {
+        width: 120px; /* Ancho uniforme */
+        height: 100px; /* Alto uniforme */
+    }
 
-<div name="Main">
-   
-    <div class="btn-group" role="group" aria-label="Basic outlined example">
-        <div class="d-flex justify-content-center  p-2">
-            <a class="btn btn-primary d-flex flex-column align-items-center" href="/Materiales">
-                <i class="lni lni-paperclip fs-3"></i> <!-- Ejemplo de ícono Bootstrap -->
-                <span class="mb-1"></span>
+        .custom-btn i {
+            font-size: 2rem; /* Tamaño del ícono */
+        }
 
-                <span class="mb-1">Materiales</span>
+        .custom-btn span {
+            font-size: 0.9rem; /* Tamaño del texto */
+        }
+</style>
+<div name="Main" class="d-flex justify-content-between align-items-center">
+    <!-- Botones -->
+    <div class="btn-group" role="group" aria-label="Basic outlined">
+        <div class="d-flex justify-content-center p-2">
+            <a class="btn btn-primary d-flex flex-column align-items-center custom-btn" href="~/Brief">
+                <i class="lni lni-file-plus-circle"></i>
+                <span>Brief</span>
             </a>
         </div>
-        <div class="d-flex justify-content-center  p-2">
-            <a class="btn btn-primary d-flex flex-column align-items-center" href="/Brief">
-                <i class="lni lni-add-files fs-3"></i> <!-- Ejemplo de ícono Bootstrap -->
-                <span class="mb-1"></span>
-
-                <span class="mb-1">Proyectos</span>
+        @if (ViewBag.RolId == 1)
+        {
+            <div class="d-flex justify-content-center p-2">
+                <a class="btn btn-primary d-flex flex-column align-items-center custom-btn" href="~/Brief/IndexAdmin">
+                    <i class="lni lni-folder-1"></i>
+                    <span>Proyectos</span>
+                </a>
+            </div>
+        }
+        <div class="d-flex justify-content-center p-2">
+            <a class="btn btn-primary d-flex flex-column align-items-center custom-btn" href="~/Materiales">
+                <i class="lni lni-photos"></i>
+                <span>Materiales</span>
             </a>
         </div>
-        <div class="d-flex justify-content-center  p-2">
-            <a class="btn btn-primary d-flex flex-column align-items-center" href="/Calendario">
-                <i class="lni lni-calendar fs-3"></i> <!-- Ejemplo de ícono Bootstrap -->
-                <span class="mb-1">Calendario</span>
-                <span class="mb-1">de Proyectos</span>
+        <div class="d-flex justify-content-center p-2">
+            <a class="btn btn-primary d-flex flex-column align-items-center custom-btn" href="~/Calendario">
+                <i class="lni lni-calendar-days"></i>
+                <span>Calendario</span>
+                <span>de Proyectos</span>
             </a>
         </div>
-
-        <div class="d-flex justify-content-center  p-2">
-            <a type="button" class="btn btn-primary position-relative p-2 " href="/Alertas">
-                <i class="lni lni-popup fs-3"></i>
-                Inbox
+        <div class="d-flex justify-content-center p-2">
+            <a type="button" class="btn btn-primary position-relative custom-btn" href="~/Alertas">
+                <i class="lni lni-bell-1"></i>
+                <span>Inbox</span>
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                     @ViewBag.ConteoAlertas
                     <span class="visually-hidden">unread messages</span>
                 </span>
             </a>
         </div>
-        
+    </div>
 
-      
+    <!-- Imagen -->
+    <div>
+        <img src="~/img/natura-logo.png" style="width:90%; max-width:150px;" />
     </div>
 </div>
+

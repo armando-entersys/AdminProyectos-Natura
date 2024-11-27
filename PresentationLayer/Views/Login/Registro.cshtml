@@ -26,17 +26,27 @@
                             <input class="form-control mb-3" type="text" placeholder="Apellido Paterno" required asp-for="ApellidoPaterno" required />
                             <input class="form-control mb-3" type="text" placeholder="Apellido Materno" required asp-for="ApellidoMaterno" required />
                             <input class="form-control mb-3" type="text" placeholder="Correo" required asp-for="Correo" required />
-                           
+
+                          
                            <input 
                                 class="form-control mb-3" 
-                                type="password" 
+                                type="password"
+                                id="Contrasena"
                                 placeholder="Contraseña" 
                                 required 
                                 asp-for="Contrasena"
                                    pattern="@( "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$" )"
                                    title="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, un número y un carácter especial."
                             />
-                            <button class="w-100 btn btn-lg btn-primary" type="submit">Registrarme</button>
+                            <input class="form-control mb-3"
+                                   type="password"
+                                   id="confirmPassword"
+                                   placeholder="Repetir Contraseña"
+                                   required
+                                   pattern="@( "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$" )"
+                                   title="La contraseña debe tener al menos 8 caracteres, una letra mayúscula, un número y un carácter especial." />
+
+                            <button class="w-100 btn btn-lg btn-primary" type="submit" onclick="return validatePasswords()">Registrarme</button>
                             @if (@TempData["Mensaje"] != null)
                             {
 
@@ -60,5 +70,17 @@
     </div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript">
+        function validatePasswords() {
+            var password = document.getElementById("Contrasena").value;
+            var confirmPassword = document.getElementById("confirmPassword").value;
+
+            if (password !== confirmPassword) {
+                alert("Las contraseñas no coinciden.");
+                return false;
+            }
+            return true;
+        }
+    </script>
 </body>
 </html>

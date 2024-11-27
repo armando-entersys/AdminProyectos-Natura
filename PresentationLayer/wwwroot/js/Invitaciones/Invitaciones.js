@@ -15,12 +15,12 @@
 
     self.inicializar = function () {
         $.ajax({
-            url: "/Invitaciones/GetAll", // URL del método GetAll en tu API
+            url: "Invitaciones/GetAll", // URL del método GetAll en tu API
             type: "GET",
             contentType: "application/json",
             success: function (d) {
                 self.registros.removeAll();
-                self.registros.push.apply(self.registros, d.datos.$values);
+                self.registros.push.apply(self.registros, d.datos);
                
             },
             error: function (xhr, status, error) {
@@ -36,7 +36,7 @@
     self.Aceptar = function (usuario) {
 
         $.ajax({
-            url: "/Invitaciones/Aceptar/" + usuario.id, // URL del método GetAll en tu API
+            url: "Invitaciones/Aceptar/" + usuario.id, // URL del método GetAll en tu API
             type: "GET",
             contentType: "application/json",
             success: function (d) {
@@ -54,7 +54,7 @@
     }
     self.Rechazar = function (usuario) {
         $.ajax({
-            url: "/Invitaciones/Rechazar/" + usuario.id, // URL del método GetAll en tu API
+            url: "Invitaciones/Rechazar/" + usuario.id, // URL del método GetAll en tu API
             type: "GET",
             contentType: "application/json",
             success: function (d) {

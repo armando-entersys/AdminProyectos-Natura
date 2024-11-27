@@ -18,7 +18,7 @@
 
     self.inicializar = function () {
         $.ajax({
-            url: "/Brief/ObtenerConteoPorProyectos", // URL del método GetAll en tu API
+            url: "Brief/ObtenerConteoPorProyectos", // URL del método GetAll en tu API
             type: "GET",
             contentType: "application/json",
             success: function (d) {
@@ -26,8 +26,10 @@
                 self.EstaSemana(d.datos.estaSemana);
                 self.ProximaSemana(d.datos.proximaSemana);
                 self.TotalProyectos(d.datos.totalProyectos);
+                self.ProyectoTiempo(d.datos.proyectoTiempo);
+                self.ProyectoExtra(d.datos.proyectoExtra);
                 $.ajax({
-                    url: "/Brief/ObtenerConteoMateriales", // URL del método GetAll en tu API
+                    url: "Brief/ObtenerConteoMateriales", // URL del método GetAll en tu API
                     type: "GET",
                     contentType: "application/json",
                     success: function (d) {
@@ -36,33 +38,19 @@
                         self.ProximaSemana_Material(d.datos.proximaSemana);
                         self.TotalMaterial(d.datos.totalProyectos);
                         $.ajax({
-                            url: "/Brief/ObtenerConteoProyectoFecha", // URL del método GetAll en tu API
+                            url: "Home/ObtenerAlertas", // URL del método GetAll en tu API
                             type: "GET",
                             contentType: "application/json",
                             success: function (d) {
-                                self.ProyectoTiempo(d.datos);
-                                self.ProyectoExtra(d.datos);
-                                $.ajax({
-                                    url: "/Home/ObtenerAlertas", // URL del método GetAll en tu API
-                                    type: "GET",
-                                    contentType: "application/json",
-                                    success: function (d) {
-                                        self.registrosAlerta.removeAll();
-                                        self.registrosAlerta.push.apply(self.registrosAlerta, d.datos.$values);
-                                       
-                                    },
-                                    error: function (xhr, status, error) {
-                                        console.error("Error al obtener los datos: ", error);
-                                        alert("Error al obtener los datos: " + xhr.responseText);
-                                    }
-                                });
+                                self.registrosAlerta.removeAll();
+                                self.registrosAlerta.push.apply(self.registrosAlerta, d.datos);
+
                             },
                             error: function (xhr, status, error) {
                                 console.error("Error al obtener los datos: ", error);
                                 alert("Error al obtener los datos: " + xhr.responseText);
                             }
                         });
-
                     },
                     error: function (xhr, status, error) {
                         console.error("Error al obtener los datos: ", error);
@@ -85,7 +73,7 @@
     };
     self.Editar = function (alerta) {
         $.ajax({
-            url: "/Alertas/ActualizarAlerta/" + alerta.id, // URL del método GetAll en tu API
+            url: "Alertas/ActualizarAlerta/" + alerta.id, // URL del método GetAll en tu API
             type: "GET",
             contentType: "application/json",
             success: function (d) {

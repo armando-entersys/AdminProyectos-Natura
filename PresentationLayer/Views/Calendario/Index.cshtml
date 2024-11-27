@@ -4,18 +4,40 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet" />
-
 <h1>Index</h1>
 
 <div class="container py-4">
     <h1 class="text-center mb-4">Calendario de Proyectos</h1>
     <div id="calendar"></div>
 </div>
-
+<div class="modal fade" id="divEdicion" tabindex="-1" aria-labelledby="Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="Modal">Material</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label>Fecha de Entrega</label>
+                <p data-bind="text:fechaEntrega"></p>
+                <label>Nombre Material</label>
+                <p data-bind="text:nombre"></p>
+                <label>Responsable</label>
+                <p data-bind="text:responsable"></p>
+                <label>Area</label>
+                <p data-bind="text:area"></p>
+                <br />
+                <a href="~/Materiales"> Ver Material</a>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
     <script>
         var RolId = @Html.Raw(ViewBag.RolId);
     </script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/es.js"></script>
     <script src="~/js/Calendario/Calendario.js"></script>
+
 }

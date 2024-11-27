@@ -30,9 +30,9 @@ namespace BusinessLayer.Concrete
         {
             return _briefDal.GetAll();
         }
-        public IEnumerable<Brief> GetAllbyUserId(int usuarioId)
+        public IEnumerable<Brief> GetAllbyUserId(int usuarioId, bool onlybrief)
         {
-            return _briefDal.GetAllbyUserId(usuarioId);
+            return _briefDal.GetAllbyUserId(usuarioId,onlybrief);
         }
         public Brief GetById(int id)
         {
@@ -75,11 +75,6 @@ namespace BusinessLayer.Concrete
         public List<Material> GetMaterialesByBriefId(int id)
         {
             return _briefDal.GetMaterialesByBriefId(id);
-        }
-
-        public IEnumerable<ClasificacionProyecto> GetAllClasificacionProyecto()
-        {
-            return _briefDal.GetAllClasificacionProyecto();
         }
 
         public void EliminarMaterial(int id)

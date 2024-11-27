@@ -104,16 +104,19 @@ namespace PresentationLayer.Controllers
           
             usuario.UserRol = _rolService.TGetById(usuario.RolId);
             _usuarioService.TInsert(usuario);
-
+            
+            var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
+            
             var valoresDinamicos = new Dictionary<string, string>
             {
-                { "Nombre", "Carlos" },
-                { "Fecha", DateTime.Now.AddDays(7).ToString("dd/MM/yyyy") }
+                { "usuario", usuario.Correo },
+                { "password", usuario.Contrasena },
+                { "link", urlBase + "/Login" }
             };
             var Destinatarios = new List<string>();
             Destinatarios.Add(usuario.Correo);
 
-            _emailSender.SendEmail(Destinatarios, "MensajeBienvenida", valoresDinamicos);
+            _emailSender.SendEmail(Destinatarios, "RegistroUsuarioAdmin", valoresDinamicos);
             res.Mensaje = "Usuario agregado exitosamente";
             res.Exito = true;
             return Ok(res);
@@ -143,7 +146,7 @@ namespace PresentationLayer.Controllers
         [HttpPost]
         public IActionResult SolicitudUsuario(string Nombre, string Correo,string ApellidoPaterno, string ApellidoMaterno, string Contrasena)
         {
-            var urlBase = $"{Request.Scheme}://{Request.Host}";
+            var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
 
             Usuario usuario = new()
             {

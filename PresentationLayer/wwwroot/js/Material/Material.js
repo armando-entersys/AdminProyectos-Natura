@@ -20,173 +20,144 @@ function AppViewModel() {
     self.noCompartio = ko.observable();
     // Observables para filtros
     self.filtroNombreProyecto = ko.observable("");
+    self.filtroArea = ko.observable("");
+    self.filtroResponsable = ko.observable("");
+
     self.filtroFechaEntrega = ko.observable("");
+    self.filtroFechaInicio = ko.observable('');
+    self.filtroFechaFin = ko.observable('');
+
+    // Obtener la fecha actual en formato YYYY-MM-DD
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Mes en formato 2 dígitos
+    const day = String(today.getDate()).padStart(2, '0'); // Día en formato 2 dígitos
+
+    // Formato de fecha mínima
+    self.minDate = `${year}-${month}-${day}`; // YYYY-MM-DD
+
+
     self.envioCorreo = ko.observable("No");
     self.id = ko.observable();
-    self.Comentario = ko.observable("").extend({ rateLimit: { timeout: 300, method: "notifyWhenChangesStop" } });
+    self.Comentario = ko.observable("").extend({ rateLimit: { timeout: 11000000, method: "notifyWhenChangesStop" } });
 
     self.fechaEntrega = ko.observable();
     // Observables y variables para autocompletado
     self.buscarUsuario = ko.observable("");
     self.resultadosBusqueda = ko.observableArray([]);
     self.registrosUsuariosCorreo = ko.observableArray();
+    function updateTextAreaValue(textarea, newValue) {
+        const cursorPosition = textarea.selectionStart;  // Guardar la posición del cursor
+
+        // Actualizar el valor del textarea
+        textarea.value = newValue;
+
+        // Restaurar la posición del cursor
+        textarea.setSelectionRange(cursorPosition, cursorPosition);
+    }
 
     // Custom binding handler to prevent cursor reset
     ko.bindingHandlers.textareaCursor = {
         init: function (element, valueAccessor) {
-            let observable = valueAccessor();
-
-            // Actualiza el observable cuando el usuario escribe
-            element.addEventListener('input', function () {
-                observable(element.value);
-            });
+            // No hacemos nada en el init, ya que solo necesitamos manejar la actualización
         },
         update: function (element, valueAccessor) {
-            let value = ko.unwrap(valueAccessor());
+            var value = ko.unwrap(valueAccessor());
+            var textarea = element;
 
-            // Guarda la posición actual del cursor
-            const cursorPos = element.selectionStart;
+            // Guardar la posición del cursor antes de actualizar el valor
+            var cursorPosition = textarea.selectionStart;
 
-            // Solo actualiza si el valor ha cambiado
-            if (element.value !== value) {
-                element.value = value;
+            // Actualizar el valor del textarea directamente desde el observable
+            textarea.value = value;
 
-                // Restaura la posición del cursor
-                element.setSelectionRange(cursorPos, cursorPos);
-            }
+            // Usar setTimeout para dar tiempo a que Knockout actualice el DOM antes de restaurar el cursor
+            setTimeout(function () {
+                textarea.setSelectionRange(cursorPosition, cursorPosition);
+            }, 0); // El retraso puede ser ajustado si es necesario
         }
     };
-    ko.bindingHandlers.stableTextInput = {
-        init: function (element, valueAccessor) {
-            // Obtener el valor observable
-            let observable = valueAccessor();
-
-            // Escuchar cambios en el input del usuario
-            element.addEventListener('input', function () {
-                observable(element.value);
-            });
-
-            // Monitorear cambios externos y mantener la posición del cursor
-            ko.utils.registerEventHandler(element, "blur", function () {
-                let value = ko.unwrap(observable);
-
-                // Solo actualizar si el valor cambia
-                if (element.value !== value) {
-                    element.value = value;
-                }
-            });
-        },
-        update: function (element, valueAccessor) {
-            let value = ko.unwrap(valueAccessor());
-
-            // Actualizar solo si el valor es diferente
-            if (element.value !== value) {
-                // Guardar la posición actual del cursor
-                const cursorPos = element.selectionStart;
-
-                // Actualizar el valor sin modificar el cursor
-                element.value = value;
-
-                // Restaurar la posición del cursor
-                element.setSelectionRange(cursorPos, cursorPos);
-            }
-        }
-    };
+   
     let comentarioEditor;
+    // Método para comprobar si el rol actual coincide con el pasado
+    self.isRoleVisible = function (allowedRoles) {
+        return allowedRoles.includes(RolId);
+    };
     self.inicializar = function () {
-        $.ajax({
-            url: "/Materiales/ObtenerMateriales", // URL del método GetAll en tu API
-            type: "GET",
-            contentType: "application/json",
-            success: function (d) {
-                self.registros.removeAll();
-                self.registros.push.apply(self.registros, d.datos.$values);
-                $.ajax({
-                    url: "/Materiales/ObtenerConteoEstatusMateriales", // URL del método GetAll en tu API
-                    type: "GET",
-                    contentType: "application/json",
-                    success: function (d) {
-                        self.revision(d.datos.revision);
-                        self.produccion(d.datos.produccion);
-                        self.faltaInfo(d.datos.faltaInfo);
-                        self.aprobado(d.datos.aprobado);
-                        self.programado(d.datos.programado);
-                        self.entregado(d.datos.entregado);
-                        self.inicioCiclo(d.datos.inicioCiclo);
-                        
-                        $.ajax({
-                            url: "/Materiales/ObtenerEstatusMateriales", // URL del método GetAll en tu API
-                            type: "GET",
-                            contentType: "application/json",
-                            success: function (d) {
-                                self.catEstatusMateriales.removeAll();
-                                self.catEstatusMateriales.push.apply(self.catEstatusMateriales, d.datos.$values);
-
-                                
-                                ClassicEditor
-                                    .create(document.querySelector('#comentario-editor'), {
-                                        toolbar: [
-                                            'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'undo', 'redo', '|', 'imageUpload'
-                                        ],
-                                        simpleUpload: {
-                                            uploadUrl: '/Materiales/UploadImage',
-                                            headers: {
-                                                'X-CSRF-TOKEN': 'tu-csrf-token'
-                                            }
-                                        }
-                                    })
-                                    .then(editor => {
-                                        comentarioEditor = editor; // Asigna el editor a la variable global
-                                        editor.model.document.on('change:data', () => {
-                                            self.Comentario(editor.getData());
-                                        });
-                                        self.Comentario.subscribe(newValue => {
-                                            editor.setData(newValue);
-                                        });
-                                    })
-                                    .catch(error => {
-                                        console.error("Error al inicializar CKEditor: ", error);
-                                    });
-                            },
-                            error: function (xhr, status, error) {
-                                console.error("Error al obtener los datos: ", error);
-                                alert("Error al obtener los datos: " + xhr.responseText);
-                            }
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error al obtener los datos: ", error);
-                        alert("Error al obtener los datos: " + xhr.responseText);
-                    }
+        $.get("Materiales/ObtenerMateriales")
+            .then(function (d) {
+                self.registros(d.datos);
+                return $.get("Materiales/ObtenerConteoEstatusMateriales");
+            })
+            .then(function (d) {
+                self.revision(d.datos.revision);
+                self.produccion(d.datos.produccion);
+                self.faltaInfo(d.datos.faltaInfo);
+                self.aprobado(d.datos.aprobado);
+                self.programado(d.datos.programado);
+                self.entregado(d.datos.entregado);
+                return $.get("Materiales/ObtenerEstatusMateriales");
+            })
+            .then(function (d) {
+                self.catEstatusMateriales(d.datos);
+                // Lógica para inicializar el editor CK
+                return ClassicEditor.create(document.querySelector('#comentario-editor'));
+            })
+            .then(function (editor) {
+                comentarioEditor = editor;
+                editor.model.document.on('change:data', function () {
+                    self.Comentario(editor.getData());
                 });
-            },
-            error: function (xhr, status, error) {
-                console.error("Error al obtener los datos: ", error);
-                alert("Error al obtener los datos: " + xhr.responseText);
-            }
-        });
-           
-    }
+                self.Comentario.subscribe(function (newValue) {
+                    editor.setData(newValue);
+                });
+            })
+            .catch(function (error) {
+                console.error("Error al obtener los datos o al inicializar el editor: ", error);
+            });
+    };
+
 
     self.inicializar();
     function updateComentario(textarea) {
         var viewModel = ko.dataFor(textarea);
         viewModel.Comentario(textarea.value);
     }
+
     // Computed observable para filtrar registros
     self.registrosFiltrados = ko.computed(function () {
         var filtroNombre = self.filtroNombreProyecto().toLowerCase();
-        var filtroFecha = self.filtroFechaEntrega();
+        var filtroArea = self.filtroArea().toLowerCase();
+        var filtroResponsable = self.filtroResponsable().toLowerCase();
+
+        var filtroFechaInicio = self.filtroFechaInicio(); // Fecha de inicio
+        var filtroFechaFin = self.filtroFechaFin(); // Fecha de fin
 
         return ko.utils.arrayFilter(self.registros(), function (registro) {
-            var nombreProyecto = registro.brief.nombre;
-            var fechaEntrega = registro.fechaEntrega;
+            var nombreProyecto = registro.brief && registro.brief.nombre ? registro.brief.nombre.toLowerCase() : "";
+            var Area = registro && registro.area ? registro.area.toLowerCase() : "";
+            var Responsable = registro && registro.responsable ? registro.responsable.toLowerCase() : "";
 
-            // Filtros: por nombre de proyecto y por fecha de entrega
+            var fechaEntrega = new Date(registro.fechaEntrega); // Asegurarse de que la fecha esté en formato Date
+
+            // Filtros: por nombre de proyecto, y por rango de fechas de entrega
             var cumpleNombre = filtroNombre === "" || nombreProyecto.includes(filtroNombre);
-            var cumpleFecha = filtroFecha === "" || fechaEntrega === filtroFecha;
+            var cumpleArea = filtroArea === "" || Area.includes(filtroArea);
+            var cumpleResponsable = filtroResponsable === "" || Responsable.includes(filtroResponsable);
 
-            return cumpleNombre && cumpleFecha;
+
+            // Verificar si la fecha de entrega está dentro del rango de fechas (Fecha Inicio y Fecha Fin)
+            var cumpleFecha = true;
+            if (filtroFechaInicio) {
+                var fechaInicio = new Date(filtroFechaInicio + "T00:00:00");
+                cumpleFecha = cumpleFecha && fechaEntrega >= fechaInicio;
+            }
+            if (filtroFechaFin) {
+                var fechaFin = new Date(filtroFechaFin + "T00:00:00");
+                cumpleFecha = cumpleFecha && fechaEntrega <= fechaFin;
+            }
+
+            return cumpleNombre && cumpleArea && cumpleResponsable && cumpleFecha;
         });
     });
     
@@ -201,12 +172,12 @@ function AppViewModel() {
         self.EstatusMateriales(EstatusMateriales);
 
         $.ajax({
-            url: "/Materiales/ObtenerHistorial/" + material.id,
+            url: "Materiales/ObtenerHistorial/" + material.id,
             type: "GET",
             contentType: "application/json",
             success: function (d) {
                 self.registrosHistorico.removeAll();
-                self.registrosHistorico.push.apply(self.registrosHistorico, d.datos.$values);
+                self.registrosHistorico.push.apply(self.registrosHistorico, d.datos);
                 
             },
             error: function (xhr, status, error) {
@@ -235,25 +206,25 @@ function AppViewModel() {
             EnvioCorreo: envioCorreo,
             Usuarios: self.registrosUsuariosCorreo()
         }
-        
-        
+
         $.ajax({
-            url: "/Materiales/AgregarHistorialMaterial", 
+            url: "Materiales/AgregarHistorialMaterial", 
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(historialMaterialRequest),
             success: function (d) {
-               
+                $('#alertMessage').text(d.mensaje);
+                $('#alertModalLabel').text("Success");
                 $.ajax({
-                    url: "/Materiales/ObtenerHistorial/" + self.id(),
+                    url: "Materiales/ObtenerHistorial/" + self.id(),
                     type: "GET",
                     contentType: "application/json",
                     success: function (d) {
-                        alert("Comentario actualizado correctamente");
+                        
                         self.registrosHistorico.removeAll();
-                        self.registrosHistorico.push.apply(self.registrosHistorico, d.datos.$values);
+                        self.registrosHistorico.push.apply(self.registrosHistorico, d.datos);
                         $.ajax({
-                            url: "/Materiales/ObtenerConteoEstatusMateriales", // URL del método GetAll en tu API
+                            url: "Materiales/ObtenerConteoEstatusMateriales", // URL del método GetAll en tu API
                             type: "GET",
                             contentType: "application/json",
                             success: function (d) {
@@ -264,6 +235,22 @@ function AppViewModel() {
                                 self.programado(d.datos.programado);
                                 self.entregado(d.datos.entregado);
                                 self.inicioCiclo(d.datos.inicioCiclo);
+                                $.ajax({
+                                    url: "Materiales/ObtenerMateriales", // URL del método GetAll en tu API
+                                    type: "GET",
+                                    contentType: "application/json",
+                                    success: function (d) {
+                                        self.registros.removeAll();
+                                        self.registros.push.apply(self.registros, d.datos);
+                                        $("#divEdicion").modal("hide");
+                                        $("#alertModal").modal("show");
+                                        
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.error("Error al obtener los datos: ", error);
+                                        alert("Error al obtener los datos: " + xhr.responseText);
+                                    }
+                                });
                             },
                             error: function (xhr, status, error) {
                                 console.error("Error al obtener los datos: ", error);
@@ -306,14 +293,14 @@ function AppViewModel() {
         }
         // Llama al método ObtenerMateriales con los filtros aplicados
         $.ajax({
-            url: "/Materiales/ObtenerMaterialesPorNombre", // URL con filtros en query params
+            url: "Materiales/ObtenerMaterialesPorNombre", // URL con filtros en query params
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(material),
             success: function (d) {
                 // Actualiza los registros con los resultados obtenidos
                 self.registros.removeAll();
-                self.registros.push.apply(self.registros, d.datos.$values);
+                self.registros.push.apply(self.registros, d.datos);
             },
             error: function (xhr, status, error) {
                 console.error("Error al obtener los datos: ", error);
@@ -332,12 +319,12 @@ function AppViewModel() {
         }
 
         $.ajax({
-            url: "/Usuarios/BuscarAllUsuarios", // Ruta de tu API para buscar usuarios
+            url: "Usuarios/BuscarAllUsuarios", // Ruta de tu API para buscar usuarios
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(usuario),
             success: function (d) {
-                self.resultadosBusqueda(d.datos.$values); // Asigna resultados al array
+                self.resultadosBusqueda(d.datos); // Asigna resultados al array
             },
             error: function (xhr, status, error) {
                 console.error("Error al buscar usuarios: ", error);

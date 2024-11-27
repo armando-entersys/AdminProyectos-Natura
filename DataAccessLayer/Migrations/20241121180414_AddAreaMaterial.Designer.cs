@@ -4,6 +4,7 @@ using DataAccessLayer.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(DataAccesContext))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20241121180414_AddAreaMaterial")]
+    partial class AddAreaMaterial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -156,6 +158,26 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("Briefs");
                 });
 
+            modelBuilder.Entity("EntityLayer.Concrete.ClasificacionProyecto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Estatus")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("clasificacionProyectos");
+                });
+
             modelBuilder.Entity("EntityLayer.Concrete.EstatusBrief", b =>
                 {
                     b.Property<int>("Id")
@@ -294,6 +316,14 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("PrioridadId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Proceso")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Produccion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Responsable")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -422,6 +452,9 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("BriefId")
                         .HasColumnType("int");
 
+                    b.Property<int>("ClasificacionProyectoId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Comentario")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -446,6 +479,8 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("BriefId")
                         .IsUnique();
+
+                    b.HasIndex("ClasificacionProyectoId");
 
                     b.ToTable("Proyectos");
                 });
@@ -728,7 +763,15 @@ namespace DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("EntityLayer.Concrete.ClasificacionProyecto", "ClasificacionProyecto")
+                        .WithMany("Proyectos")
+                        .HasForeignKey("ClasificacionProyectoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Brief");
+
+                    b.Navigation("ClasificacionProyecto");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.RetrasoMaterial", b =>
@@ -764,6 +807,11 @@ namespace DataAccessLayer.Migrations
 
                     b.Navigation("Proyecto")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("EntityLayer.Concrete.ClasificacionProyecto", b =>
+                {
+                    b.Navigation("Proyectos");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.EstatusBrief", b =>

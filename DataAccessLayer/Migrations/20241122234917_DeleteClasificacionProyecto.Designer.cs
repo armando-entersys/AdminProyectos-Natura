@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(DataAccesContext))]
-    [Migration("20241115195510_EstatusMaterialHostorial")]
-    partial class EstatusMaterialHostorial
+    [Migration("20241122234917_DeleteClasificacionProyecto")]
+    partial class DeleteClasificacionProyecto
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -158,26 +158,6 @@ namespace DataAccessLayer.Migrations
                     b.ToTable("Briefs");
                 });
 
-            modelBuilder.Entity("EntityLayer.Concrete.ClasificacionProyecto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Descripcion")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("Estatus")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("clasificacionProyectos");
-                });
-
             modelBuilder.Entity("EntityLayer.Concrete.EstatusBrief", b =>
                 {
                     b.Property<int>("Id")
@@ -253,9 +233,14 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("MaterialId")
                         .HasColumnType("int");
 
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("MaterialId");
+
+                    b.HasIndex("UsuarioId");
 
                     b.ToTable("HistorialMateriales");
                 });
@@ -267,6 +252,10 @@ namespace DataAccessLayer.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Area")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("AudienciaId")
                         .HasColumnType("int");
@@ -443,9 +432,6 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("BriefId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ClasificacionProyectoId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Comentario")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -470,8 +456,6 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("BriefId")
                         .IsUnique();
-
-                    b.HasIndex("ClasificacionProyectoId");
 
                     b.ToTable("Proyectos");
                 });
@@ -654,7 +638,15 @@ namespace DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("EntityLayer.Concrete.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Material");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.Material", b =>
@@ -746,15 +738,7 @@ namespace DataAccessLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EntityLayer.Concrete.ClasificacionProyecto", "ClasificacionProyecto")
-                        .WithMany("Proyectos")
-                        .HasForeignKey("ClasificacionProyectoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Brief");
-
-                    b.Navigation("ClasificacionProyecto");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.RetrasoMaterial", b =>
@@ -790,11 +774,6 @@ namespace DataAccessLayer.Migrations
 
                     b.Navigation("Proyecto")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("EntityLayer.Concrete.ClasificacionProyecto", b =>
-                {
-                    b.Navigation("Proyectos");
                 });
 
             modelBuilder.Entity("EntityLayer.Concrete.EstatusBrief", b =>

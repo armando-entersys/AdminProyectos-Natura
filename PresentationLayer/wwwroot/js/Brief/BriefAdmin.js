@@ -32,8 +32,6 @@ function AppViewModel() {
     self.EstatusBrief = ko.observable();
     self.catTipoBrief = ko.observableArray();
     self.TipoBrief = ko.observable();
-    self.catClasificacionProyecto = ko.observableArray();
-    self.ClasificacionProyecto = ValidationModule.validations.requiredField();
     
     self.cargaArchivo = ko.observable();
     self.registros = ko.observableArray();
@@ -54,9 +52,9 @@ function AppViewModel() {
     self.catAudiencia = ko.observableArray();
 
     self.fechaEntrega = ValidationModule.validations.requiredField();
-    self.proceso = ValidationModule.validations.requiredField();
-    self.produccion = ValidationModule.validations.requiredField();
     self.responsable = ValidationModule.validations.requiredField();
+    self.area = ValidationModule.validations.requiredField();
+
 
     self.determinarEstado = ValidationModule.validations.requiredField();
     self.planComunicacion = ValidationModule.validations.requiredField();
@@ -70,18 +68,26 @@ function AppViewModel() {
     self.buscarUsuario = ko.observable("");
     self.resultadosBusqueda = ko.observableArray([]);
 
+    // Obtener la fecha actual en formato YYYY-MM-DD
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Mes en formato 2 dígitos
+    const day = String(today.getDate()).padStart(2, '0'); // Día en formato 2 dígitos
+
+    // Formato de fecha mínima
+    self.minDate = `${year}-${month}-${day}`; // YYYY-MM-DD
 
     self.errors = ko.validation.group(self);
     self.inicializar = function () {
         $.ajax({
-            url: "/Brief/GetAllColumns", // URL del método GetAll en tu API
+            url: "Brief/GetAllColumns", // URL del método GetAll en tu API
             type: "GET",
             contentType: "application/json",
             success: function (d) {
                 self.columns.removeAll();
                 // Asegúrate de que los datos se transformen en instancias de Task y Column
-                var transformedColumns = d.datos.$values.map(function (columnData) {
-                    var tasks = columnData.tasks.$values.map(function (taskData) {
+                var transformedColumns = d.datos.map(function (columnData) {
+                    var tasks = columnData.tasks.map(function (taskData) {
                         return new Task(taskData.id, taskData.title, taskData.usuarioId, taskData.nombreUsuario, taskData.fechaEntrega);
                     });
                     return new Column(columnData.id, columnData.name, tasks);
@@ -92,63 +98,51 @@ function AppViewModel() {
                 // Inicializa SortableJS una vez que los datos han sido cargados
                 initializeSortable();
                 $.ajax({
-                    url: "/Brief/GetAllEstatusBrief", // URL del método GetAll en tu API
+                    url: "Brief/GetAllEstatusBrief", // URL del método GetAll en tu API
                     type: "GET",
                     contentType: "application/json",
                     success: function (d) {
                         self.catEstatusBrief.removeAll();
-                        self.catEstatusBrief.push.apply(self.catEstatusBrief, d.datos.$values);
+                        self.catEstatusBrief.push.apply(self.catEstatusBrief, d.datos);
                         $("#divEdicion").modal("hide");
                         $.ajax({
-                            url: "/Brief/GetAllTipoBrief", // URL del método GetAll en tu API
+                            url: "Brief/GetAllTipoBrief", // URL del método GetAll en tu API
                             type: "GET",
                             contentType: "application/json",
                             success: function (d) {
                                 self.catTipoBrief.removeAll();
-                                self.catTipoBrief.push.apply(self.catTipoBrief, d.datos.$values);
+                                self.catTipoBrief.push.apply(self.catTipoBrief, d.datos);
 
                                 $.ajax({
-                                    url: "/Brief/GetAllPrioridad",
+                                    url: "Brief/GetAllPrioridad",
                                     type: "GET",
                                     contentType: "application/json",
                                     success: function (d) {
                                         self.catPrioridad.removeAll();
-                                        self.catPrioridad.push.apply(self.catPrioridad, d.datos.$values);
+                                        self.catPrioridad.push.apply(self.catPrioridad, d.datos);
                                         $.ajax({
-                                            url: "/Brief/GetAllPCN",
+                                            url: "Brief/GetAllPCN",
                                             type: "GET",
                                             contentType: "application/json",
                                             success: function (d) {
                                                 self.catPCN.removeAll();
-                                                self.catPCN.push.apply(self.catPCN, d.datos.$values);
+                                                self.catPCN.push.apply(self.catPCN, d.datos);
                                                 $.ajax({
-                                                    url: "/Brief/GetAllFormatos",
+                                                    url: "Brief/GetAllFormatos",
                                                     type: "GET",
                                                     contentType: "application/json",
                                                     success: function (d) {
                                                         self.catFormato.removeAll();
-                                                        self.catFormato.push.apply(self.catFormato, d.datos.$values);
+                                                        self.catFormato.push.apply(self.catFormato, d.datos);
                                                         $.ajax({
-                                                            url: "/Brief/GetAllAudiencias",
+                                                            url: "Brief/GetAllAudiencias",
                                                             type: "GET",
                                                             contentType: "application/json",
                                                             success: function (d) {
                                                                 self.catAudiencia.removeAll();
-                                                                self.catAudiencia.push.apply(self.catAudiencia, d.datos.$values);
-                                                                $.ajax({
-                                                                    url: "/Brief/GetAllClasificacionProyecto", // URL del método GetAll en tu API
-                                                                    type: "GET",
-                                                                    contentType: "application/json",
-                                                                    success: function (d) {
-                                                                        self.catClasificacionProyecto.removeAll();
-                                                                        self.catClasificacionProyecto.push.apply(self.catClasificacionProyecto, d.datos.$values);
-                                                                        $("#divEdicion").modal("hide");
-                                                                    },
-                                                                    error: function (xhr, status, error) {
-                                                                        console.error("Error al obtener los datos: ", error);
-                                                                        alert("Error al obtener los datos: " + xhr.responseText);
-                                                                    }
-                                                                });
+                                                                self.catAudiencia.push.apply(self.catAudiencia, d.datos);
+                                                                $("#divEdicion").modal("hide");
+                                                               
                                                             },
                                                             error: function (xhr, status, error) {
                                                                 console.error("Error al obtener los datos: ", xhr.responseText);
@@ -208,7 +202,7 @@ function AppViewModel() {
 
         self.id(brief.id);
         $.ajax({
-            url: "/Brief/Details/" + self.id(), // URL del método GetAll en tu API
+            url: "Brief/Details/" + self.id(), // URL del método GetAll en tu API
             type: "GET",
             contentType: "application/json",
             success: function (d) {
@@ -231,12 +225,12 @@ function AppViewModel() {
                 self.ObtenerProyecto(self.id());
                 self.ObtenerMateriales(self.id());
                 $.ajax({
-                    url: "/Usuarios/ObtenerParticipantes/" + d.datos.id, // URL del método GetAll en tu API
+                    url: "Usuarios/ObtenerParticipantes/" + d.datos.id, // URL del método GetAll en tu API
                     type: "GET",
                     contentType: "application/json",
                     success: function (d) {
                         self.registrosParticipantes.removeAll();
-                        self.registrosParticipantes.push.apply(self.registrosParticipantes, d.datos.$values);
+                        self.registrosParticipantes.push.apply(self.registrosParticipantes, d.datos);
                         $("#divEdicion").modal("show");
 
                     },
@@ -281,7 +275,7 @@ function AppViewModel() {
             EstatusBriefId: toColumnId
         }
         $.ajax({
-            url: "/Brief/EditStatus", // URL del método GetAll en tu API
+            url: "Brief/EditStatus", // URL del método GetAll en tu API
             type: "PUT",
             contentType: "application/json",
             data: JSON.stringify(brief),
@@ -323,49 +317,50 @@ function AppViewModel() {
         self.cargaArchivo("");
     }
     self.GuardarProyecto = function () {
-            var PlanComunicacion = false;
-            if (self.determinarEstado() === "Sí") {
-                PlanComunicacion = true;
+        var PlanComunicacion = false;
+        if (self.planComunicacion() === "Sí") {
+            PlanComunicacion = true;
+        }
+
+        var proyecto = {
+            BriefId: self.id(),
+            EstatusBriefId: self.EstatusBrief() ? self.EstatusBrief().id : null,
+            Comentario: self.comentarioProyecto(),
+            Estado: self.determinarEstado(),
+            RequierePlan: PlanComunicacion,
+            FechaPublicacion: self.fechaPublicacion()
+        };
+
+        console.log("Datos del proyecto:", proyecto); // Añade esto para revisar en consola
+
+        $.ajax({
+            url: "Brief/CreateProyecto",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(proyecto),
+            success: function (d) {
+                alert(d.mensaje);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error al obtener los datos: ", xhr.responseText);
+                $('#alertMessage').text("Error al obtener los datos: " + xhr.responseText);
+                $('#alertModalLabel').text("Error");
+                $("#alertModal").modal("show");
             }
-
-            var proyecto = {
-                BriefId: self.id(),
-                EstatusBriefId: self.EstatusBrief() ? self.EstatusBrief().id : null,
-                ClasificacionProyectoId: self.ClasificacionProyecto() ? self.ClasificacionProyecto().id : null,
-                Comentario: self.comentarioProyecto(),
-                Estado: self.determinarEstado(),
-                RequierePlan: PlanComunicacion,
-                FechaPublicacion: self.fechaPublicacion()
-            };
-
-            console.log("Datos del proyecto:", proyecto); // Añade esto para revisar en consola
-
-            $.ajax({
-                url: "/Brief/CreateProyecto",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify(proyecto),
-                success: function (d) {
-                    $('#alertMessage').text(d.mensaje);
-                    alert(d.mensaje);
-                },
-                error: function (xhr, status, error) {
-                    console.error("Error al obtener los datos: ", xhr.responseText);
-                    $('#alertMessage').text("Error al obtener los datos: " + xhr.responseText);
-                    $('#alertModalLabel').text("Error");
-                    $("#alertModal").modal("show");
-                }
-            });
+        });
        
     }
     self.LimpiarMaterial = function () {
-        self.nombreMaterial();
+        self.nombreMaterial("");
         self.mensaje("");
         self.ciclo("");
         self.fechaEntrega("");
-        self.proceso("");
-        self.produccion("");
         self.responsable("");
+        self.area("");
+        self.prioridad("");
+        self.pcn("");
+        self.formato("");
+        self.audiencia("");
     }
     self.GuardarMaterial = function () {
         validarYProcesarFormulario(self.errors, function () {
@@ -379,13 +374,12 @@ function AppViewModel() {
                 AudienciaId: self.audiencia().id,
                 FormatoId: self.formato().id,
                 FechaEntrega: self.fechaEntrega(),
-                Proceso: self.proceso(),
-                Produccion: self.produccion(),
-                Responsable: self.responsable()
+                Responsable: self.responsable(),
+                Area: self.area()
             };
 
             $.ajax({
-                url: "/Brief/CreateMaterial", // URL del método en tu API
+                url: "Brief/CreateMaterial", // URL del método en tu API
                 type: "POST",
                 contentType: "application/json", // Cambiado a JSON
                 data: JSON.stringify(Material),  // Serializamos los datos a JSON
@@ -393,6 +387,7 @@ function AppViewModel() {
                     
                     self.ObtenerMateriales(self.id());
                     self.LimpiarMaterial();
+                    alert(d.mensaje);
                 },
                 error: function (xhr, status, error) {
                     console.error("Error al obtener los datos: ", error);
@@ -405,7 +400,7 @@ function AppViewModel() {
     }
     self.ObtenerProyecto = function (id) {
         $.ajax({
-            url: "/Brief/ObtenerProyectoPorBrief/" + id, // URL del método GetAll en tu API
+            url: "Brief/ObtenerProyectoPorBrief/" + id, // URL del método GetAll en tu API
             type: "GET",
             contentType: "application/json",
             success: function (d) {
@@ -414,10 +409,6 @@ function AppViewModel() {
                     if (d.datos.requierePlan) {
                         PlanComunicacion = "Sí";
                     }
-                    var ClasificacionProyecto = self.catClasificacionProyecto().find(function (r) {
-                        return r.id === d.datos.clasificacionProyectoId;
-                    });
-                    self.ClasificacionProyecto(ClasificacionProyecto);
                     self.planComunicacion(PlanComunicacion);
                     self.determinarEstado(d.datos.estado);
                     self.comentarioProyecto(d.datos.comentario);
@@ -435,12 +426,12 @@ function AppViewModel() {
     }
     self.ObtenerMateriales = function (id) {
         $.ajax({
-            url: "/Brief/ObtenerMateriales/" + id, // URL del método GetAll en tu API
+            url: "Brief/ObtenerMateriales/" + id, // URL del método GetAll en tu API
             type: "GET",
             contentType: "application/json",
             success: function (d) {
                 self.registrosMateriales.removeAll();
-                self.registrosMateriales.push.apply(self.registrosMateriales, d.datos.$values);
+                self.registrosMateriales.push.apply(self.registrosMateriales, d.datos);
                 
             },
             error: function (xhr, status, error) {
@@ -451,36 +442,51 @@ function AppViewModel() {
 
     }
     self.EliminarMaterial = function (material) {
-
-        $.ajax({
-            url: "/Brief/EliminarMaterial/" + material.id, // URL del método GetAll en tu API
-            type: "GET",
-            contentType: "application/json",
-            success: function (d) {
-                self.ObtenerMateriales(self.id());
-            },
-            error: function (xhr, status, error) {
-                console.error("Error al obtener los datos: ", error);
-                alert("Error al obtener los datos: " + xhr.responseText);
-            }
-        });
+        if (confirm("Desea eliminar el Material seleccionado?")) {
+            $.ajax({
+                url: "Brief/EliminarMaterial/" + material.id, // URL del método GetAll en tu API
+                type: "GET",
+                contentType: "application/json",
+                success: function (d) {
+                    self.ObtenerMateriales(self.id());
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error al obtener los datos: ", error);
+                    alert("Error al obtener los datos: " + xhr.responseText);
+                }
+            });
+        }
+      
 
     }
     self.EliminarParticipante = function (participante) {
-
-        $.ajax({
-            url: "/Brief/EliminarParticipante/" + participante.id, // URL del método GetAll en tu API
-            type: "GET",
-            contentType: "application/json",
-            success: function (d) {
-                self.ObtenerMateriales(self.id());
-            },
-            error: function (xhr, status, error) {
-                console.error("Error al obtener los datos: ", error);
-                alert("Error al obtener los datos: " + xhr.responseText);
-            }
-        });
-
+        if (confirm("Desea eliminar el Participante seleccionado?")) {
+            $.ajax({
+                url: "Brief/EliminarParticipante/" + participante.id, // URL del método GetAll en tu API
+                type: "GET",
+                contentType: "application/json",
+                success: function (d) {
+                  
+                    $.ajax({
+                        url: "Usuarios/ObtenerParticipantes/" + self.id(), // URL del método GetAll en tu API
+                        type: "GET",
+                        contentType: "application/json",
+                        success: function (d) {
+                            self.registrosParticipantes.removeAll();
+                            self.registrosParticipantes.push.apply(self.registrosParticipantes, d.datos);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error al obtener los datos: ", error);
+                            alert("Error al obtener los datos: " + xhr.responseText);
+                        }
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error al obtener los datos: ", error);
+                    alert("Error al obtener los datos: " + xhr.responseText);
+                }
+            });
+        }
     }
 
     // Método de búsqueda de usuarios con Autocompletar
@@ -494,12 +500,12 @@ function AppViewModel() {
         }
 
         $.ajax({
-            url: "/Usuarios/BuscarUsuario", // Ruta de tu API para buscar usuarios
+            url: "Usuarios/BuscarUsuario", // Ruta de tu API para buscar usuarios
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(usuario),
             success: function (d) {
-                self.resultadosBusqueda(d.datos.$values); // Asigna resultados al array
+                self.resultadosBusqueda(d.datos); // Asigna resultados al array
             },
             error: function (xhr, status, error) {
                 console.error("Error al buscar usuarios: ", error);
@@ -515,7 +521,7 @@ function AppViewModel() {
             UsuarioId : usuario.id
         }
         $.ajax({
-            url: "/Usuarios/AgregarParticipante", // Ruta de tu API para buscar usuarios
+            url: "Usuarios/AgregarParticipante", // Ruta de tu API para buscar usuarios
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(participante),
@@ -524,12 +530,12 @@ function AppViewModel() {
                 self.buscarUsuario(""); // Limpia el campo de búsqueda
                 self.resultadosBusqueda([]); // Limpia resultados de autocompletado
                 $.ajax({
-                    url: "/Usuarios/ObtenerParticipantes/" + self.id(), // URL del método GetAll en tu API
+                    url: "Usuarios/ObtenerParticipantes/" + self.id(), // URL del método GetAll en tu API
                     type: "GET",
                     contentType: "application/json",
                     success: function (d) {
                         self.registrosParticipantes.removeAll();
-                        self.registrosParticipantes.push.apply(self.registrosParticipantes, d.datos.$values);
+                        self.registrosParticipantes.push.apply(self.registrosParticipantes, d.datos);
                         $("#divEdicion").modal("show");
 
                     },

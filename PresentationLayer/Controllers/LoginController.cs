@@ -37,8 +37,8 @@ namespace PresentationLayer.Controllers
         [HttpPost]
         public async Task<IActionResult> Autenticar(string Username, string Password)
         {
-           // Username = "ajcortest@gmail.com";
-            Password = "Operaciones2024$";
+            // Username = "ajcortest@gmail.com";
+            // Password = "Operaciones2024$";
 
             Usuario usuario = await _authService.Autenticar(Username, Password);
             
@@ -122,7 +122,7 @@ namespace PresentationLayer.Controllers
         public IActionResult CambioPasswordEmail(string Correo)
         {
 
-            var urlBase = $"{Request.Scheme}://{Request.Host}";
+            var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
             var resp =  _authService.CambioPasswordEmail(Correo);
             if (resp.Exito == true)
             {
@@ -146,7 +146,7 @@ namespace PresentationLayer.Controllers
         [HttpPost]
         public IActionResult CambiarPasswordUsuario(Usuario usuario)
         {
-            var urlBase = $"{Request.Scheme}://{Request.Host}";
+            var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
             var resp = _authService.CambiarPasswordUsuario(usuario);
 
             if (resp.Exito)

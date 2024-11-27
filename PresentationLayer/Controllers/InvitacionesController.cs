@@ -84,7 +84,7 @@ namespace PresentationLayer.Controllers
             usuario.CambioContrasena = false;
             _usuarioService.TUpdate(usuario);
 
-            var urlBase = $"{Request.Scheme}://{Request.Host}";
+            var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
             var valoresDinamicos = new Dictionary<string, string>
             {
                 { "link", urlBase + "/Login" } 
