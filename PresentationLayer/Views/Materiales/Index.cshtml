@@ -50,8 +50,8 @@
     <div class="col">
         <input type="text"
                class="form-control"
-               placeholder="Buscar por nombre de proyecto"
-               data-bind="value: filtroNombreProyecto, valueUpdate: 'input'" />
+               placeholder="Buscar por Nombre"
+               data-bind="value: filtroNombre, valueUpdate: 'input'" />
     </div>
     <div class="col">
         <input type="text"
@@ -64,6 +64,14 @@
                class="form-control"
                placeholder="Buscar por Responsable"
                data-bind="value: filtroResponsable, valueUpdate: 'input'" />
+    </div>
+</div>
+<div class="row mb-3">
+    <div class="col">
+        <input type="text"
+               class="form-control"
+               placeholder="Buscar por nombre de proyecto"
+               data-bind="value: filtroNombreProyecto, valueUpdate: 'input'" />
     </div>
     <div class="col">
         <!-- Fecha Inicio -->
@@ -79,7 +87,6 @@
                placeholder="Filtrar por fecha fin"
                data-bind="value: filtroFechaFin, valueUpdate: 'input'" />
     </div>
-  
 </div>
 
 <div class="row">

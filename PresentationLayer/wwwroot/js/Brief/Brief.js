@@ -1,19 +1,4 @@
-﻿
-function Task(id, title, UsuarioId, NombreUsuario, FechaEntrega) {
-    this.id = id;
-    this.title = ko.observable(title);
-    this.usuarioId = ko.observable(UsuarioId);
-    this.nombreUsuario = ko.observable(NombreUsuario);
-    this.fechaEntrega = ko.observable(FechaEntrega)
-}
-
-function Column(id, name, tasks) {
-    this.id = id;
-    this.name = ko.observable(name);
-    this.tasks = ko.observableArray(tasks);
-}
-
-function AppViewModel() {
+﻿function AppViewModel() {
     var self = this;
 
     self.columns = ko.observableArray();
@@ -36,7 +21,21 @@ function AppViewModel() {
     self.registros = ko.observableArray();
     self.linksReferencias = ValidationModule.validations.requiredField();
 
+    self.filtroNombre = ko.observable(""); // Texto del filtro
+
     self.errors = ko.validation.group(self);
+
+    // Computado para devolver los registros filtrados
+    self.registrosFiltrados = ko.computed(function () {
+        var filtro = self.filtroNombre().toLowerCase();
+        if (!filtro) {
+            return self.registros(); // Sin filtro, devuelve todos los registros
+        }
+        return ko.utils.arrayFilter(self.registros(), function (item) {
+            return item.nombre.toLowerCase().includes(filtro);
+        });
+    });
+
     self.inicializar = function () {
         $.ajax({
             url: "Brief/GetAllbyUserBrief", // URL del método GetAll en tu API
@@ -254,26 +253,18 @@ function AppViewModel() {
             }
         });
     }
-
+    // Función para leer el filtro desde el query string y asignarlo
+   
 }
 
 // Inicializa SortableJS después de que Knockout haya sido inicializado
-function initializeSortable() {
-    document.querySelectorAll('.sortable').forEach(function (element) {
-        new Sortable(element, {
-            group: 'kanban',
-            animation: 150,
-            onEnd: function (evt) {
-                var taskId = parseInt(evt.item.getAttribute('data-task-id'));
-                var fromColumnId = parseInt(evt.from.id);
-                var toColumnId = parseInt(evt.to.id);
-                var newIndex = evt.newIndex;
-
-                appViewModel.moveTask(taskId, fromColumnId, toColumnId, newIndex);
-            }
-        });
-    });
-}
-
+ function setFiltroFromQueryString(viewModel) {
+        const params = new URLSearchParams(window.location.search);
+        const filtro = params.get("filtroNombre"); // Nombre del parámetro en el query string
+        if (filtro) {
+            viewModel.filtroNombre(filtro); // Asigna el valor al filtro
+        }
+    }
 var appViewModel = new AppViewModel();
 ko.applyBindings(appViewModel);
+setFiltroFromQueryString(appViewModel);

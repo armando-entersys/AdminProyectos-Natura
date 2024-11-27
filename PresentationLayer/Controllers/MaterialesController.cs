@@ -27,7 +27,7 @@ namespace PresentationLayer.Controllers
             _usuarioService = usuarioService;
             _toolsService = toolsService;
         }
-        public IActionResult Index()
+        public IActionResult Index(string filtroNombre = null)
         {
             IEnumerable<Menu> menus = null;
 
@@ -40,6 +40,7 @@ namespace PresentationLayer.Controllers
 
                 ViewBag.Menus = _authService.GetMenusByRole(ViewBag.RolId);
                 ViewBag.ConteoAlertas = _toolsService.GetUnreadAlertsCount(ViewBag.UsuarioId);
+                ViewBag.FiltroNombre = filtroNombre;
             }
             else
             {
@@ -166,7 +167,7 @@ namespace PresentationLayer.Controllers
                     { "usuario",usuarioLogueado.Nombre },
                     { "estatus", EstatusMaterial.Descripcion},
                     { "comentario", historialMaterialRequest.HistorialMaterial.Comentarios },
-                    { "link", urlBase + "/Materiales"  }
+                    { "link", urlBase + "/Materiales?filtroNombre=" + material.Nombre }
                 };
                     _emailSender.SendEmail(Destinatarios, "ComentarioMaterial", valoresDinamicos);
                 }

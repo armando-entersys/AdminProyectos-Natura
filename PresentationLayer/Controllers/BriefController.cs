@@ -36,7 +36,7 @@ namespace PresentationLayer.Controllers
             _hubContext = hubContext;
         }
         // GET: BriefController
-        public ActionResult Index()
+        public ActionResult Index(string filtroNombre = null)
         {
             IEnumerable<Menu> menus = null;
 
@@ -49,6 +49,7 @@ namespace PresentationLayer.Controllers
 
                 ViewBag.Menus = _authService.GetMenusByRole(ViewBag.RolId);
                 ViewBag.ConteoAlertas = _toolsService.GetUnreadAlertsCount(ViewBag.UsuarioId);
+                ViewBag.FiltroNombre = filtroNombre;
             }
             else
             {
@@ -218,7 +219,7 @@ namespace PresentationLayer.Controllers
                         Nombre = "Cambio Estatus Proyecto " + brief.Nombre,
                         Descripcion = "Cambio de estatus a " + brief.EstatusBrief.Descripcion,
                         IdTipoAlerta = 3,
-                        Accion = urlBase + "/Brief"
+                        Accion = urlBase + "/Brief?filtroNombre=" + brief.Nombre
 
                     });
                 }
@@ -258,7 +259,7 @@ namespace PresentationLayer.Controllers
                 Nombre = "Cambio Estatus Proyecto " + brief.Nombre,
                 Descripcion = "Cambio de estatus a " + brief.EstatusBrief.Descripcion,
                 IdTipoAlerta = 3,
-                Accion = urlBase + "/Brief"
+                Accion = urlBase + "/Brief?filtroNombre=" + brief.Nombre
 
             });
 
@@ -271,7 +272,7 @@ namespace PresentationLayer.Controllers
             {
                 { "estatus", brief.EstatusBrief.Descripcion},
                 { "nombreProyecto", brief.Nombre },
-                { "link", urlBase + "/Brief"  }
+                { "link", urlBase + "/Brief?filtroNombre=" + brief.Nombre }
 
             };
 
@@ -337,7 +338,7 @@ namespace PresentationLayer.Controllers
             {
                 { "nombre", User.FindFirst(ClaimTypes.Name)?.Value },
                 { "nombreProyecto", brief.Nombre },
-                { "link", urlBase + "/Brief/IndexAdmin" }
+                { "link", urlBase + "/Brief/IndexAdmin?filtroNombre=" + brief.Nombre }
             };
             var Destinatarios = _toolsService.GetUsuarioByRol(1).Select(q => q.Correo).ToList();
 
@@ -352,7 +353,7 @@ namespace PresentationLayer.Controllers
                     Nombre = "Nuevo Proyecto",
                     Descripcion = "Se agrego un nuevo proyecto " + brief.Nombre,
                     IdTipoAlerta = 1,
-                    Accion = urlBase + "/Brief/IndexAdmin"
+                    Accion = urlBase + "/Brief/IndexAdmin?filtroNombre=" + brief.Nombre
 
                 };
 
@@ -422,7 +423,7 @@ namespace PresentationLayer.Controllers
             {
                 { "nombre", User.FindFirst(ClaimTypes.Name)?.Value },
                 { "nombreProyecto", brief.Nombre },
-                { "link", urlBase + "/BriefAdmin"  }
+                { "link", urlBase + "/BriefAdmin?filtroNombre=" + brief.Nombre  }
 
             };
             var Destinatarios = _toolsService.GetUsuarioByRol(1).Select(q => q.Correo).ToList();
@@ -501,7 +502,7 @@ namespace PresentationLayer.Controllers
                     Nombre = "Nuevo Material",
                     Descripcion = "Se agrego un material al brief " + brief.Nombre,
                     IdTipoAlerta = 4,
-                    Accion = urlBase + "/Materiales"
+                    Accion = urlBase + "/Materiales?filtroNombre="+material.Nombre
 
                 };
 
@@ -512,7 +513,7 @@ namespace PresentationLayer.Controllers
                     Nombre = "Nuevo Material",
                     Descripcion = "Se agrego un material al brief " + brief.Nombre,
                     IdTipoAlerta = 4,
-                    Accion = urlBase + "/Materiales"
+                    Accion = urlBase + "/Materiales?filtroNombre=" + material.Nombre
 
                 };
 

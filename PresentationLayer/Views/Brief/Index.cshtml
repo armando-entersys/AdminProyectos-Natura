@@ -13,6 +13,7 @@
         </button>
     </div>
     <div class="col">
+        <input type="text" class="form-control" placeholder="Buscar por nombre..." data-bind="value: filtroNombre, valueUpdate: 'input'">
     </div>
 </div>
 <div class="row">
@@ -22,13 +23,15 @@
                 <tr>
                     <th scope="col">Id</th>
                     <th scope="col">Nombre</th>
+                    <th scope="col">Fecha Publicación</th>
                     <th scope="col">Detalles</th>
                 </tr>
             </thead>
-            <tbody data-bind="foreach: registros">
+            <tbody data-bind="foreach: registrosFiltrados">
                 <tr>
                     <td data-bind="text: id"></td>
                     <td data-bind="text: nombre"></td>
+                    <td data-bind="text: (new Date(fechaEntrega).toISOString().split('T')[0])"></td>
                     <td class="small">
                         <button type="button" class="btn btn-outline-primary" data-bind="click:$root.Editar">
                             <i class="lni lni-pencil"></i>

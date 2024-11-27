@@ -19,6 +19,7 @@ function AppViewModel() {
     self.inicioCiclo = ko.observable();
     self.noCompartio = ko.observable();
     // Observables para filtros
+    self.filtroNombre = ko.observable("");
     self.filtroNombreProyecto = ko.observable("");
     self.filtroArea = ko.observable("");
     self.filtroResponsable = ko.observable("");
@@ -126,7 +127,8 @@ function AppViewModel() {
 
     // Computed observable para filtrar registros
     self.registrosFiltrados = ko.computed(function () {
-        var filtroNombre = self.filtroNombreProyecto().toLowerCase();
+        var filtroNombreProyecto = self.filtroNombreProyecto().toLowerCase();
+        var filtroNombre = self.filtroNombre().toLowerCase();
         var filtroArea = self.filtroArea().toLowerCase();
         var filtroResponsable = self.filtroResponsable().toLowerCase();
 
@@ -135,13 +137,17 @@ function AppViewModel() {
 
         return ko.utils.arrayFilter(self.registros(), function (registro) {
             var nombreProyecto = registro.brief && registro.brief.nombre ? registro.brief.nombre.toLowerCase() : "";
+            var Nombre = registro && registro.nombre ? registro.nombre.toLowerCase() : "";
+
             var Area = registro && registro.area ? registro.area.toLowerCase() : "";
             var Responsable = registro && registro.responsable ? registro.responsable.toLowerCase() : "";
 
             var fechaEntrega = new Date(registro.fechaEntrega); // Asegurarse de que la fecha esté en formato Date
 
             // Filtros: por nombre de proyecto, y por rango de fechas de entrega
-            var cumpleNombre = filtroNombre === "" || nombreProyecto.includes(filtroNombre);
+            var cumpleNombreProyecto = filtroNombreProyecto === "" || nombreProyecto.includes(filtroNombreProyecto);
+            var cumpleNombre = filtroNombre === "" || Nombre.includes(filtroNombre);
+
             var cumpleArea = filtroArea === "" || Area.includes(filtroArea);
             var cumpleResponsable = filtroResponsable === "" || Responsable.includes(filtroResponsable);
 
@@ -157,7 +163,7 @@ function AppViewModel() {
                 cumpleFecha = cumpleFecha && fechaEntrega <= fechaFin;
             }
 
-            return cumpleNombre && cumpleArea && cumpleResponsable && cumpleFecha;
+            return cumpleNombre && cumpleNombreProyecto && cumpleArea && cumpleResponsable && cumpleFecha;
         });
     });
     
@@ -342,6 +348,14 @@ function AppViewModel() {
 
     };
 }
-
+function setFiltroFromQueryString(viewModel) {
+    const params = new URLSearchParams(window.location.search);
+    const filtro = params.get("filtroNombre"); // Nombre del parámetro en el query string
+    if (filtro) {
+        viewModel.filtroNombre(filtro); // Asigna el valor al filtro
+    }
+}
 // Activar Knockout.js
-ko.applyBindings(new AppViewModel());
+var appViewModel = new AppViewModel();
+ko.applyBindings(appViewModel);
+setFiltroFromQueryString(appViewModel);
