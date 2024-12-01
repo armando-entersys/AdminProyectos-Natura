@@ -27,7 +27,7 @@ namespace DataAccessLayer.Repositories
         }
         public List<Brief> GetAll()
         {
-            return _context.Set<Brief>().ToList();
+            return _context.Set<Brief>().Where(q => q.FechaEntrega >= DateTime.Now.AddDays(-15)).ToList();
         }
         public List<Brief> GetAllByUserId(int id)
         {
@@ -171,7 +171,7 @@ namespace DataAccessLayer.Repositories
                 Id = p.Id,
                 Nombre = p.Nombre,
                 Mensaje = p.Mensaje,
-                Prioridad = _context.Prioridad.Where(u => u.Id == p.Id).FirstOrDefault(),
+                Prioridad = _context.Prioridad.Where(u => u.Id == p.PrioridadId).FirstOrDefault(),
                 Ciclo = p.Ciclo,
                 PCN = _context.PCN.Where(u => u.Id == p.Id).FirstOrDefault(),
                 Audiencia = _context.Audiencia.Where(u => u.Id == p.Id).FirstOrDefault(),
@@ -245,17 +245,17 @@ namespace DataAccessLayer.Repositories
             conteoProyectos.TotalProyectos = briefs
                 .Count();
             var IdsBrief = briefs.Select(q => q.Id).ToList();
-            var materiales = _context.Materiales.Where(q => IdsBrief.Contains(q.BriefId))
+            var materiales = _context.Materiales.Where(q => IdsBrief.Contains(q.BriefId) && (q.EstatusMaterialId == 4 || q.EstatusMaterialId == 5))
                              .Select(p => new Material
                              {
                                  Id = p.Id,
                                  Nombre = p.Nombre,
                                  Mensaje = p.Mensaje,
-                                 Prioridad = _context.Prioridad.Where(u => u.Id == p.Id).FirstOrDefault(),
+                                 Prioridad = _context.Prioridad.Where(u => u.Id == p.PrioridadId).FirstOrDefault(),
                                  Ciclo = p.Ciclo,
                                  PCN = _context.PCN.Where(u => u.Id == p.Id).FirstOrDefault(),
-                                 Audiencia = _context.Audiencia.Where(u => u.Id == p.Id).FirstOrDefault(),
-                                 Formato = _context.Formato.Where(u => u.Id == p.Id).FirstOrDefault(),
+                                 Audiencia = _context.Audiencia.Where(u => u.Id == p.AudienciaId).FirstOrDefault(),
+                                 Formato = _context.Formato.Where(u => u.Id == p.FormatoId).FirstOrDefault(),
                                  FechaEntrega = p.FechaEntrega,
                                  Responsable = p.Responsable,
                                  FechaRegistro = p.FechaRegistro,
@@ -524,6 +524,30 @@ namespace DataAccessLayer.Repositories
             material.EstatusMaterialId = historialMaterial.EstatusMaterialId;
             _context.Update(material);
             _context.SaveChanges();
+            if(historialMaterial.EstatusMaterialId == 4)
+            {
+                var Briefs = _context.Materiales.Where(q => q.BriefId == material.BriefId && q.EstatusMaterialId != 4).ToList();
+                if(Briefs == null || Briefs.Count == 0)
+                {
+                    var brief = _context.Briefs.Where(q => q.Id == material.BriefId).FirstOrDefault();
+                    brief.EstatusBriefId = 4;
+                    _context.Update(brief);
+                    _context.SaveChanges();
+                }
+            }
+            if (historialMaterial.EstatusMaterialId == 5)
+            {
+                var Briefs = _context.Materiales.Where(q => q.BriefId == material.BriefId && material.EstatusMaterialId != 5).ToList();
+                if (Briefs == null)
+                {
+                    var brief = _context.Briefs.Where(q => q.Id == material.BriefId).FirstOrDefault();
+                    brief.EstatusBriefId = 5;
+                    _context.Update(brief);
+                    _context.SaveChanges();
+                }
+            }
+
+
         }
         public void ActualizaRetrasoMaterial(RetrasoMaterial retrasoMaterial)
         {

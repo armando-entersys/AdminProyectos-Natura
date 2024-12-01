@@ -4,41 +4,42 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <h3>Gestión de Material</h3>
 
 <div class="row text-center">
     <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
         <div class="p-3 d-flex flex-column justify-content-center align-items-center rounded"
-             style="background:#22D548; width: 100px; height: 100px; border-radius: 10px; overflow: hidden; text-align: center;">
+             style="background:#E1636E; width: 100px; height: 100px; border-radius: 10px; overflow: hidden; text-align: center;">
             <h2 data-bind="text:revision" style="margin: 0; word-wrap: break-word; max-width: 100%; font-size: 1.5em;"></h2>
             <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Revisión</p>
         </div>
     </div>
     <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
         <div class="p-3 d-flex flex-column justify-content-center align-items-center rounded"
-             style="background:#FF450B; width: 100px; height: 100px; border-radius: 10px; overflow: hidden; text-align: center;">
+             style="background:#DC67A0; width: 100px; height: 100px; border-radius: 10px; overflow: hidden; text-align: center;">
             <h2 data-bind="text:faltaInfo" style="margin: 0; word-wrap: break-word; max-width: 100%; font-size: 1.5em;"></h2>
             <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Falta Información</p>
         </div>
     </div>
     <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
         <div class="p-3 d-flex flex-column justify-content-center align-items-center rounded"
-             style="background:#84B8FF; width: 100px; height: 100px; border-radius: 10px; overflow: hidden; text-align: center;">
+             style="background:#DA6AC3; width: 100px; height: 100px; border-radius: 10px; overflow: hidden; text-align: center;">
             <h2 data-bind="text:aprobado" style="margin: 0; word-wrap: break-word; max-width: 100%; font-size: 1.5em;"></h2>
             <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Aprobado</p>
         </div>
     </div>
     <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
         <div class="p-3 d-flex flex-column justify-content-center align-items-center rounded"
-             style="background:#4DBEFF; width: 100px; height: 100px; border-radius: 10px; overflow: hidden; text-align: center;">
+             style="background:#E291AD; width: 100px; height: 100px; border-radius: 10px; overflow: hidden; text-align: center;">
             <h2 data-bind="text:programado" style="margin: 0; word-wrap: break-word; max-width: 100%; font-size: 1.5em;"></h2>
             <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Programado</p>
         </div>
     </div>
     <div class="col-6 col-md-3 col-lg-1 my-2 me-3">
         <div class="p-3 d-flex flex-column justify-content-center align-items-center rounded"
-             style="background:#9F81FD; width: 100px; height: 100px; border-radius: 10px; overflow: hidden; text-align: center;">
+             style="background:#ECB693; width: 100px; height: 100px; border-radius: 10px; overflow: hidden; text-align: center;">
             <h2 data-bind="text:entregado" style="margin: 0; word-wrap: break-word; max-width: 100%; font-size: 1.5em;"></h2>
             <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; margin: 0;">Entregado</p>
         </div>
@@ -89,6 +90,15 @@
     </div>
 </div>
 
+<!-- Botón para Exportar a Excel -->
+<div class="row mb-3">
+    <div class="col text-end">
+        <button type="button" class="btn btn-success my-2" data-bind="click: exportarExcel">
+            <i class="lni lni-download"></i> Exportar a Excel
+        </button>
+    </div>
+</div>
+
 <div class="row">
     <div class="col">
         <table class="table table-hover">
@@ -107,7 +117,7 @@
 
                 </tr>
             </thead>
-            <tbody data-bind="foreach: registrosFiltrados">
+            <tbody data-bind="foreach: paginatedRegistros">
                 <tr>
                     <td data-bind="text: nombre"></td>
                     <td data-bind="text: mensaje"></td>
@@ -127,13 +137,21 @@
                 </tr>
             </tbody>
         </table>
+        <div class="pagination">
+            <button class="btn btn-primary" data-bind="click: () => goToPage(currentPage() - 1), enable: currentPage() > 1">Anterior</button>
+            <!-- Mostrar número de páginas -->
+            <span data-bind="foreach: ko.utils.range(1, totalPages())">
+                <button class="btn btn-outline-secondary mx-3" data-bind="text: $data, click: () => $root.goToPage($data), css: { 'btn-primary': $data === $root.currentPage() }"></button>
+            </span>
+            <button class="btn btn-primary" data-bind="click: () => goToPage(currentPage() + 1), enable: currentPage() < totalPages()">Siguiente</button>
+        </div>
     </div>
 </div>
 
 <div class="modal fade" id="divEdicion" tabindex="-1" aria-labelledby="Modal" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="Modal">Editar Material</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -158,10 +176,14 @@
                                 <label class="col-form-label">Clasificación:</label>
                                 <select class="form-control" data-bind="options: catEstatusMateriales, value: EstatusMateriales, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
                             </div>
-                            <div class="mb-3" data-bind="validationElement: Comentario">
+                           <!-- <div class="mb-3" data-bind="validationElement: Comentario">
                                 <label for="comentario-editor" class="col-form-label">Comentario:</label>
                                 <div id="comentario-editor" class="form-control" contenteditable="true" style="min-height: 100px; border: 1px solid #ccc;" maxlength="128"></div>
 
+                            </div>-->
+                            <div class="mb-3">
+                                <label class="form-label">Comentario</label>
+                                <input type="text" class="form-control" data-bind="value: Comentario" />
                             </div>
                             <div class="mb-3" data-bind="validationElement: fechaEntrega, visible:isRoleVisible([1])">
                                 <label for="recipient-name" class="col-form-label">Cambiar Fecha Entrega:</label>
@@ -236,7 +258,6 @@
         var RolId = @Html.Raw(ViewBag.RolId);
 
     </script>
-    <script src="https://cdn.ckeditor.com/ckeditor5/35.3.1/classic/ckeditor.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     
     <script src="~/js/Material/Material.js"></script>

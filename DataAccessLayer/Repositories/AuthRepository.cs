@@ -21,7 +21,8 @@ namespace DataAccessLayer.Repositories
         }
         public async Task<Usuario> Autenticar(string correo, string contrasena)
         {
-            Usuario usuario = await _context.Usuarios.Where(q => q.Correo == correo && q.Contrasena == contrasena).FirstOrDefaultAsync();
+            Usuario usuario = await _context.Usuarios.Where(q => q.Correo == correo && q.Contrasena == contrasena 
+                                                            && q.CambioContrasena == false && q.Estatus == true ).FirstOrDefaultAsync();
             if (usuario != null)
             {
                 usuario.UserRol = new Rol();
@@ -71,6 +72,7 @@ namespace DataAccessLayer.Repositories
             Usuario usuarioBD = _context.Usuarios.Where(q => q.Correo == correo).FirstOrDefault();
             if (usuarioBD != null)
             {
+                usuarioBD.Estatus = false;
                 usuarioBD.CambioContrasena = true;
                 _context.Update(usuarioBD);
                 _context.SaveChanges();

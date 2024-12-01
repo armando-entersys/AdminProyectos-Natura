@@ -3,66 +3,111 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <style>
-    .custom-width {
-        width: 100%;
-        overflow-x: auto;
-    }
-
-    .row.flex-nowrap {
+    .kanban-columns {
         display: flex;
-        flex-wrap: nowrap;
+        gap: 15px;
+        padding: 15px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
-    .col {
-        min-width: 22%; /* Ajusta el tamaño mínimo de cada columna */
+    .kanban-column {
+        flex: 1;
+        min-width: 300px;
         max-width: 22%;
-        margin-right: 10px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        background-color: #f8f9fa;
+    }
+
+    .kanban-card {
+        display: flex;
+        flex-direction: column;
+        border-radius: 10px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-header {
+        background: #f4ab34;
+        color: white;
+        text-align: center;
+        padding: 10px;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .card-body {
+        overflow-y: auto;
+        padding: 10px;
+        height: 350px; /* Altura fija para evitar variaciones entre columnas */
+    }
+
+    .search-input {
+        margin-top: 10px;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+    }
+
+    .task-item {
+        background-color: #ffffff;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 8px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    }
+
+        .task-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+    .modal {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .autocomplete-results {
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+        .autocomplete-results li:hover {
+            background-color: #e9ecef;
+        }
+
+    .btn-outline-primary {
+        margin: 5px 0;
     }
 </style>
-<h1 class="py-3">Proyectos</h1>
-<div class="row py-3">
-    <div class="col" data-bind="visible:isRoleVisible([2])">
-       
-    </div>
-    <div class="col">
-    </div>
 
-</div>
-<div class="row flex-nowrap" data-bind="foreach: columns" style="overflow-x: auto; white-space: nowrap;">
-    <div class="col" style="flex: 0 0 22%; max-width: 22%;">
-        <div class="card">
+<h1 class="py-3 text-center">Gestión de Proyectos</h1>
+
+<div class="kanban-columns" data-bind="foreach: columns">
+    <div class="kanban-column">
+        <div class="kanban-card">
             <div class="card-header">
-                <h5 class="card-title" data-bind="text: name"></h5>
+                <h5 class="mb-0" data-bind="text: name"></h5>
+                <input type="text" class="form-control search-input" placeholder="Buscar..."
+                       data-bind="value: searchTitle, valueUpdate: 'input'" />
             </div>
             <div class="card-body">
-                <div class="list-group sortable" data-bind="foreach: tasks, attr: { id: id }">
-                    <div class="list-group-item" data-bind="attr: { 'data-task-id': id }">
+                <div class="list-group sortable" data-bind="foreach: filteredTasks, attr: { id: id }">
+                    <div class="list-group-item task-item" data-bind="attr: { 'data-task-id': id }">
                         <div>
-                            <div>
-                                <i class="lni lni-folder"></i>
-                                <span data-bind="text: title" style="display: inline-block; max-width: calc(100% - 30px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></span>
-                            </div>
-                            <div>
-                                <i class="lni lni-user"></i>
-                                <span data-bind="text: nombreUsuario" style="display: inline-block; max-width: calc(100% - 30px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></span>
-                            </div>
-                            <div>
-                                <i class="lni lni-calendar"></i>
-                                <span data-bind="text: fechaEntrega"></span>
-                            </div>
-                            <div class="row">
-                                <div class="col-4 transparent-div">
-                                    l
-                                </div>
-                                <div class="col-4 transparent-div">
-                                    l
-                                </div>
-                                <div class="col-4">
-                                    <div>
-                                        <i data-bind="click:$root.Editar" class="lni lni-search-text"></i>
-                                    </div>
-                                </div>
-                            </div>
+                            <strong data-bind="text: title"></strong>
+                        </div>
+                        <div class="text-muted" data-bind="text: nombreUsuario"></div>
+                        <small class="text-muted" data-bind="text: fechaEntrega"></small>
+                        <div class="mt-2">
+                            <button class="btn btn-outline-primary btn-sm" data-bind="click: $root.Editar">
+                                Ver Detalles
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -70,61 +115,81 @@
         </div>
     </div>
 </div>
+
+<!-- Modal para edición -->
 <div class="modal fade" id="divEdicion" tabindex="-1" aria-labelledby="Modal" aria-hidden="true">
-    <div class="modal-dialog modal-fullscreen" >
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="Modal">Solicitud Proyecto</h5>
+            <!-- Header del Modal -->
+            <div class="modal-header text-white" style="background: #f4ab34;">
+                <h5 class="modal-title" id="Modal">Gestión de Proyecto</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body" style="background-color: rgba(0, 0, 0, .03);">
-                <div class="row">   
-                    <div class="col-6">
-                        <div id="formulario" style="background-color: #FFFFFF;" class="p-3" >
-                            <h1>Solicitud</h1>
-                            <div class="mb-3" data-bind="validationElement: nombre">
-                                <label for="recipient-name" class="col-form-label">Nombre de solicitud:</label>
-                                <input disabled type="text" class="form-control" id="nombre" maxlength="128" data-bind="value: nombre" />
+            <!-- Cuerpo del Modal -->
+            <div class="modal-body">
+                <!-- Información General -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <h6 class="text-muted">Información de la Solicitud</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nombre de la Solicitud</label>
+                                <input type="text" class="form-control" data-bind="value: nombre" disabled />
                             </div>
-                            <div class="mb-3" data-bind="validationElement: descripcion">
-                                <label for="recipient-name" class="col-form-label">Descripción de la solicitud:</label>
-                                <input disabled type="text" class="form-control" id="descripcion"  data-bind="value: descripcion">
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha de Entrega Deseada</label>
+                                <input type="date" class="form-control" data-bind="value: fechaEntrega" disabled />
                             </div>
-                            <div class="mb-3" data-bind="validationElement: objetivo">
-                                <label for="recipient-name" class="col-form-label">Objetivo de comunicación (128 caracteres):</label>
-                                <input disabled type="text" class="form-control" maxlength="128" id="objetivo" data-bind="value: objetivo">
+                            <div class="col-md-6">
+                                <label class="form-label">Objetivo de Comunicación</label>
+                                <input type="text" class="form-control" data-bind="value: objetivo" disabled />
                             </div>
-                            <div class="mb-3" data-bind="validationElement: dirigidoA">
-                                <label for="recipient-name" class="col-form-label">Publico al que va dirigido (128 caracteres) :</label>
-                                <input disabled type="text" class="form-control" id="dirigidoA" maxlength="128" data-bind="value: dirigidoA">
+                            <div class="col-md-6">
+                                <label class="form-label">Público Dirigido</label>
+                                <input type="text" class="form-control" data-bind="value: dirigidoA" disabled />
                             </div>
-                            <div class="mb-3" data-bind="validationElement: fechaEntrega">
-                                <label for="recipient-name" class="col-form-label">Fecha deseada de publicación:</label>
-                                <input disabled type="date" class="form-control" id="fechaEntrega" data-bind="value: fechaEntrega">
+                            <div class="col-md-6">
+                                <label class="form-label">Descripción</label>
+                                <textarea class="form-control" rows="2" data-bind="value: descripcion" disabled></textarea>
                             </div>
-                            <div class="mb-3" data-bind="validationElement: linksReferencias">
-                                <label for="recipient-name" class="col-form-label">Link de Referencia:</label>
-                                <a data-bind="attr: { href: linksReferencias }, text: linksReferencias" class="form-control" target="_blank">Link Referencia</a>
-                            </div>
-                            <div class="mb-3" data-bind="validationElement: cargaArchivo">
-                                <label for="cargaArchivo" class="col-form-label">Subir referencia:</label>
-                                <input disabled type="file" class="form-control" id="cargaArchivo" data-bind="event: { change: cargarArchivo }" accept=".pdf,.doc,.docx">
-                            </div>
-                            <div class="mb-3" data-bind="visible: rutaArchivo">
-                                <label for="archivoCargado" class="col-form-label">Referencia:</label>
-                                <a data-bind="attr: { href: '/Brief/DownloadFile/' + id() }, text: rutaArchivo" class="form-control" target="_blank">Descargar archivo</a>
+                            <div class="col-md-6">
+                                <label class="form-label">Link de Referencia</label>
+                                <a class="form-control" data-bind="attr: { href: linksReferencias }, text: linksReferencias" target="_blank">Abrir Link</a>
                             </div>
                         </div>
                     </div>
-                    <div class="col-6">
-                        <div id="formularioAdmin" class="p-3">
-                            <h1>Panel Edición Administrador</h1>
-                            <div class="mb-3" data-bind="validationElement: comentarioProyecto">
-                                <label for="recipient-name" class="col-form-label">Comentario:</label>
-                                <input type="text" class="form-control" id="comentarioProyecto" maxlength="128" data-bind="value: comentarioProyecto">
+                </div>
+
+                <!-- Tabs -->
+                <ul class="nav nav-tabs mb-3" id="projectTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin" type="button" role="tab" aria-controls="admin" aria-selected="true">
+                            Edición Administrador
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="materiales-tab" data-bs-toggle="tab" data-bs-target="#materiales" type="button" role="tab" aria-controls="materiales" aria-selected="false">
+                            Materiales
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="participantes-tab" data-bs-toggle="tab" data-bs-target="#participantes" type="button" role="tab" aria-controls="participantes" aria-selected="false">
+                            Participantes
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <!-- Panel de Edición Administrador -->
+                    <div class="tab-pane fade show active" id="admin" role="tabpanel" aria-labelledby="admin-tab">
+                        <h6 class="text-muted">Edición Administrador</h6>
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Comentario del Proyecto</label>
+                                <textarea class="form-control" rows="2" data-bind="value: comentarioProyecto"></textarea>
                             </div>
-                            <div class="mb-3" data-bind="validationElement: planComunicacion">
-                                <label for="recipient-name" class="col-form-label">Requiere Plan de Comunicación:</label>
+                            <div class="col-md-6">
+                                <label class="form-label">Requiere Plan de Comunicación</label>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="planComunicacionOptions" id="planComunicacion1" value="Sí" data-bind="checked: planComunicacion">
                                     <label class="form-check-label" for="planComunicacion1">Sí</label>
@@ -134,166 +199,175 @@
                                     <label class="form-check-label" for="planComunicacion2">No</label>
                                 </div>
                             </div>
-                            <div class="mb-3" data-bind="validationElement: determinarEstado">
-                                <label for="recipient-name" class="col-form-label">Determinar Estado:</label>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="determinarEstadoOptions" id="determinarEstado1" value="Ciclal Regional" data-bind="checked: determinarEstado">
-                                    <label class="form-check-label" for="determinarEstado1">Ciclal Regional</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="determinarEstadoOptions" id="determinarEstado2" value="Ciclal Local" data-bind="checked: determinarEstado">
-                                    <label class="form-check-label" for="determinarEstado2">Ciclal Local</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="determinarEstadoOptions" id="determinarEstado3" value="Ciclal Local" data-bind="checked: determinarEstado">
-                                    <label class="form-check-label" for="determinarEstado3">Inicio de Ciclo</label>
-                                </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Estado del Proyecto</label>
+                                <select class="form-control" data-bind="value: determinarEstado">
+                                    <option value="Ciclal Regional">Ciclal Regional</option>
+                                    <option value="Ciclal Local">Ciclal Local</option>
+                                    <option value="Inicio de Ciclo">Inicio de Ciclo</option>
+                                </select>
                             </div>
-                            <div class="mb-3" data-bind="validationElement: fechaPublicacion">
-                                <label for="recipient-name" class="col-form-label">Fecha Publicacion:</label>
-                                <input type="date" class="form-control" id="fechaEntrega" data-bind="value: fechaPublicacion, attr: { min: minDate }">
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha de Publicación</label>
+                                <input type="date" class="form-control" data-bind="value: fechaPublicacion, attr: { min: minDate }">
                             </div>
-                            <button type="button" class="btn btn-primary" data-bind="click:GuardarProyecto">
-                                <i class="lni lni-save"></i>
-                                <span>Guardar</span>
-                            </button>
-                        </div>
-                        <div id="formularioMateriales"  class="p-3">
-                            <h1>Asignar Material</h1>
-                            <div class="mb-3" data-bind="validationElement: nombreMaterial">
-                                <label for="recipient-name" class="col-form-label">Nombre:</label>
-                                <input type="text" class="form-control" id="nombreMaterial" maxlength="128" data-bind="value: nombreMaterial">
-                             
+                            <div class="col-md-12 text-end">
+                                <button class="btn btn-primary" data-bind="click: GuardarProyecto">
+                                    <i class="lni lni-save"></i> Guardar Cambios
+                                </button>
                             </div>
-                            <div class="mb-3" data-bind="validationElement: mensaje">
-                                <label for="recipient-name" class="col-form-label">Mensaje:</label>
-                                <input type="text" class="form-control" id="mensaje" maxlength="128" data-bind="value: mensaje">
-                            </div>
-                            <div class="mb-3" data-bind="validationElement: prioridad">
-                                <label class="col-form-label">Prioridad:</label>
-                                <select class="form-control" data-bind="options: catPrioridad, value: prioridad, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
-                            </div>
-                            <div class="mb-3" data-bind="validationElement: ciclo">
-                                <label for="recipient-name" class="col-form-label">Ciclo:</label>
-                                <input type="text" class="form-control" id="ciclo" maxlength="128" data-bind="value: ciclo">
-                            </div>
-                            <div class="mb-3" data-bind="validationElement: pcn">
-                                <label class="col-form-label">PCN:</label>
-                                <select class="form-control" data-bind="options: catPCN, value: pcn, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
-                            </div>
-                            <div class="mb-3" data-bind="validationElement: formato">
-                                <label class="col-form-label">Formato:</label>
-                                <select class="form-control" data-bind="options: catFormato, value: formato, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
-                            </div>
-                            <div class="mb-3" data-bind="validationElement: audiencia">
-                                <label class="col-form-label">Audicencia:</label>
-                                <select class="form-control" data-bind="options: catAudiencia, value: audiencia, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
-                            </div>
-                            <div class="mb-3" data-bind="validationElement: fechaEntrega">
-                                <label for="recipient-name" class="col-form-label">Fecha Entrega:</label>
-                                <input type="date" class="form-control" id="fechaEntrega" maxlength="128" data-bind="value: fechaEntrega">
-                            </div>
-                            <div class="mb-3" data-bind="validationElement: responsable">
-                                <label for="recipient-name" class="col-form-label">Responsable:</label>
-                                <input type="text" class="form-control" id="responsable" maxlength="128" data-bind="value: responsable">
-                            </div>
-                            <div class="mb-3" data-bind="validationElement: area">
-                                <label for="recipient-name" class="col-form-label">Area:</label>
-                                <input type="text" class="form-control" id="area" maxlength="128" data-bind="value: area">
-                            </div>
-                            <button type="button" class="btn btn-primary" data-bind="click:GuardarMaterial">
-                                <i class="lni lni-save"></i>
-                                <span>Agregar Material</span>
-                            </button>
-                        </div>
-                        <div id="ListaMateriales" class="p-3">
-                            <h2 style="color:#FFAA16;">Materiales Asignados</h2>
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Id</th>
-                                        <th scope="col">Nombre</th>
-                                        <th scope="col">Fecha Entrega</th>
-                                        <th scope="col">Detalles</th>
-
-                                    </tr>
-                                </thead>
-                                <tbody data-bind="foreach: registrosMateriales">
-                                    <tr>
-                                        <td data-bind="text: id"></td>
-                                        <td data-bind="text: nombre"></td>
-                                        <td data-bind="text: fechaEntrega"></td>
-                                        <td class="small">
-                                            <button type="button" class="btn btn-outline-primary" data-bind="click:$root.EliminarMaterial">
-                                                <i class="lni lni-pencil"></i>
-                                                <span>Eliminar Material</span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <h2 style="color:#FFAA16;">Participantes del proyecto</h2>
-                            <div>
-                                <label for="buscarUsuario">Buscar usuario:</label>
-                                <input id="buscarUsuario" type="text" class="form-control" placeholder="Escribe el nombre del usuario..."
-                                       data-bind="value: buscarUsuario, valueUpdate: 'input', event: { keyup: buscarUsuarios }" />
-                                <ul data-bind="foreach: resultadosBusqueda" class="autocomplete-results" style="background-color:#fff">
-                                    <li data-bind="text: nombre, click: $root.seleccionarUsuario"></li>
-                                </ul>
-                            </div>
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Id</th>
-                                        <th scope="col">Nombre</th>
-                                        <th scope="col">Detalles</th>
-
-                                    </tr>
-                                </thead>
-                                <tbody data-bind="foreach: registrosParticipantes">
-                                    <tr>
-                                        <td data-bind="text: id"></td>
-                                        <td data-bind="text: usuario.nombre"></td>
-                                        <td class="small">
-                                            <button type="button" class="btn btn-outline-primary" data-bind="click:$root.EliminarParticipante">
-                                                <i class="lni lni-pencil"></i>
-                                                <span>Eliminar</span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
                         </div>
                     </div>
+
+                    <!-- Tab: Materiales -->
+                    <div class="tab-pane fade" id="materiales" role="tabpanel" aria-labelledby="materiales-tab">
+                        <div class="row">
+                            <!-- Formulario de Materiales -->
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Agregar Material</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Nombre</label>
+                                        <input type="text" class="form-control" data-bind="value: nombreMaterial">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Ciclo</label>
+                                        <input type="text" class="form-control" data-bind="value: ciclo">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label">Mensaje</label>
+                                        <textarea class="form-control" rows="2" data-bind="value: mensaje"></textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Prioridad</label>
+                                        <select class="form-control" data-bind="options: catPrioridad, value: prioridad, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">PCN</label>
+                                        <select class="form-control" data-bind="options: catPCN, value: pcn, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Audiencia</label>
+                                        <select class="form-control" data-bind="options: catAudiencia, value: audiencia, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Formato</label>
+                                        <select class="form-control" data-bind="options: catFormato, value: formato, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Responsable</label>
+                                        <input type="text" class="form-control" data-bind="value: responsable">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Área</label>
+                                        <input type="text" class="form-control" data-bind="value: area">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Fecha Entrega</label>
+                                        <input type="date" class="form-control" data-bind="value: fechaEntrega">
+                                    </div>
+                                    
+                                </div>
+                                <button class="btn btn-success mt-3 w-100" data-bind="click: GuardarMaterial">
+                                    <i class="lni lni-save"></i> Agregar Material
+                                </button>
+                            </div>
+
+                            <!-- Tabla de Materiales Asignados -->
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Materiales Asignados</h6>
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Responsable</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody data-bind="foreach: registrosMateriales">
+                                        <tr>
+                                            <td data-bind="text: nombre"></td>
+                                            <td data-bind="text: responsable"></td>
+                                            <td>
+                                                <button class="btn btn-danger btn-sm" data-bind="click: $root.EliminarMaterial">
+                                                    <i class="lni lni-trash"></i> Eliminar
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Participantes -->
+                    <div class="tab-pane fade" id="participantes" role="tabpanel" aria-labelledby="participantes-tab">
+                        <div>
+                            <label for="buscarUsuario">Buscar Usuario</label>
+                            <input id="buscarUsuario" type="text" class="form-control mb-3" placeholder="Escribe el nombre del usuario..."
+                                   data-bind="value: buscarUsuario, valueUpdate: 'input', event: { keyup: buscarUsuarios }">
+                            <ul class="autocomplete-results" data-bind="foreach: resultadosBusqueda">
+                                <li class="list-group-item" data-bind="text: nombre, click: $root.seleccionarUsuario"></li>
+                            </ul>
+                        </div>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="foreach: registrosParticipantes">
+                                <tr>
+                                    <td data-bind="text: usuario.nombre"></td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm" data-bind="click: $root.EliminarParticipante">
+                                            <i class="lni lni-trash"></i> Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-             
             </div>
+
+            <!-- Footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
-                    <i class="lni lni-save"></i>
-                    <span>Aceptar</span>
-                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    .custom-width {
-        max-width: 1200px; /* Puedes definir cualquier ancho aquí */
-    }
-</style>
 @section Scripts {
     <script>
-        // Pasar los valores de ViewBag a variables JavaScript
         var RolId = @Html.Raw(ViewBag.RolId);
-        // Obtener la fecha de hoy en formato YYYY-MM-DD
-        const today = new Date().toISOString().split('T')[0];
+        function adjustColumnHeights() {
+            const columns = document.querySelectorAll('.kanban-column');
+            let maxHeight = 0;
 
-        // Establecer la fecha mínima en el input
-        document.getElementById('fechaEntrega').setAttribute('min', today);
+            // Encuentra la altura máxima de las columnas
+            columns.forEach(column => {
+                const columnHeight = column.offsetHeight;
+                if (columnHeight > maxHeight) {
+                    maxHeight = columnHeight;
+                }
+            });
+
+            // Ajusta todas las columnas para que tengan la misma altura
+            columns.forEach(column => {
+                column.style.height = `${maxHeight}px`;
+            });
+        }
+
+            // Ejecutar cuando el DOM esté completamente cargado
+        document.addEventListener('DOMContentLoaded', () => {
+            adjustColumnHeights();
+
+            // Vuelve a ajustar las alturas cuando la ventana cambie de tamaño
+            window.addEventListener('resize', adjustColumnHeights);
+        });
     </script>
-    <script src="~/js/brief/BriefAdmin.js"></script>
-   
+    <script src="~/js/brief/BriefAdmin.js?v=1.0.1"></script>
 }

@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -56,7 +58,23 @@ namespace DataAccessLayer.Repositories
             {
                 usuarios = _context.Usuarios.Where(q => q.Nombre.ToUpper().Contains(nombre)).ToList();
             }
+            usuarios = usuarios.Select(q => new Usuario
+            {
+                Id = q.Id,
+                Nombre = q.Nombre,
+                ApellidoPaterno = q.ApellidoPaterno,
+                ApellidoMaterno = q.ApellidoMaterno,
+                Correo = q.Correo,
+                Contrasena = q.Contrasena,
+                RolId = q.RolId,
+                UserRol = _context.Roles.Where(p => p.Id == q.RolId).FirstOrDefault(),
+                Estatus = q.Estatus,
+                FechaRegistro = q.FechaRegistro,
+                FechaModificacion = q.FechaModificacion,
+                CambioContrasena = q.CambioContrasena,
+                SolicitudRegistro = q.SolicitudRegistro
 
+            }).ToList();
             return usuarios;
 
         }

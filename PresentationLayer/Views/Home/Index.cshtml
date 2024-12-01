@@ -4,128 +4,141 @@
 <div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-min.js"></script>
 </div>
-<div class="text-center">
-    <h1 class="display-5">Bienvenido @ViewBag.Name</h1>
-</div>
-<div class="row">
-    <div class="col">
-        <div class="card">
+<style>
+    .card-header{
+        background-color: #FFAA16;
+    }
+</style>
+
+<div class="row gy-4">
+    <!-- Alertas -->
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header text-white">
+                <h5 class="card-title mb-0">Alertas</h5>
+            </div>
             <div class="card-body">
-                <h5 class="card-title">Alertas</h5>
-                <div class="row" data-bind="foreach:registrosAlerta">
-                    <div class="col-6">
-                        <div class="card">
+                <div class="row g-3" data-bind="foreach: registrosAlerta">
+                    <div class="col-md-6">
+                        <div class="card border-secondary">
                             <div class="card-body">
-                                <h5 class="card-title" data-bind="text:nombre"></h5>
-                                <p class="card-text" data-bind="text:descripcion"></p>
-                                <a class="btn btn-primary" data-bind="click:$root.Editar">Accion</a>
+                                <h5 class="card-title" data-bind="text: nombre"></h5>
+                                <p class="card-text text-muted" data-bind="text: descripcion"></p>
+                                <button class="btn btn-outline-primary btn-sm" data-bind="click: $root.Editar">Acción</button>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
-    <div class="col">
-        <div class="card">
+
+    <!-- Proyectos -->
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header text-white">
+                <h5 class="card-title mb-0">Proyectos</h5>
+            </div>
             <div class="card-body">
-                <h5 class="card-title">Proyectos</h5>
                 <div class="row text-center">
-                    <div class="col-3">
-                        <div class="card card-Home">
-                            <h2 class="card-title titleCardHome" data-bind="text:Hoy"></h2>
+                    <div class="col">
+                        <div class="card bg-light shadow-sm">
+                            <h2 class="card-title my-2" data-bind="text: Hoy"></h2>
                         </div>
                         <h6 class="fw-bold">Hoy</h6>
                     </div>
-                    <div class="col-3">
-                        <div class="card card-Home">
-                            <h2 class="card-title titleCardHome" data-bind="text:EstaSemana"></h2>
+                    <div class="col">
+                        <div class="card bg-light shadow-sm">
+                            <h2 class="card-title my-2" data-bind="text: EstaSemana"></h2>
                         </div>
                         <h6 class="fw-bold">Esta Semana</h6>
                     </div>
-                    <div class="col-3">
-                        <div class="card card-Home">
-                            <h2 class="card-title titleCardHome" data-bind="text:ProximaSemana"></h2>
+                    <div class="col">
+                        <div class="card bg-light shadow-sm">
+                            <h2 class="card-title my-2" data-bind="text: ProximaSemana"></h2>
                         </div>
-                        <h6 class="fw-bold">Proxima Semana</h6>
+                        <h6 class="fw-bold">Próxima Semana</h6>
                     </div>
-                    <div class="col-3">
-                        <div class="card card-Home">
-                            <h2 class="card-title titleCardHome" data-bind="text:TotalProyectos"></h2>
+                    <div class="col">
+                        <div class="card bg-light shadow-sm">
+                            <h2 class="card-title my-2" data-bind="text: TotalProyectos"></h2>
                         </div>
-                        <h6 class="fw-bold">Total de Proyectos</h6>
+                        <h6 class="fw-bold">Total Proyectos</h6>
                     </div>
                 </div>
-
             </div>
         </div>
-        <div class="card">
+    </div>
+
+    <!-- Materiales -->
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header text-white">
+                <h5 class="card-title mb-0">Materiales</h5>
+            </div>
             <div class="card-body">
-                <h5 class="card-title">Materiales</h5>
                 <div class="row text-center">
-                    <div class="col-3">
-                        <div class="card card-Home">
-                            <h2 class="card-title titleCardHome" data-bind="text:Hoy_Material"></h2>
+                    <div class="col">
+                        <div class="card bg-light shadow-sm">
+                            <h2 class="card-title my-2" data-bind="text: Hoy_Material"></h2>
                         </div>
                         <h6 class="fw-bold">Hoy</h6>
                     </div>
-                    <div class="col-3">
-                        <div class="card card-Home">
-                            <h2 class="card-title titleCardHome" data-bind="text:EstaSemana_Material"></h2>
+                    <div class="col">
+                        <div class="card bg-light shadow-sm">
+                            <h2 class="card-title my-2" data-bind="text: EstaSemana_Material"></h2>
                         </div>
                         <h6 class="fw-bold">Esta Semana</h6>
                     </div>
-                    <div class="col-3">
-                        <div class="card card-Home">
-                            <h2 class="card-title titleCardHome" data-bind="text:ProximaSemana_Material"></h2>
+                    <div class="col">
+                        <div class="card bg-light shadow-sm">
+                            <h2 class="card-title my-2" data-bind="text: ProximaSemana_Material"></h2>
                         </div>
-                        <h6 class="fw-bold">Proxima Semana</h6>
+                        <h6 class="fw-bold">Próxima Semana</h6>
                     </div>
-                    <div class="col-3">
-                        <div class="card card-Home">
-                            <h2 class="card-title titleCardHome" data-bind="text:TotalMaterial"></h2>
+                    <div class="col">
+                        <div class="card bg-light shadow-sm">
+                            <h2 class="card-title my-2" data-bind="text: TotalMaterial"></h2>
                         </div>
-                        <h6 class="fw-bold">Total de Materiales</h6>
+                        <h6 class="fw-bold">Total Materiales</h6>
                     </div>
                 </div>
-
             </div>
         </div>
-        <div class="card">
+    </div>
+
+    <!-- Proyectos Finalizados -->
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-header text-white">
+                <h5 class="card-title mb-0">Proyectos Finalizados</h5>
+            </div>
             <div class="card-body">
-                <h5 class="card-title">Proyectos Finalizados</h5>
                 <div class="row text-center">
-                    <div class="col-3">
-                        <div class="card card-Home">
-                            <h2 class="card-title titleCardHome" data-bind="text:ProyectoTiempo"></h2>
+                    <div class="col">
+                        <div class="card bg-light shadow-sm">
+                            <h2 class="card-title my-2" data-bind="text: ProyectoTiempo"></h2>
                         </div>
-                        <h6 class="fw-bold">En tiempo</h6>
+                        <h6 class="fw-bold">En Tiempo</h6>
                     </div>
-                    <div class="col-3">
-                    </div>
-                    <div class="col-3">
-                    </div>
-                    <div class="col-3">
-                        <div class="card card-Home">
-                            <h2 class="card-title titleCardHome" data-bind="text:ProyectoExtra"></h2>
+                    <div class="col"></div>
+                    <div class="col"></div>
+                    <div class="col">
+                        <div class="card bg-light shadow-sm">
+                            <h2 class="card-title my-2" data-bind="text: ProyectoExtra"></h2>
                         </div>
                         <h6 class="fw-bold">Extratemporal</h6>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
 
-
 @section Scripts {
     <script>
-        // Pasar los valores de ViewBag a variables JavaScript
         var RolId = @Html.Raw(ViewBag.RolId);
-        var UsuarioId = @Html.Raw(ViewBag.UsuarioId); // Pasar los valores de ViewBag a variables JavaScript
-
+        var UsuarioId = @Html.Raw(ViewBag.UsuarioId);
     </script>
-    <script src="~/js/home/Home.js"></script>
+    <script src="~/js/home/Home.js?v=1.0.0"></script>
 }

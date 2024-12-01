@@ -44,70 +44,93 @@
         </table>
     </div>
 </div>
-<div class="modal fade" id="divEdicion" tabindex="-1" aria-labelledby="Modal" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="divEdicion" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <!-- Cambiado a modal-lg para mayor espacio -->
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="Modal">Solicitud Brief</h5>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="ModalLabel">Solicitud Brief</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div id="formulario">
-                    <div  class="mb-3" data-bind="validationElement: EstatusBrief">
-                        <label class="col-form-label">Estatus Proyecto:</label>
-                        <select disabled class="form-control" data-bind="options: catEstatusBrief, value: EstatusBrief, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                <form id="formBrief">
+                    <div class="row g-3">
+                        <!-- Estatus Proyecto -->
+                        <div class="col-md-6" data-bind="validationElement: EstatusBrief">
+                            <label for="estatusProyecto" class="form-label">Estatus Proyecto</label>
+                            <select id="estatusProyecto" class="form-control" disabled
+                                    data-bind="options: catEstatusBrief, value: EstatusBrief, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                        </div>
+
+                        <!-- Nombre -->
+                        <div class="col-md-6" data-bind="validationElement: nombre">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" id="nombre" class="form-control" maxlength="128" placeholder="Ej: Nombre del Brief" data-bind="value: nombre">
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="col-md-12" data-bind="validationElement: descripcion">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea id="descripcion" class="form-control" rows="2" maxlength="256" placeholder="Describe el brief brevemente" data-bind="value: descripcion"></textarea>
+                        </div>
+
+                        <!-- Objetivo -->
+                        <div class="col-md-6" data-bind="validationElement: objetivo">
+                            <label for="objetivo" class="form-label">Objetivo de Comunicación</label>
+                            <input type="text" id="objetivo" class="form-control" maxlength="128" placeholder="Ej: Aumentar ventas" data-bind="value: objetivo">
+                        </div>
+
+                        <!-- Dirigido A -->
+                        <div class="col-md-6" data-bind="validationElement: dirigidoA">
+                            <label for="dirigidoA" class="form-label">Dirigido A</label>
+                            <input type="text" id="dirigidoA" class="form-control" maxlength="128" placeholder="Ej: Público joven" data-bind="value: dirigidoA">
+                        </div>
+
+                        <!-- Fecha de Entrega -->
+                        <div class="col-md-6" data-bind="validationElement: fechaEntrega">
+                            <label for="fechaEntrega" class="form-label">Fecha de Entrega Deseada</label>
+                            <input type="date" id="fechaEntrega" class="form-control" data-bind="value: fechaEntrega">
+                        </div>
+
+                        <!-- Tipo -->
+                        <div class="col-md-6" data-bind="validationElement: TipoBrief">
+                            <label for="tipoBrief" class="form-label">Tipo</label>
+                            <select id="tipoBrief" class="form-control"
+                                    data-bind="options: catTipoBrief, value: TipoBrief, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
+                        </div>
+
+                        <!-- Link de Referencia -->
+                        <div class="col-md-12" data-bind="validationElement: linksReferencias">
+                            <label for="linksReferencias" class="form-label">Link de Referencia</label>
+                            <input type="url" id="linksReferencias" class="form-control" maxlength="256" placeholder="Ej: https://example.com" data-bind="value: linksReferencias">
+                        </div>
+
+                        <!-- Cargar Documento -->
+                        <div class="col-md-12" data-bind="validationElement: cargaArchivo">
+                            <label for="cargaArchivo" class="form-label">Cargar Documento</label>
+                            <input type="file" id="cargaArchivo" class="form-control" accept=".pdf,.doc,.docx"
+                                   data-bind="event: { change: cargarArchivo }">
+                        </div>
+
+                        <!-- Archivo Cargado -->
+                        <div class="col-md-12" data-bind="visible: rutaArchivo">
+                            <label for="archivoCargado" class="form-label">Archivo Cargado</label>
+                            <a id="archivoCargado" class="form-control text-truncate"
+                               data-bind="attr: { href: '/Brief/DownloadFile/' + id() }, text: rutaArchivo" target="_blank">Descargar archivo</a>
+                        </div>
                     </div>
-                    <div class="mb-3" data-bind="validationElement: nombre">
-                        <label for="recipient-name" class="col-form-label">Nombre:</label>
-                        <input type="text" class="form-control" id="nombre" maxlength="128" data-bind="value: nombre" />
-                    </div>
-                    <div class="mb-3" data-bind="validationElement: descripcion">
-                        <label for="recipient-name" class="col-form-label">Descripción:</label>
-                        <input type="text" class="form-control" id="descripcion" maxlength="128" data-bind="value: descripcion">
-                    </div>
-                    <div class="mb-3" data-bind="validationElement: objetivo">
-                        <label for="recipient-name" class="col-form-label">Objetivo de comunicación:</label>
-                        <input type="text" class="form-control" id="objetivo" maxlength="128" data-bind="value: objetivo">
-                    </div>
-                    <div class="mb-3" data-bind="validationElement: dirigidoA">
-                        <label for="recipient-name" class="col-form-label">A quién va dirigido :</label>
-                        <input type="text" class="form-control" id="dirigidoA" maxlength="128" data-bind="value: dirigidoA">
-                    </div>
-                    <div class="mb-3" data-bind="validationElement: fechaEntrega">
-                        <label for="recipient-name" class="col-form-label">Fecha de entrega deseada:</label>
-                        <input type="date" class="form-control" id="fechaEntrega" maxlength="128" data-bind="value: fechaEntrega">
-                    </div>
-                   
-                    <div class="mb-3" data-bind="validationElement: TipoBrief">
-                        <label class="col-form-label">Tipo:</label>
-                        <select class="form-control" data-bind="options: catTipoBrief, value: TipoBrief, optionsText: 'descripcion', optionsCaption: 'Seleccione'"></select>
-                    </div>
-                    <div class="mb-3" data-bind="validationElement: linksReferencias">
-                        <label for="recipient-name" class="col-form-label">Link de Referencia:</label>
-                        <input type="text" class="form-control" maxlength="128" data-bind="value: linksReferencias" />
-                        
-                    </div>
-                    <div class="mb-3" data-bind="validationElement: cargaArchivo">
-                        <label for="cargaArchivo" class="col-form-label">Cargar Documento:</label>
-                        <input type="file" class="form-control" id="cargaArchivo" data-bind="event: { change: cargarArchivo }" accept=".pdf,.doc,.docx">
-                       
-                    </div>
-                    <div class="mb-3" data-bind="visible: rutaArchivo">
-                        <label for="archivoCargado" class="col-form-label">Archivo cargado:</label>
-                        <a data-bind="attr: { href: '/Brief/DownloadFile/' + id() }, text: rutaArchivo" class="form-control" target="_blank">Descargar archivo</a>
-                    </div>
-                </div>
+                </form>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer d-flex justify-content-between">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" data-bind="click:Guardar">
-                    <i class="lni lni-save"></i>
-                    <span>Guardar</span>
+                <button type="button" class="btn btn-primary" data-bind="click: Guardar">
+                    <i class="lni lni-save"></i> Guardar
                 </button>
             </div>
         </div>
     </div>
 </div>
+
 
 <style>
     .custom-width {
@@ -120,6 +143,6 @@
         var RolId = @Html.Raw(ViewBag.RolId);
 
     </script>
-    <script src="~/js/brief/Brief.js"></script>
+    <script src="~/js/brief/Brief.js?v=1.0.0"></script>
    
 }

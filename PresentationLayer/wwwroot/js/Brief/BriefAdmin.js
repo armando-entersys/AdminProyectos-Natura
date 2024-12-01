@@ -1,16 +1,26 @@
 ﻿
-function Task(id, title, UsuarioId, NombreUsuario, FechaEntrega) {
+function Task(id, title, usuarioId, nombreUsuario, fechaEntrega) {
     this.id = id;
-    this.title = ko.observable(title);
-    this.usuarioId = ko.observable(UsuarioId);
-    this.nombreUsuario = ko.observable(NombreUsuario);
-    this.fechaEntrega = ko.observable(FechaEntrega)
+    this.title = title;
+    this.usuarioId = usuarioId;
+    this.nombreUsuario = nombreUsuario;
+    this.fechaEntrega = fechaEntrega;
 }
 
+// Define el ViewModel de la columna
 function Column(id, name, tasks) {
     this.id = id;
-    this.name = ko.observable(name);
-    this.tasks = ko.observableArray(tasks);
+    this.name = name;
+    this.tasks = ko.observableArray(tasks); // Tareas de la columna
+    this.searchTitle = ko.observable(""); // Campo de búsqueda por título
+
+    // Filtrar tareas basado en el título
+    this.filteredTasks = ko.computed(function () {
+        var search = this.searchTitle().toLowerCase(); // Obtener el valor de búsqueda
+        return this.tasks().filter(function (task) {
+            return task.title.toLowerCase().includes(search); // Filtrar tareas por título
+        });
+    }, this);
 }
 
 function AppViewModel() {
@@ -199,7 +209,7 @@ function AppViewModel() {
     self.inicializar();
     self.Editar = function (brief) {
         self.Limpiar();
-
+        self.LimpiarMaterial();
         self.id(brief.id);
         $.ajax({
             url: "Brief/Details/" + self.id(), // URL del método GetAll en tu API

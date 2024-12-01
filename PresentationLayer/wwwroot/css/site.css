@@ -59,7 +59,10 @@ body {
     transition: all 0.35s ease-in-out;
     background-color: #fafbfe;
 }
-
+.bg-primary {
+    --bs-bg-opacity: 1;
+    background-color: #FFAA16 !important;
+}
 #sidebar {
     width: 70px;
     min-width: 70px;
@@ -225,3 +228,13 @@ div[disabled] {
     border-color: #FFAA16 !important;
     box-shadow: 0 0 0 .25rem rgba(49, 132, 253, .5);
 }
+.btn-outline-primary {
+    color: #FFAA16;
+    border-color: #FFAA16;
+}
+
+    .btn-outline-primary:hover {
+        color: #fff;
+        background-color: #FFAA16;
+        border-color: #FFAA16;
+    }

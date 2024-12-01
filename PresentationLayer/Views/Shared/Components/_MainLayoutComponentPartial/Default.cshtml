@@ -1,65 +1,120 @@
-﻿
-<style>
-    .custom-btn {
-        width: 120px; /* Ancho uniforme */
-        height: 100px; /* Alto uniforme */
+﻿<style>
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #f8f9fa; /* Fondo claro */
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra suave */
     }
 
-        .custom-btn i {
-            font-size: 2rem; /* Tamaño del ícono */
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+        .user-info h6 {
+            margin: 0;
+            color: #6c757d;
         }
 
-        .custom-btn span {
-            font-size: 0.9rem; /* Tamaño del texto */
+        .user-info h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #343a40;
         }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+
+    
+    .custom-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100px; /* Tamaño uniforme */
+        height: 80px;
+        text-align: center;
+        background: #FFAA16;
+        font-size: 0.9rem;
+        color: #fff; /* Texto blanco */
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+    }
+
+    a:hover {
+        color: #FFFFFF;
+    }
+
+        .custom-btn:hover {
+            transform: scale(1.05); /* Efecto de aumento */
+        }
+
+        .custom-btn i {
+            font-size: 1.5rem;
+            margin-bottom: 0.3rem;
+        }
+
+    .logo-wrapper img {
+        max-width: 120px;
+    }
+
+    .badge {
+        font-size: 0.8rem;
+        padding: 0.2rem 0.4rem;
+    }
 </style>
-<div name="Main" class="d-flex justify-content-between align-items-center">
-    <!-- Botones -->
-    <div class="btn-group" role="group" aria-label="Basic outlined">
-        <div class="d-flex justify-content-center p-2">
-            <a class="btn btn-primary d-flex flex-column align-items-center custom-btn" href="~/Brief">
-                <i class="lni lni-file-plus-circle"></i>
-                <span>Brief</span>
-            </a>
-        </div>
-        @if (ViewBag.RolId == 1)
-        {
-            <div class="d-flex justify-content-center p-2">
-                <a class="btn btn-primary d-flex flex-column align-items-center custom-btn" href="~/Brief/IndexAdmin">
-                    <i class="lni lni-folder-1"></i>
-                    <span>Proyectos</span>
-                </a>
-            </div>
-        }
-        <div class="d-flex justify-content-center p-2">
-            <a class="btn btn-primary d-flex flex-column align-items-center custom-btn" href="~/Materiales">
-                <i class="lni lni-photos"></i>
-                <span>Materiales</span>
-            </a>
-        </div>
-        <div class="d-flex justify-content-center p-2">
-            <a class="btn btn-primary d-flex flex-column align-items-center custom-btn" href="~/Calendario">
-                <i class="lni lni-calendar-days"></i>
-                <span>Calendario</span>
-                <span>de Proyectos</span>
-            </a>
-        </div>
-        <div class="d-flex justify-content-center p-2">
-            <a type="button" class="btn btn-primary position-relative custom-btn" href="~/Alertas">
-                <i class="lni lni-bell-1"></i>
-                <br />
-                <span>Inbox</span>
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                    @ViewBag.ConteoAlertas
-                    <span class="visually-hidden">unread messages</span>
-                </span>
-            </a>
-        </div>
+
+<div class="top-bar mb-3">
+    <!-- Información del usuario -->
+    <div class="user-info">
+        <h6>Usuario:</h6>
+        <h1>@ViewBag.Name</h1>
     </div>
 
-    <!-- Imagen -->
+    <!-- Botones de acción -->
+    <div class="action-buttons">
+        <a class="custom-btn" href="~/Brief">
+            <i class="lni lni-file-plus-circle"></i>
+            <span>Brief</span>
+        </a>
+        @if (ViewBag.RolId == 1)
+        {
+            <a class="custom-btn" href="~/Brief/IndexAdmin">
+                <i class="lni lni-folder-1"></i>
+                <span>Proyectos</span>
+            </a>
+        }
+        <a class="custom-btn" href="~/Materiales">
+            <i class="lni lni-photos"></i>
+            <span>Materiales</span>
+        </a>
+        <a class="custom-btn" href="~/Calendario">
+            <i class="lni lni-calendar-days"></i>
+            <span>Calendario</span>
+            <span>Proyectos</span>
+        </a>
+        <a class="custom-btn position-relative" href="~/Alertas">
+            <i class="lni lni-bell-1"></i>
+            <span>Inbox</span>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                @ViewBag.ConteoAlertas
+                <span class="visually-hidden">unread messages</span>
+            </span>
+        </a>
+    </div>
+
+    <!-- Logo -->
     <div>
         <img src="~/img/natura-logo.svg" style="width:90%; max-width:150px;" />
     </div>
 </div>
-

@@ -1,6 +1,7 @@
 ﻿function AppViewModel() {
     var self = this;
-    self.registros = ko.observableArray();
+
+    // Observables para datos de la vista
     self.Hoy = ko.observable();
     self.EstaSemana = ko.observable();
     self.ProximaSemana = ko.observable();
@@ -13,81 +14,61 @@
 
     self.ProyectoTiempo = ko.observable();
     self.ProyectoExtra = ko.observable();
-
     self.registrosAlerta = ko.observableArray();
 
-    self.inicializar = function () {
-        $.ajax({
-            url: "Brief/ObtenerConteoPorProyectos", // URL del método GetAll en tu API
+    // Función genérica para cargar datos desde el servidor
+    self.cargarDatos = function (url, successCallback) {
+        return $.ajax({
+            url: url,
             type: "GET",
             contentType: "application/json",
-            success: function (d) {
-                self.Hoy(d.datos.hoy);
-                self.EstaSemana(d.datos.estaSemana);
-                self.ProximaSemana(d.datos.proximaSemana);
-                self.TotalProyectos(d.datos.totalProyectos);
-                self.ProyectoTiempo(d.datos.proyectoTiempo);
-                self.ProyectoExtra(d.datos.proyectoExtra);
-                $.ajax({
-                    url: "Brief/ObtenerConteoMateriales", // URL del método GetAll en tu API
-                    type: "GET",
-                    contentType: "application/json",
-                    success: function (d) {
-                        self.Hoy_Material(d.datos.hoy);
-                        self.EstaSemana_Material(d.datos.estaSemana);
-                        self.ProximaSemana_Material(d.datos.proximaSemana);
-                        self.TotalMaterial(d.datos.totalProyectos);
-                        $.ajax({
-                            url: "Home/ObtenerAlertas", // URL del método GetAll en tu API
-                            type: "GET",
-                            contentType: "application/json",
-                            success: function (d) {
-                                self.registrosAlerta.removeAll();
-                                self.registrosAlerta.push.apply(self.registrosAlerta, d.datos);
-
-                            },
-                            error: function (xhr, status, error) {
-                                console.error("Error al obtener los datos: ", error);
-                                alert("Error al obtener los datos: " + xhr.responseText);
-                            }
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error al obtener los datos: ", error);
-                        alert("Error al obtener los datos: " + xhr.responseText);
-                    }
-                });
-              
-            },
-            error: function (xhr, status, error) {
-                console.error("Error al obtener los datos: ", error);
-                alert("Error al obtener los datos: " + xhr.responseText);
+            success: successCallback,
+            error: function (xhr) {
+                console.error(`Error al cargar datos de ${url}:`, xhr.responseText || xhr.statusText);
+                alert(`Error al cargar datos: ${xhr.responseText || xhr.statusText}`);
             }
         });
     };
 
-    self.inicializar();
-    // Método para comprobar si el rol actual coincide con el pasado
+    // Inicializar datos de la vista
+    self.inicializar = function () {
+        self.cargarDatos("Brief/ObtenerConteoPorProyectos", function (data) {
+            self.Hoy(data.datos.hoy);
+            self.EstaSemana(data.datos.estaSemana);
+            self.ProximaSemana(data.datos.proximaSemana);
+            self.TotalProyectos(data.datos.totalProyectos);
+            self.ProyectoTiempo(data.datos.proyectoTiempo);
+            self.ProyectoExtra(data.datos.proyectoExtra);
+        })
+            .then(() => self.cargarDatos("Brief/ObtenerConteoMateriales", function (data) {
+                self.Hoy_Material(data.datos.hoy);
+                self.EstaSemana_Material(data.datos.estaSemana);
+                self.ProximaSemana_Material(data.datos.proximaSemana);
+                self.TotalMaterial(data.datos.totalProyectos);
+            }))
+            .then(() => self.cargarDatos("Home/ObtenerAlertas", function (data) {
+                self.registrosAlerta(data.datos || []);
+            }));
+    };
+
+    // Método para redirigir a la acción de una alerta
+    self.Editar = function (alerta) {
+        if (!alerta || !alerta.id) return;
+
+        self.cargarDatos(`Alertas/ActualizarAlerta/${alerta.id}`, function () {
+            if (alerta.accion) {
+                window.location.href = alerta.accion;
+            }
+        });
+    };
+
+    // Verificar roles
     self.isRoleVisible = function (allowedRoles) {
         return allowedRoles.includes(RolId);
     };
-    self.Editar = function (alerta) {
-        $.ajax({
-            url: "Alertas/ActualizarAlerta/" + alerta.id, // URL del método GetAll en tu API
-            type: "GET",
-            contentType: "application/json",
-            success: function (d) {
-                // Redirigir a la página especificada en alerta.accion
-                if (alerta.accion) {
-                    window.location.href = alerta.accion;
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error("Error al obtener los datos: ", error);
-                alert("Error al obtener los datos: " + xhr.responseText);
-            }
-        });
-    }
+
+    // Inicializar la vista
+    self.inicializar();
 }
 
 // Activar Knockout.js

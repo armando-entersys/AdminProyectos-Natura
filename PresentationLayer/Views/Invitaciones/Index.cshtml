@@ -12,6 +12,7 @@
                     <th scope="col">Id</th>
                     <th scope="col">Nombre</th>
                     <th scope="col">Correo</th>
+                    <th scope="col">Rol</th>
                     <th scope="col">Detalles</th>
 
                 </tr>
@@ -21,6 +22,7 @@
                     <td data-bind="text: id"></td>
                     <td data-bind="text: nombre"></td>
                     <td data-bind="text: correo"></td>
+                    <td data-bind="text: userRol.descripcion"></td>
                     <td class="small">
                         <button type="button" class="btn btn-outline-primary" data-bind="click:$root.Aceptar">
                             <i class="lni lni-pencil"></i>
@@ -40,6 +42,6 @@
 
 @section Scripts {
 
-    <script src="~/js/Invitaciones/Invitaciones.js"></script>
+    <script src="~/js/Invitaciones/Invitaciones.js?v=1.0.0"></script>
 }
 

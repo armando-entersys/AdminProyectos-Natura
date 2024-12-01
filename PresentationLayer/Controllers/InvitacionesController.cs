@@ -82,6 +82,7 @@ namespace PresentationLayer.Controllers
             res = _toolService.CambioSolicitud(id,true);
             Usuario usuario = _usuarioService.TGetById(id);
             usuario.CambioContrasena = false;
+            usuario.Estatus = true;
             _usuarioService.TUpdate(usuario);
 
             var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";

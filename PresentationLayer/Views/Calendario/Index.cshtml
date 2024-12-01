@@ -4,10 +4,22 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet" />
-<h1>Index</h1>
+<style>
+    .fc-h-event {
+        background-color: var(--fc-event-bg-color, #A564DC) !important;
+        border: 1px solid var(--fc-event-border-color, #A564DC) !important;
+    }
 
+    .fc-event-title-container {
+        white-space: nowrap; /* Evita que el texto salte de línea */
+        overflow: hidden; /* Oculta el texto que se desborda */
+        text-overflow: ellipsis; /* Agrega puntos suspensivos al texto truncado */
+        max-width: 100%; /* Ajusta al tamaño del contenedor */
+    }
+
+</style>
 <div class="container py-4">
-    <h1 class="text-center mb-4">Calendario de Proyectos</h1>
+    <h1 class="text-center mb-4">Calendario de Materiales</h1>
     <div id="calendar"></div>
 </div>
 <div class="modal fade" id="divEdicion" tabindex="-1" aria-labelledby="Modal" aria-hidden="true">
@@ -26,8 +38,11 @@
                 <p data-bind="text:responsable"></p>
                 <label>Area</label>
                 <p data-bind="text:area"></p>
-                <br />
-                <a href="~/Materiales"> Ver Material</a>
+                <a class="btn btn-primary"
+                   data-bind="attr: { href: '/AdministradorProyectos/Materiales?filtroNombre=' + encodeURIComponent(nombre()) }">
+                    Ver Material
+                </a>
+                
             </div>
         </div>
     </div>
@@ -38,6 +53,6 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/es.js"></script>
-    <script src="~/js/Calendario/Calendario.js"></script>
+    <script src="~/js/Calendario/Calendario.js?v=1.0.0"></script>
 
 }

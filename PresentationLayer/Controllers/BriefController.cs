@@ -176,8 +176,47 @@ namespace PresentationLayer.Controllers
         [HttpPut]
         public ActionResult EditStatus([FromBody] Brief brief)
         {
-            respuestaServicio res = new respuestaServicio();
+            var res = new respuestaServicio();
             var BriefOrg = _briefService.GetById(brief.Id);
+
+            if (brief.EstatusBriefId == BriefOrg.EstatusBriefId)
+            {
+                res.Mensaje = "El estatus no ha cambiado.";
+                res.Exito = false;
+                return Ok(res);
+            }
+
+            // Actualizar datos del Brief
+            UpdateBriefData(brief, BriefOrg);
+
+            // Actualizar el Brief en la base de datos
+            _briefService.Update(brief);
+
+            // Obtener estatus actualizado
+            var estatusBriefs = _briefService.GetAllEstatusBrief();
+            brief.EstatusBrief = estatusBriefs.FirstOrDefault(q => q.Id == brief.EstatusBriefId);
+
+            // Obtener destinatarios según el nuevo estatus
+            var urlBase = $"{Request.Scheme}://{Request.Host}/AdministradorProyectos";
+            var destinatarios = GetRecipientsByStatus(brief, urlBase);
+
+            // Crear una alerta general
+            CreateAlert(brief, urlBase);
+
+            // Enviar notificación por correo
+            SendStatusChangeEmail(destinatarios, brief, urlBase);
+
+            res.Datos = brief;
+            res.Mensaje = "Actualizado exitosamente";
+            res.Exito = true;
+
+            return Ok(res);
+        }
+
+        // Métodos auxiliares
+
+        private void UpdateBriefData(Brief brief, Brief BriefOrg)
+        {
             brief.UsuarioId = BriefOrg.UsuarioId;
             brief.Comentario = BriefOrg.Comentario;
             brief.Nombre = BriefOrg.Nombre;
@@ -190,126 +229,83 @@ namespace PresentationLayer.Controllers
             brief.FechaRegistro = BriefOrg.FechaRegistro;
             brief.FechaModificacion = DateTime.Now;
             brief.TipoBriefId = BriefOrg.TipoBriefId;
+        }
 
-            _briefService.Update(brief);
-
-            var estatusBriesfs = _briefService.GetAllEstatusBrief();
-            brief.EstatusBrief = estatusBriesfs.Where(q => q.Id == brief.EstatusBriefId).FirstOrDefault();
-
-            var Destinatarios = new List<string>();
-            var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
+        private List<string> GetRecipientsByStatus(Brief brief, string urlBase)
+        {
+            var recipients = new List<string>();
 
             if (brief.EstatusBriefId == 1)
             {
-                Destinatarios = _toolsService.GetUsuarioByRol(1).Select(q => q.Correo).ToList();
-                Destinatarios.AddRange(_toolsService.ObtenerParticipantes(brief.Id).Select(q => q.Usuario.Correo).ToList());
+                recipients = _toolsService.GetUsuarioByRol(1).Select(q => q.Correo).ToList();
+                recipients.AddRange(_toolsService.ObtenerParticipantes(brief.Id).Select(q => q.Usuario.Correo));
             }
-            if (brief.EstatusBriefId == 2)
+            else if (brief.EstatusBriefId == 2)
             {
-                Destinatarios = _toolsService.GetUsuarioByRol(3).Select(q => q.Correo).ToList();
+                recipients = _toolsService.GetUsuarioByRol(3).Select(q => q.Correo).ToList();
+                recipients.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
 
-                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
-
-                var usuariosProduccion = _toolsService.GetUsuarioByRol(3).Select(q => q.Id).ToList();
-                foreach (var item in usuariosProduccion)
+                foreach (var userId in _toolsService.GetUsuarioByRol(3).Select(q => q.Id))
                 {
-                    _toolsService.CrearAlerta(new Alerta
-                    {
-                        IdUsuario = item,
-                        Nombre = "Cambio Estatus Proyecto " + brief.Nombre,
-                        Descripcion = "Cambio de estatus a " + brief.EstatusBrief.Descripcion,
-                        IdTipoAlerta = 3,
-                        Accion = urlBase + "/Brief?filtroNombre=" + brief.Nombre
-
-                    });
+                    CreateProductionAlert(userId, brief, urlBase);
                 }
-                
+            }
+            else if (brief.EstatusBriefId >= 3 && brief.EstatusBriefId <= 6)
+            {
+                recipients.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
+            }
+            else if (brief.EstatusBriefId == 7 || brief.EstatusBriefId == 8)
+            {
+                recipients = _toolsService.GetUsuarioByRol(3).Select(q => q.Correo).ToList();
+                recipients.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
+            }
 
-            }
-            if (brief.EstatusBriefId == 3)
-            {
-                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
+            return recipients;
+        }
 
-            }
-            if (brief.EstatusBriefId == 4)
+        private void CreateProductionAlert(int userId, Brief brief, string urlBase)
+        {
+            _toolsService.CrearAlerta(new Alerta
             {
-                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
-            }
-            if (brief.EstatusBriefId == 5)
-            {
-                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
-            }
-            if (brief.EstatusBriefId == 6)
-            {
-                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
-            }
-            if (brief.EstatusBriefId == 7)
-            {
-                Destinatarios = _toolsService.GetUsuarioByRol(3).Select(q => q.Correo).ToList();
-                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
-            }
-            if (brief.EstatusBriefId == 8)
-            {
-                Destinatarios = _toolsService.GetUsuarioByRol(3).Select(q => q.Correo).ToList();
-                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
-            }
+                IdUsuario = userId,
+                Nombre = $"Cambio Estatus Proyecto {brief.Nombre}",
+                Descripcion = $"Cambio de estatus a {brief.EstatusBrief.Descripcion}",
+                IdTipoAlerta = 3,
+                Accion = $"{urlBase}/Brief?filtroNombre={brief.Nombre}"
+            });
+        }
+
+        private void CreateAlert(Brief brief, string urlBase)
+        {
             _toolsService.CrearAlerta(new Alerta
             {
                 IdUsuario = brief.UsuarioId,
-                Nombre = "Cambio Estatus Proyecto " + brief.Nombre,
-                Descripcion = "Cambio de estatus a " + brief.EstatusBrief.Descripcion,
+                Nombre = $"Cambio Estatus Proyecto {brief.Nombre}",
+                Descripcion = $"Cambio de estatus a {brief.EstatusBrief.Descripcion}",
                 IdTipoAlerta = 3,
-                Accion = urlBase + "/Brief?filtroNombre=" + brief.Nombre
-
+                Accion = $"{urlBase}/Brief?filtroNombre={brief.Nombre}"
             });
-
-            var estatusBriefs = _briefService.GetAllEstatusBrief();
-            brief.EstatusBrief = estatusBriefs.Where(q => q.Id == brief.EstatusBriefId).FirstOrDefault();
-          
-
-            // Diccionario con los valores dinámicos a reemplazar
-            var valoresDinamicos = new Dictionary<string, string>()
-            {
-                { "estatus", brief.EstatusBrief.Descripcion},
-                { "nombreProyecto", brief.Nombre },
-                { "link", urlBase + "/Brief?filtroNombre=" + brief.Nombre }
-
-            };
-
-
-            _emailSender.SendEmail(Destinatarios, "ActualizaEstatusProyecto", valoresDinamicos);
-            
-
-            res.Datos = brief;
-            res.Mensaje = "Actualizado exitosamente";
-            res.Exito = true;
-            return Ok(res);
         }
+
+        private void SendStatusChangeEmail(List<string> recipients, Brief brief, string urlBase)
+        {
+            var dynamicValues = new Dictionary<string, string>
+    {
+        { "estatus", brief.EstatusBrief.Descripcion },
+        { "nombreProyecto", brief.Nombre },
+        { "link", $"{urlBase}/Brief?filtroNombre={brief.Nombre}" }
+    };
+
+            _emailSender.SendEmail(recipients, "ActualizaEstatusProyecto", dynamicValues);
+        }
+
 
         [HttpPost]
         public ActionResult AddBrief([FromForm] ArchivoT Addbrief)
         {
             respuestaServicio res = new respuestaServicio();
 
-            if (Addbrief.Archivo != null && (Addbrief.Archivo.ContentType == "application/pdf" ||
-                                             Addbrief.Archivo.ContentType == "application/msword" ||
-                                             Addbrief.Archivo.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-            {
-                // Guardar el archivo en una ruta específica o procesarlo según sea necesario
-                string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "\\uploads\\Brief\\" + Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
-
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
-
-                string filePath = Path.Combine(uploadsFolder, Addbrief.Archivo.FileName);
-                Addbrief.RutaArchivo = Addbrief.Archivo.FileName;
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    Addbrief.Archivo.CopyTo(stream);
-                }
-            }
+           
             Addbrief.Comentario = "";
             Brief brief = new Brief
             {
@@ -331,6 +327,26 @@ namespace PresentationLayer.Controllers
             };
 
             _briefService.Insert(brief);
+
+            if (Addbrief.Archivo != null && (Addbrief.Archivo.ContentType == "application/pdf" ||
+                                            Addbrief.Archivo.ContentType == "application/msword" ||
+                                            Addbrief.Archivo.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+            {
+                // Guardar el archivo en una ruta específica o procesarlo según sea necesario
+                string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "\\uploads\\Brief\\" + brief.Id);
+
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                string filePath = Path.Combine(uploadsFolder, Addbrief.Archivo.FileName);
+                Addbrief.RutaArchivo = Addbrief.Archivo.FileName;
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    Addbrief.Archivo.CopyTo(stream);
+                }
+            }
             //Envio Correo
             var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
             // Diccionario con los valores dinámicos a reemplazar
@@ -362,7 +378,7 @@ namespace PresentationLayer.Controllers
            
 
             res.Datos = brief;
-            res.Mensaje = "Se ha recibido correctamente tu solicitud. En breve recibirás una notificación del estatus de tu solicitud.";
+            res.Mensaje = "Se ha recibido correctamente tu petición.\r\nEn breve recibirás una notificación del estatus de tu proceso.";
             res.Exito = true;
 
             return Ok(res);
@@ -377,7 +393,7 @@ namespace PresentationLayer.Controllers
                                              Addbrief.Archivo.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
             {
                 // Guardar el archivo en una ruta específica o procesarlo según sea necesario
-                string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "\\uploads\\Brief\\" + Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
+                string uploadsFolder = @_hostingEnvironment.WebRootPath + "\\uploads\\Brief\\" + briefOld.Id;
 
                 if (!Directory.Exists(uploadsFolder))
                 {
@@ -386,9 +402,16 @@ namespace PresentationLayer.Controllers
 
                 string filePath = Path.Combine(uploadsFolder, Addbrief.Archivo.FileName);
                 Addbrief.RutaArchivo = Addbrief.Archivo.FileName;
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                try
                 {
-                    Addbrief.Archivo.CopyTo(stream);
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        Addbrief.Archivo.CopyTo(stream);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    res.Mensaje = "Error al guardar el archivo: " + ex.Message;
                 }
             }
             else

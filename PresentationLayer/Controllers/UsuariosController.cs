@@ -61,8 +61,8 @@ namespace PresentationLayer.Controllers
                     Correo = q.Correo,
                     Contrasena = q.Contrasena,
                     Estatus = q.Estatus,
-                    RolId = q.RolId
-                    //UserRol = _rolService.TGetById(q.RolId)
+                    RolId = q.RolId,
+                    UserRol = _rolService.TGetById(q.RolId)
                 })
                 .ToList();
 

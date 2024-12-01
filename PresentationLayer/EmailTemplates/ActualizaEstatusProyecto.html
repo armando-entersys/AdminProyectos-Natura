@@ -38,14 +38,14 @@
             padding: 12px 25px;
             font-size: 16px;
             color: #ffffff;
-            background-color: #007bff;
+            background-color: #FFAA16;
             text-decoration: none;
             border-radius: 5px;
             transition: background-color 0.3s ease;
         }
-        .btn-confirm:hover {
-            background-color: #0056b3;
-        }
+            .btn-confirm:hover {
+                background-color: #FFAA16;
+            }
         .footer {
             margin-top: 20px;
             font-size: 12px;
@@ -55,10 +55,12 @@
 </head>
 <body>
     <div class="container">
-        <img src="/img/natura.svg" alt="Natura" class="logo">
+        <img src="http://solucionesmkt.com.mx/AdministradorProyectos/img/natura.svg" alt="Natura" class="logo">
 
-        <h1>Se edito un proyecto</h1>
-        <p>El Administrador actualizo a {estatus} el estatus del proyecto {nombreProyecto}</p>
+        <h1>Tu proyecto {nombreProyecto}</h1>
+        <p>se encuentra en estatus <strong> {estatus}</strong>.</p>
+        <p>El administrador revisará la información de tu  proyecto y determinará su siguiente estatus.</p>
+        <p>En caso de existir algÚn faltante o duda te notificaremos.</p>
         <a href="{link}" class="btn-confirm">ver proyecto</a>
         <div class="footer">
            
