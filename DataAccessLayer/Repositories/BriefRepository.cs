@@ -467,7 +467,7 @@ namespace DataAccessLayer.Repositories
         }
         public IEnumerable<Audiencia> GetAllAudiencias()
         {
-            return _context.Audiencia.ToList();
+            return _context.Audiencia.Where(q=> q.Activo == true).ToList();
         }
         public IEnumerable<Formato> GetAllFormatos()
         {

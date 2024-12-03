@@ -96,5 +96,33 @@ namespace BusinessLayer.Concrete
         {
             return _toolsDal.GetUnreadAlertsCount(usuarioId);
         }
+
+        #region Catalogo Audiencia
+        public void DeleteAudiencia(int id)
+        {
+            _toolsDal.DeleteAudiencia(id);
+        }
+
+        public List<Audiencia> GetAllAudiencia()
+        {
+            return _toolsDal.GetAllAudiencia();
+        }
+
+        public Audiencia GetByAudienciaId(int id)
+        {
+            return _toolsDal.GetByAudienciaId((int)id);
+        }
+
+        public void InsertAudiencia(Audiencia entity)
+        {
+            _toolsDal.InsertAudiencia(entity);
+        }
+
+        public void UpdateAudiencia(Audiencia entity)
+        {
+            _toolsDal.UpdateAudiencia(entity);
+        }
+        #endregion
+
     }
 }

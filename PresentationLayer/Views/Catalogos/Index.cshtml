@@ -1,0 +1,87 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Catálogos</h1>
+<div class="row">
+    <div class="col">
+        <div>
+            <label class="col-form-label">Catálogo:</label>
+            <select class="form-control" data-bind="options: CatCatalogo, value: Catalogo, optionsText: 'Descripcion',
+                                         optionsCaption: 'Seleccione',  event: { change: onCatalogoChange }"></select>
+        </div>
+    </div>
+    <div class="col">
+        <button type="button" class="btn btn-outline-primary" data-bind="click:Agregar">
+            <span>Agregar</span>
+        </button>
+    </div>
+    <div class="col"></div>
+</div>
+<div class="row">
+    <div class="col">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Id</th>
+                    <th scope="col">Descripción</th>
+                    <th scope="col">Detalles</th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: registros">
+                <tr>
+                    <td data-bind="text: id"></td>
+                    <td data-bind="text: descripcion"></td>
+                    <td class="small">
+                        <button type="button" class="btn btn-outline-primary" data-bind="click:$root.Editar">
+                            <i class="lni lni-pencil"></i>
+                            <span>Editar</span>
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" data-bind="click:$root.Eliminar">
+                            <i class="lni lni-pencil"></i>
+                            <span>Eliminar</span>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+    <div class="modal fade" id="divEdicion" tabindex="-1" aria-labelledby="Modal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="Modal">Editar</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="formulario">
+                        <div class="mb-3">
+                            <label for="recipient-name" class="col-form-label">Descripción:</label>
+                            <input type="text" class="form-control" id="nombre" maxlength="128" data-bind="value: Descripcion" />
+                        </div>
+                       
+                        <div class="mb-3" data-bind="validationElement: Estatus">
+                            <label class="col-form-label">Estatus:</label>
+                            <select class="form-control" data-bind="options: catEstatus, value: Estatus, optionsText: 'Estatus', optionsCaption: 'Seleccione'"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" data-bind="click:Guardar">
+                        <i class="lni lni-save"></i>
+                        <span>Guardar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+@section Scripts {
+
+    <script src="~/js/Catalogos/Catalogos.js?v=1.0.0"></script>
+}

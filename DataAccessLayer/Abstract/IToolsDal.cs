@@ -22,5 +22,13 @@ namespace DataAccessLayer.Abstract
         List<TipoAlerta> ObtenerTiposAlerta();
         void UpdateAlerta(int Id);
         int GetUnreadAlertsCount(int usuarioId);
+
+        #region Catalogo Audiencia
+        void DeleteAudiencia(int id);
+        List<Audiencia> GetAllAudiencia();
+        Audiencia GetByAudienciaId(int id);
+        void InsertAudiencia(Audiencia entity);
+        void UpdateAudiencia(Audiencia entity);
+        #endregion
     }
 }

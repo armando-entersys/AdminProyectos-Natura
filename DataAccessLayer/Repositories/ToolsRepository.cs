@@ -160,5 +160,36 @@ namespace DataAccessLayer.Repositories
             _context.SaveChanges();
             
         }
+
+        #region Catalogo Audiencia
+        public void DeleteAudiencia(int id)
+        {
+            var value = _context.Set<Audiencia>().Find(id);
+            _context.Set<Audiencia>().Remove(value);
+            _context.SaveChanges();
+        }
+
+        public List<Audiencia> GetAllAudiencia()
+        {
+            return _context.Set<Audiencia>().ToList();
+        }
+
+        public Audiencia GetByAudienciaId(int id)
+        {
+            return _context.Set<Audiencia>().Find(id);
+        }
+
+        public void InsertAudiencia(Audiencia entity)
+        {
+            _context.Set<Audiencia>().Add(entity);
+            _context.SaveChanges();
+        }
+
+        public void UpdateAudiencia(Audiencia entity)
+        {
+            _context.Set<Audiencia>().Update(entity);
+            _context.SaveChanges();
+        }
+        #endregion
     }
 }
