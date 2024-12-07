@@ -10,6 +10,7 @@ namespace EntityLayer.Concrete
     {
         public int Id { get; set; }
         public string Descripcion { get; set; }
+        public bool Activo { get; set; } = false;
         // Colección de Briefs asociados con el TipoBrief
         public ICollection<Brief> Briefs { get; set; }
     }

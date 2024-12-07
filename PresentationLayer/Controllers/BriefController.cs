@@ -23,9 +23,11 @@ namespace PresentationLayer.Controllers
         private readonly IToolsService _toolsService;
         private readonly IUsuarioService _usuarioService;
         private readonly IHubContext<NotificationHub> _hubContext;
+        private readonly IConfiguration _configuration;
+
         public BriefController(IEmailSender emailSender, IBriefService briefService, IAuthService authService, 
                                 IWebHostEnvironment hostingEnvironment, IToolsService toolsService, 
-                                IUsuarioService usuarioService, IHubContext<NotificationHub> hubContext)
+                                IUsuarioService usuarioService, IHubContext<NotificationHub> hubContext,IConfiguration configuration)
         {
             _emailSender = emailSender;
             _briefService = briefService;
@@ -34,6 +36,7 @@ namespace PresentationLayer.Controllers
             _toolsService = toolsService;
             _usuarioService = usuarioService;
             _hubContext = hubContext;
+            _configuration = configuration;
         }
         // GET: BriefController
         public ActionResult Index(string filtroNombre = null)
@@ -127,15 +130,18 @@ namespace PresentationLayer.Controllers
 
             if (brief == null || string.IsNullOrEmpty(brief.RutaArchivo))
             {
-                return NotFound("Archivo no encontrado.");
+                return NotFound("Ruta no encontrado.");
             }
 
             // Obtener la ruta del archivo en el servidor
-            var filePath = Path.Combine(_hostingEnvironment.WebRootPath + "\\uploads\\Brief\\" + brief.Id, brief.RutaArchivo);
+            // Leer la ruta desde appsettings.json
+            var uploadPath = _configuration["FileStorage:UploadPath"];
+            var filePath = Path.Combine(_hostingEnvironment.WebRootPath, uploadPath, brief.Id.ToString(), brief.RutaArchivo);
 
             if (!System.IO.File.Exists(filePath))
             {
-                return NotFound("Archivo no encontrado.");
+                // Registra detalles para verificar qué ruta está generando
+                return NotFound("Archivo no encontrado: " +  filePath);
             }
 
             // Obtener el tipo MIME del archivo

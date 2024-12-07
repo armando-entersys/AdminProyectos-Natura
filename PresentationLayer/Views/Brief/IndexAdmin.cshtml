@@ -84,6 +84,9 @@
     .btn-outline-primary {
         margin: 5px 0;
     }
+    a:hover {
+            color: #e9ecef !important;
+    }
 </style>
 
 <h1 class="py-3 text-center">Gestión de Proyectos</h1>
@@ -155,6 +158,11 @@
                             <div class="col-md-6">
                                 <label class="form-label">Link de Referencia</label>
                                 <a class="form-control" data-bind="attr: { href: linksReferencias }, text: linksReferencias" target="_blank">Abrir Link</a>
+                            </div>
+                            <div class="col-md-6" data-bind="visible: rutaArchivo">
+                                <label for="archivoCargado" class="form-label">Archivo Cargado</label>
+                                <a id="archivoCargado" class="form-control text-truncate"
+                                   data-bind="attr: { href: '/AdministradorProyectos/Brief/DownloadFile/' + id }, text: rutaArchivo" target="_blank">Descargar archivo</a>
                             </div>
                         </div>
                     </div>

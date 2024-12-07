@@ -9,8 +9,12 @@ function AppViewModel() {
     // Observables principales
     self.registros = ko.observableArray([]);
     self.registrosHistorico = ko.observableArray([]);
+
     self.catEstatusMateriales = ko.observableArray([]);
     self.EstatusMateriales = ko.observable();
+
+    self.catEstatusMaterialesFiltro = ko.observableArray([]);
+    self.EstatusMaterialesFiltro = ko.observable();
 
     self.revision = ko.observable(0);
     self.produccion = ko.observable(0);
@@ -20,6 +24,9 @@ function AppViewModel() {
     self.entregado = ko.observable(0);
     self.inicioCiclo = ko.observable(0);
     self.noCompartio = ko.observable(0);
+    self.linksReferencias = ko.observable("");
+    self.idBrief = ko.observable(0);
+    self.rutaArchivo = ko.observable("");
 
     // Observables para filtros
     self.filtroNombre = ko.observable("");
@@ -73,6 +80,7 @@ function AppViewModel() {
         var filtroNombre = self.filtroNombre().toLowerCase();
         var filtroArea = self.filtroArea().toLowerCase();
         var filtroResponsable = self.filtroResponsable().toLowerCase();
+        var filtroEstatus = self.EstatusMaterialesFiltro(); // Obtener el estatus seleccionado
 
         return ko.utils.arrayFilter(self.registros(), function (registro) {
             var nombreProyecto = (registro.brief?.nombre || "").toLowerCase();
@@ -85,6 +93,8 @@ function AppViewModel() {
             var cumpleFiltroProyecto = !filtroNombreProyecto || nombreProyecto.includes(filtroNombreProyecto);
             var cumpleFiltroArea = !filtroArea || area.includes(filtroArea);
             var cumpleFiltroResponsable = !filtroResponsable || responsable.includes(filtroResponsable);
+            // Verifica el estatus
+            var cumpleFiltroEstatus = !filtroEstatus || registro.estatusMaterialId === filtroEstatus.id;
 
             let cumpleFechas = true;
             if (self.filtroFechaInicio()) {
@@ -94,7 +104,7 @@ function AppViewModel() {
                 cumpleFechas = cumpleFechas && fechaEntrega <= new Date(self.filtroFechaFin());
             }
 
-            return cumpleFiltroNombre && cumpleFiltroProyecto && cumpleFiltroArea && cumpleFiltroResponsable && cumpleFechas;
+            return cumpleFiltroNombre && cumpleFiltroProyecto && cumpleFiltroArea && cumpleFiltroResponsable && cumpleFiltroEstatus && cumpleFechas;
         });
     });
 
@@ -132,6 +142,7 @@ function AppViewModel() {
             })
             .then(function (d) {
                 self.catEstatusMateriales(d.datos);
+                self.catEstatusMaterialesFiltro(d.datos);
                 return ClassicEditor.create(document.querySelector('#comentario-editor'));
             })
  
@@ -148,7 +159,15 @@ function AppViewModel() {
         self.id(material.id);
         self.fechaEntrega(new Date(material.fechaEntrega).toISOString().split('T')[0]);
         self.registrosUsuariosCorreo.removeAll();
-
+        self.idBrief(material.brief.id);
+        if (material.brief.linksReferencias == "undefined") {
+            self.linksReferencias("");
+        }
+        else {
+            self.linksReferencias(material.brief.linksReferencias);
+        }
+        
+        self.rutaArchivo(material.brief.rutaArchivo);
         var EstatusMateriales = self.catEstatusMateriales().find(function (r) {
             return r.id === material.estatusMaterialId;
         });

@@ -15,6 +15,7 @@ using PresentationLayer.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using PresentationLayer.Controllers;
 using PresentationLayer.Services;
+using Microsoft.Extensions.FileProviders;
 
 // Configuración inicial de Serilog
 Log.Logger = new LoggerConfiguration()

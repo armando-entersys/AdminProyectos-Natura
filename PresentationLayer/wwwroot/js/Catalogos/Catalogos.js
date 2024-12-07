@@ -3,12 +3,12 @@ var estatusInactivo = { IdEstatus: false, Estatus: "Inactivo" };
 
 var catEstatus = [estatusActivo, estatusInactivo];
 var CatCatalogo = [{ Id: 1, Descripcion: "Audiencia" },
-    { Id: 2, Descripcion: "TipoBreaf" },
+    { Id: 2, Descripcion: "TipoBrief" },
     { Id: 3, Descripcion: "TipoAlerta" },
     { Id: 4, Descripcion: "Prioridad" },
     { Id: 5, Descripcion: "PCN" },
     { Id: 6, Descripcion: "EstatusMaterial" },
-    { Id: 6, Descripcion: "EstatusBreaf" },
+    { Id: 6, Descripcion: "EstatusBrief" },
     { Id: 6, Descripcion: "Formato" },
 
                    ];
@@ -76,19 +76,20 @@ function AppViewModel() {
         self.Estatus(Estatus);
     }
     self.GuardarEditar = function () {
-        if (tipo = "Audiencia") {
-        }
-      
-        var Audiencia = {
-            Id : self.id(),
-            Descripcion: self.Descripcion(),
-            Activo: self.Estatus().IdEstatus,
+        var peticionCatalogos = {
+            Id: self.id(),
+            nombreCatalogo: self.Catalogo().Descripcion,
+            Objeto: {
+                Id: self.id(),
+                Descripcion: self.Descripcion(),
+                Activo: self.Estatus().IdEstatus,
+            }
         }
         $.ajax({
-            url: "Catalogos/CreateAudiencia", // URL del método GetAll en tu API
+            url: "Catalogos/Create", // URL del método GetAll en tu API
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify(Audiencia),
+            data: JSON.stringify(peticionCatalogos),
             success: function (d) {
                 self.onCatalogoChange();
                 $("#divEdicion").modal("hide");
@@ -108,16 +109,20 @@ function AppViewModel() {
     }
     self.GuardarNuevo = function () {
         
-        var audiencia = {
-            Id: self.id(),
-            Descripcion: self.Descripcion(),
-            Activo: self.Estatus().IdEstatus,
+        var peticionCatalogos = {
+            Id: 0,
+            nombreCatalogo: self.Catalogo().Descripcion,
+            Objeto: {
+                Id: 0,
+                Descripcion: self.Descripcion(),
+                Activo: self.Estatus().IdEstatus,
+            }
         }
         $.ajax({
-            url: "Catalogos/CreateAudiencia", // URL del método GetAll en tu API
+            url: "Catalogos/Create", // URL del método GetAll en tu API
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify(audiencia),
+            data: JSON.stringify(peticionCatalogos),
             success: function (d) {
                 self.onCatalogoChange();
                 $("#divEdicion").modal("hide");
@@ -146,7 +151,7 @@ function AppViewModel() {
     self.Eliminar = function (elemento) {
         var peticionCatalogos = {
             Id: elemento.id,
-            nombreCatalogo:"Audiencia"
+            nombreCatalogo: self.Catalogo().Descripcion
         }
         $.ajax({
             url: "Catalogos/Delete", // URL del método GetAll en tu API

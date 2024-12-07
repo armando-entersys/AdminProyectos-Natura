@@ -238,3 +238,6 @@ div[disabled] {
         background-color: #FFAA16;
         border-color: #FFAA16;
     }
+a.form-control:hover {
+    color: #FFAA16 !important;
+}

@@ -10,7 +10,7 @@ namespace EntityLayer.Concrete
     {
         public int Id { get; set; }
         public string Descripcion { get; set; }
-        public bool Activo { get; set; }
+        public bool Activo { get; set; } = false;
 
         // Relación de uno a muchos con Material
         public ICollection<Material> Materiales { get; set; } = new List<Material>();

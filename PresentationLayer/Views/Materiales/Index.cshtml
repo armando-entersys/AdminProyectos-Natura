@@ -5,7 +5,15 @@
 }
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+    a#archivoCargado:hover {
+        color: #FFAA16 !important;
+    }
 
+    a.form-control:hover {
+        color: #FFAA16 !important;
+    }
+</style>
 <h3>Gestión de Material</h3>
 
 <div class="row text-center">
@@ -89,9 +97,11 @@
                data-bind="value: filtroFechaFin, valueUpdate: 'input'" />
     </div>
 </div>
-
 <!-- Botón para Exportar a Excel -->
 <div class="row mb-3">
+    <div class="col-4">
+        <select id="filtroEstatusMateriales" class="form-control" data-bind="options: catEstatusMaterialesFiltro, value: EstatusMaterialesFiltro, optionsText: 'descripcion', optionsCaption: 'Seleccione Estatus'"></select>
+    </div>
     <div class="col text-end">
         <button type="button" class="btn btn-success my-2" data-bind="click: exportarExcel">
             <i class="lni lni-download"></i> Exportar a Excel
@@ -167,7 +177,18 @@
                             <p data-bind="html: usuario.nombre + ' ' + usuario.apellidoPaterno"> </p>
                             <hr class="border border-3 border-primary w-100 mx-auto my-4">
                         </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Link de Referencia</label>
+                            <a class="form-control" data-bind="attr: { href: linksReferencias }, text: linksReferencias" target="_blank">Abrir Link</a>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="archivoCargado" class="form-label">Archivo Cargado</label>
+                            <a id="archivoCargado" class="form-control text-truncate"
+                               data-bind="attr: { href: '/AdministradorProyectos/Brief/DownloadFile/' + idBrief() }, text: rutaArchivo" target="_blank">Descargar archivo</a>
+                        </div>
                     </div>
+                    
+                    
                     <div class="col">
                         <div id="formulario" class="p-3">
                             <h1>Cambio Estatus</h1>

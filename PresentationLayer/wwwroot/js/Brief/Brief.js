@@ -19,7 +19,7 @@
     self.TipoBrief = ValidationModule.validations.requiredField();
     self.cargaArchivo = ko.observable();
     self.registros = ko.observableArray();
-    self.linksReferencias = ValidationModule.validations.requiredField();
+    self.linksReferencias = ko.observableArray();
 
     self.filtroNombre = ko.observable(""); // Texto del filtro
 

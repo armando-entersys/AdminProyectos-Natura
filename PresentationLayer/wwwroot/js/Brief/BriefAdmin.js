@@ -323,7 +323,6 @@ function AppViewModel() {
         self.comentario("");
         self.rutaArchivo("");
         self.fechaEntrega("");
-        self.rutaArchivo("");
         self.cargaArchivo("");
     }
     self.GuardarProyecto = function () {

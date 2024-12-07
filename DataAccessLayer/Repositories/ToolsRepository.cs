@@ -2,6 +2,7 @@
 using DataAccessLayer.Concrete;
 using DataAccessLayer.Context;
 using DataAccessLayer.EntityFramework;
+using DataAccessLayer.Migrations;
 using EntityLayer.Concrete;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -191,5 +192,216 @@ namespace DataAccessLayer.Repositories
             _context.SaveChanges();
         }
         #endregion
+        #region Catalogo TipoBrief
+        public void DeleteTipoBrief(int id)
+        {
+            var value = _context.Set<TipoBrief>().Find(id);
+            _context.Set<TipoBrief>().Remove(value);
+            _context.SaveChanges();
+        }
+
+        public List<TipoBrief> GetAllTipoBrief()
+        {
+            return _context.Set<TipoBrief>().ToList();
+        }
+
+        public TipoBrief GetByTipoBriefId(int id)
+        {
+            return _context.Set<TipoBrief>().Find(id);
+        }
+
+        public void InsertTipoBrief(TipoBrief entity)
+        {
+            _context.Set<TipoBrief>().Add(entity);
+            _context.SaveChanges();
+        }
+
+        public void UpdateTipoBrief(TipoBrief entity)
+        {
+            _context.Set<TipoBrief>().Update(entity);
+            _context.SaveChanges();
+        }
+        #endregion
+        #region Catalogo TipoAlerta
+        public void DeleteTipoAlerta(int id)
+        {
+            var value = _context.Set<TipoAlerta>().Find(id);
+            _context.Set<TipoAlerta>().Remove(value);
+            _context.SaveChanges();
+        }
+
+        public List<TipoAlerta> GetAllTipoAlerta()
+        {
+            return _context.Set<TipoAlerta>().ToList();
+        }
+
+        public TipoAlerta GetByTipoAlertaId(int id)
+        {
+            return _context.Set<TipoAlerta>().Find(id);
+        }
+
+        public void InsertTipoAlerta(TipoAlerta entity)
+        {
+            _context.Set<TipoAlerta>().Add(entity);
+            _context.SaveChanges();
+        }
+
+        public void UpdateTipoAlerta(TipoAlerta entity)
+        {
+            _context.Set<TipoAlerta>().Update(entity);
+            _context.SaveChanges();
+        }
+        #endregion
+        #region Catalogo Prioridad
+        public void DeletePrioridad(int id)
+        {
+            var value = _context.Set<Prioridad>().Find(id);
+            _context.Set<Prioridad>().Remove(value);
+            _context.SaveChanges();
+        }
+
+        public List<Prioridad> GetAllPrioridad()
+        {
+            return _context.Set<Prioridad>().ToList();
+        }
+
+        public Prioridad GetByPrioridadId(int id)
+        {
+            return _context.Set<Prioridad>().Find(id);
+        }
+
+        public void InsertPrioridad(Prioridad entity)
+        {
+            _context.Set<Prioridad>().Add(entity);
+            _context.SaveChanges();
+        }
+
+        public void UpdatePrioridad(Prioridad entity)
+        {
+            _context.Set<Prioridad>().Update(entity);
+            _context.SaveChanges();
+        }
+        #endregion
+        #region Catalogo PCN
+        public void DeletePCN(int id)
+        {
+            var value = _context.Set<PCN>().Find(id);
+            _context.Set<PCN>().Remove(value);
+            _context.SaveChanges();
+        }
+
+        public List<PCN> GetAllPCN()
+        {
+            return _context.Set<PCN>().ToList();
+        }
+
+        public PCN GetByPCNId(int id)
+        {
+            return _context.Set<PCN>().Find(id);
+        }
+
+        public void InsertPCN(PCN entity)
+        {
+            _context.Set<PCN>().Add(entity);
+            _context.SaveChanges();
+        }
+
+        public void UpdatePCN(PCN entity)
+        {
+            _context.Set<PCN>().Update(entity);
+            _context.SaveChanges();
+        }
+        #endregion
+        #region Catalogo EstatusMaterial
+        public void DeleteEstatusMaterial(int id)
+        {
+            var value = _context.Set<EstatusMaterial>().Find(id);
+            _context.Set<EstatusMaterial>().Remove(value);
+            _context.SaveChanges();
+        }
+
+        public List<EstatusMaterial> GetAllEstatusMaterial()
+        {
+            return _context.Set<EstatusMaterial>().ToList();
+        }
+
+        public EstatusMaterial GetByEstatusMaterialId(int id)
+        {
+            return _context.Set<EstatusMaterial>().Find(id);
+        }
+
+        public void InsertEstatusMaterial(EstatusMaterial entity)
+        {
+            _context.Set<EstatusMaterial>().Add(entity);
+            _context.SaveChanges();
+        }
+
+        public void UpdateEstatusMaterial(EstatusMaterial entity)
+        {
+            _context.Set<EstatusMaterial>().Update(entity);
+            _context.SaveChanges();
+        }
+        #endregion
+        #region Catalogo EstatusBrief
+        public void DeleteEstatusBrief(int id)
+        {
+            var value = _context.Set<EstatusBrief>().Find(id);
+            _context.Set<EstatusBrief>().Remove(value);
+            _context.SaveChanges();
+        }
+
+        public List<EstatusBrief> GetAllEstatusBrief()
+        {
+            return _context.Set<EstatusBrief>().ToList();
+        }
+
+        public EstatusBrief GetByEstatusBriefId(int id)
+        {
+            return _context.Set<EstatusBrief>().Find(id);
+        }
+
+        public void InsertEstatusBrief(EstatusBrief entity)
+        {
+            _context.Set<EstatusBrief>().Add(entity);
+            _context.SaveChanges();
+        }
+
+        public void UpdateEstatusBrief(EstatusBrief entity)
+        {
+            _context.Set<EstatusBrief>().Update(entity);
+            _context.SaveChanges();
+        }
+        #endregion
+        #region Catalogo Formato
+        public void DeleteFormato(int id)
+        {
+            var value = _context.Set<Formato>().Find(id);
+            _context.Set<Formato>().Remove(value);
+            _context.SaveChanges();
+        }
+
+        public List<Formato> GetAllFormato()
+        {
+            return _context.Set<Formato>().ToList();
+        }
+
+        public Formato GetByFormatoId(int id)
+        {
+            return _context.Set<Formato>().Find(id);
+        }
+
+        public void InsertFormato(Formato entity)
+        {
+            _context.Set<Formato>().Add(entity);
+            _context.SaveChanges();
+        }
+
+        public void UpdateFormato(Formato entity)
+        {
+            _context.Set<Formato>().Update(entity);
+            _context.SaveChanges();
+        }
+        #endregion
+
     }
 }

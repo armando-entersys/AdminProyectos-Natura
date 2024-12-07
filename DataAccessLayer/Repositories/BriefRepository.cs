@@ -40,16 +40,16 @@ namespace DataAccessLayer.Repositories
            Usuario usuario = _context.Usuarios.Where(q => q.Id == id).FirstOrDefault();
             if(usuario == null)
             {
-                Briefs = _context.Briefs.Where(q => q.UsuarioId == id).ToList();
+                Briefs = _context.Briefs.Where(q => q.UsuarioId == id).OrderByDescending(u=> u.FechaEntrega).ToList();
 
             }
             else
             {
-                Briefs = _context.Briefs.ToList();
+                Briefs = _context.Briefs.OrderByDescending(u => u.FechaEntrega).ToList();
             }
             if (Briefs != null)
             {
-                List<EstatusBrief> EstatusBrief = _context.EstatusBriefs.ToList();
+                List<EstatusBrief> EstatusBrief = _context.EstatusBriefs.Where(q => q.Activo == true).ToList();
                 Columns = new List<Column<Brief>>();
                 foreach (var item in EstatusBrief)
                 {
@@ -65,7 +65,9 @@ namespace DataAccessLayer.Repositories
                                     UsuarioId = i.UsuarioId,
                                     NombreUsuario = _context.Usuarios.Where(p=> p.Id == i.UsuarioId).Select(u=>u.Nombre).FirstOrDefault(),
                                     FechaEntrega = i.FechaEntrega.ToShortDateString()
-                                }).ToList()
+                                })
+                                .OrderByDescending(u => u.FechaEntrega)
+                                .ToList()
                     });
                 }
             }
@@ -90,7 +92,7 @@ namespace DataAccessLayer.Repositories
 
                 if (usuarioAdmin != null)
                 {
-                    briefs = _context.Briefs.ToList();
+                    briefs = _context.Briefs.OrderByDescending(u => u.FechaRegistro).ToList();
                 }
             }
 
@@ -121,11 +123,11 @@ namespace DataAccessLayer.Repositories
         }
         public IEnumerable<EstatusBrief> GetAllEstatusBrief()
         {
-            return _context.EstatusBriefs.ToList();
+            return _context.EstatusBriefs.Where(q => q.Activo == true).ToList();
         }
         public IEnumerable<TipoBrief> GetAllTipoBrief()
         {
-            return _context.TiposBrief.ToList();
+            return _context.TiposBrief.Where(q => q.Activo == true).ToList();
         }
         public void InsertProyecto(Proyecto entity)
         {
@@ -439,7 +441,7 @@ namespace DataAccessLayer.Repositories
                                  Brief = _context.Briefs.Where(q => q.Id == p.BriefId).FirstOrDefault(),
                                  EstatusMaterialId = p.EstatusMaterialId,
                                  EstatusMaterial = _context.EstatusMateriales.Where(u => u.Id == p.EstatusMaterialId).FirstOrDefault()
-                             }).ToList();
+                             }).OrderByDescending(u => u.FechaEntrega).ToList();
 
             if (usuarioAdmin != null)
             {
@@ -461,7 +463,7 @@ namespace DataAccessLayer.Repositories
                     Brief = _context.Briefs.Where(q => q.Id == p.BriefId).FirstOrDefault(),
                     EstatusMaterialId = p.EstatusMaterialId,
                     EstatusMaterial = _context.EstatusMateriales.Where(u => u.Id == p.EstatusMaterialId).FirstOrDefault()
-                }).ToList();
+                }).OrderByDescending(u => u.FechaEntrega).ToList();
             }
             return materiales;
         }
@@ -471,18 +473,18 @@ namespace DataAccessLayer.Repositories
         }
         public IEnumerable<Formato> GetAllFormatos()
         {
-            return _context.Formato.ToList();
+            return _context.Formato.Where(q => q.Activo == true).ToList();
         }
         public IEnumerable<PCN> GetAllPCN()
         {
-            return _context.PCN.ToList();
+            return _context.PCN.Where(q => q.Activo == true).ToList();
         }
         public IEnumerable<Prioridad> GetAllPrioridades()
         {
             var prioridades =new List<Prioridad>();
             try
             {
-                prioridades = _context.Prioridad.ToList();
+                prioridades = _context.Prioridad.Where(q => q.Activo == true).ToList();
             }
             catch (Exception ex)
             {
@@ -515,7 +517,7 @@ namespace DataAccessLayer.Repositories
         }
         public IEnumerable<EstatusMaterial> GetAllEstatusMateriales()
         {
-            return _context.EstatusMateriales.ToList();
+            return _context.EstatusMateriales.Where(q => q.Activo == true).ToList();
         }
         public void ActualizaHistorialMaterial(HistorialMaterial historialMaterial)
         {
@@ -568,6 +570,7 @@ namespace DataAccessLayer.Repositories
                                                    Usuario = _context.Usuarios.Where(w => w.Id == p.UsuarioId).FirstOrDefault(),
                                                    MaterialId = p.MaterialId
                                                })
+                                               .OrderByDescending( u => u.Id)
                                                .ToList();
         }
     }
