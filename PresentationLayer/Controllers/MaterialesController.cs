@@ -59,14 +59,16 @@ namespace PresentationLayer.Controllers
                 res.Datos = materiales;
                 res.Exito = true;
             }
-            catch (Exception)
+            catch (Exception ex) // Capturamos el error exacto
             {
-                res.Mensaje = "Petición fallida";
+                res.Mensaje = $"Petición fallida: {ex.Message}";
                 res.Exito = false;
+
+                // Registrar detalles del error para la depuración
+                Console.WriteLine($"Error en ObtenerMateriales: {ex}");
             }
 
             return Ok(res);
-
         }
         [HttpPost]
         public ActionResult ObtenerMaterialesPorNombre([FromBody] Material material)

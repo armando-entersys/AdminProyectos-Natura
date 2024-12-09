@@ -5,347 +5,378 @@ using EntityLayer.Concrete;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories
 {
     public class BriefRepository<T> : IBriefDal where T : class
     {
-
         private readonly DataAccesContext _context;
 
         public BriefRepository(DataAccesContext context)
         {
             _context = context;
         }
+
+        /// <summary>
+        /// Elimina un Brief por su ID.
+        /// </summary>
+        /// <param name="id">ID del Brief a eliminar.</param>
         public void Delete(int id)
         {
-            throw new NotImplementedException();
+            var brief = _context.Briefs.Find(id);
+            if (brief != null)
+            {
+                _context.Briefs.Remove(brief);
+                _context.SaveChanges();
+            }
         }
+
+        /// <summary>
+        /// Obtiene todos los Briefs cuya fecha de entrega es dentro de los últimos 15 días.
+        /// </summary>
+        /// <returns>Lista de Briefs.</returns>
         public List<Brief> GetAll()
         {
-            return _context.Set<Brief>().Where(q => q.FechaEntrega >= DateTime.Now.AddDays(-15)).ToList();
+            return _context.Briefs
+                .Where(q => q.FechaEntrega >= DateTime.Now.AddDays(-15))
+                .ToList();
         }
-        public List<Brief> GetAllByUserId(int id)
-        {
-           return _context.Briefs.Where(q=> q.UsuarioId == id).ToList();
-        }
+
+        /// <summary>
+        /// Obtiene las columnas de Briefs agrupadas por estatus para un usuario específico o para todos si es administrador.
+        /// </summary>
+        /// <param name="id">ID del usuario.</param>
+        /// <returns>Lista de Columnas de Briefs.</returns>
         public List<Column<Brief>> GetColumnsByUserId(int id)
         {
-            List<Column<Brief>> Columns = null;
-            List<Brief> Briefs = null;
-           Usuario usuario = _context.Usuarios.Where(q => q.Id == id).FirstOrDefault();
-            if(usuario == null)
-            {
-                Briefs = _context.Briefs.Where(q => q.UsuarioId == id).OrderByDescending(u=> u.FechaEntrega).ToList();
+            var isAdmin = _context.Usuarios
+                .Any(u => u.Id == id && (u.RolId == 1 || u.RolId == 3));
 
-            }
-            else
+            var briefsQuery = _context.Briefs.Where(b => b.UsuarioId == id).AsQueryable(); 
+
+            if (isAdmin)
             {
-                Briefs = _context.Briefs.OrderByDescending(u => u.FechaEntrega).ToList();
+                briefsQuery = _context.Briefs.AsQueryable();
             }
-            if (Briefs != null)
+
+            var briefs = briefsQuery
+                .OrderByDescending(b => b.FechaEntrega)
+                .Include(b => b.Usuario)
+                .ToList();
+
+            var estatusBriefs = _context.EstatusBriefs
+                .Where(e => e.Activo)
+                .ToList();
+
+            return estatusBriefs.Select(e => new Column<Brief>
             {
-                List<EstatusBrief> EstatusBrief = _context.EstatusBriefs.Where(q => q.Activo == true).ToList();
-                Columns = new List<Column<Brief>>();
-                foreach (var item in EstatusBrief)
-                {
-                    Columns.Add(new Column<Brief>
+                Id = e.Id,
+                Name = e.Descripcion,
+                Tasks = briefs
+                    .Where(b => b.EstatusBriefId == e.Id)
+                    .Select(b => new Tasks<Brief>
                     {
-                        Id = item.Id,
-                        Name = item.Descripcion,
-                        Tasks = Briefs.Where(q => q.EstatusBriefId == item.Id)
-                                .Select(i => new Tasks<Brief>
-                                {
-                                    Id = i.Id,
-                                    Title = i.Nombre,
-                                    UsuarioId = i.UsuarioId,
-                                    NombreUsuario = _context.Usuarios.Where(p=> p.Id == i.UsuarioId).Select(u=>u.Nombre).FirstOrDefault(),
-                                    FechaEntrega = i.FechaEntrega.ToShortDateString()
-                                })
-                                .OrderByDescending(u => u.FechaEntrega)
-                                .ToList()
-                    });
-                }
-            }
-            return Columns;
-
-
-        }
-        public Brief GetById(int id)
-        {
-            Brief brief = _context.Set<Brief>().Find(id);
-            if(brief == null) {
-                brief.Usuario = _context.Usuarios.Where(q=> q.Id == brief.UsuarioId).FirstOrDefault();
-            }
-            return brief;
-        }
-        public IEnumerable<Brief> GetAllbyUserId(int usuarioId,bool onlybrief)
-        {
-            IEnumerable<Brief> briefs = _context.Briefs.Where(q => q.UsuarioId == usuarioId).ToList();
-            if (onlybrief)
-            {
-                var usuarioAdmin = _context.Usuarios.Where(u => u.Id == usuarioId && (u.RolId == 1 || u.RolId == 3)).FirstOrDefault();
-
-                if (usuarioAdmin != null)
-                {
-                    briefs = _context.Briefs.OrderByDescending(u => u.FechaRegistro).ToList();
-                }
-            }
-
-            return briefs;
-        }
-        public void Insert(Brief entity)
-        {
-            _context.Set<Brief>().Add(entity);
-            _context.SaveChanges();
-        }
-        public void Update(Brief entity)
-        {
-            try
-            {
-                var existingEntity = _context.Set<Brief>().Find(entity.Id);  // Carga la entidad original
-                if (existingEntity != null)
-                {
-                    _context.Entry(existingEntity).CurrentValues.SetValues(entity);  // Solo copia los valores modificados
-                    _context.SaveChanges();
-                }
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-          
-        }
-        public IEnumerable<EstatusBrief> GetAllEstatusBrief()
-        {
-            return _context.EstatusBriefs.Where(q => q.Activo == true).ToList();
-        }
-        public IEnumerable<TipoBrief> GetAllTipoBrief()
-        {
-            return _context.TiposBrief.Where(q => q.Activo == true).ToList();
-        }
-        public void InsertProyecto(Proyecto entity)
-        {
-            var proyecto = _context.Proyectos.Where(q => q.BriefId == entity.BriefId).FirstOrDefault();
-            
-            if(proyecto != null)
-            {
-                proyecto.RequierePlan = entity.RequierePlan;
-                proyecto.FechaPublicacion = entity.FechaPublicacion;
-                proyecto.FechaModificacion = DateTime.Now;
-                proyecto.Comentario = entity.Comentario;
-                proyecto.Estado = entity.Estado;
-                _context.Update(proyecto);
-            }
-            else
-            {
-                _context.Set<Proyecto>().Add(entity);
-                
-            }
-            _context.SaveChanges();
-        }
-        public void InsertMaterial(Material entity)
-        {
-            try
-            {
-                _context.Set<Material>().Add(entity);
-                _context.SaveChanges();
-            }
-            catch(Exception ex)
-            {
-
-            }
-            
-        }
-        public Proyecto GetProyectoByBriefId(int id)
-        {
-            return _context.Proyectos.Where(q => q.BriefId == id).FirstOrDefault();
-        }
-        public List<Material> GetMaterialesByBriefId(int id)
-        {
-            return _context.Materiales.Where(q => q.BriefId == id).Select(p => new Material
-            {
-                Id = p.Id,
-                Nombre = p.Nombre,
-                Mensaje = p.Mensaje,
-                Prioridad = _context.Prioridad.Where(u => u.Id == p.PrioridadId).FirstOrDefault(),
-                Ciclo = p.Ciclo,
-                PCN = _context.PCN.Where(u => u.Id == p.Id).FirstOrDefault(),
-                Audiencia = _context.Audiencia.Where(u => u.Id == p.Id).FirstOrDefault(),
-                Formato = _context.Formato.Where(u => u.Id == p.Id).FirstOrDefault(),
-                FechaEntrega = p.FechaEntrega,
-                Responsable = p.Responsable,
-                FechaRegistro = p.FechaRegistro,
-                FechaModificacion = p.FechaModificacion,
-                Brief = _context.Briefs.Where(q => q.Id == p.BriefId).FirstOrDefault(),
-                EstatusMaterial = _context.EstatusMateriales.Where(u => u.Id == p.EstatusMaterialId).FirstOrDefault()
+                        Id = b.Id,
+                        Title = b.Nombre,
+                        UsuarioId = b.UsuarioId,
+                        NombreUsuario = b.Usuario.Nombre,
+                        FechaEntrega = b.FechaEntrega.ToShortDateString()
+                    })
+                    .ToList()
             }).ToList();
         }
-        public void EliminarMaterial(int id)
-        {
-           var material = _context.Materiales.Where(q => q.Id == id).FirstOrDefault();
-            if (material != null) {
 
-                _context.Remove(material);
+        /// <summary>
+        /// Obtiene todos los Briefs asociados a un usuario. Si el usuario es administrador, devuelve todos los Briefs.
+        /// </summary>
+        /// <param name="usuarioId">ID del usuario.</param>
+        /// <param name="onlybrief">Si es true, solo devuelve Briefs del usuario.</param>
+        /// <returns>Enumerable de Briefs.</returns>
+        public IEnumerable<Brief> GetAllbyUserId(int usuarioId, bool onlybrief)
+        {
+            var isAdmin = _context.Usuarios
+                .Any(u => u.Id == usuarioId && (u.RolId == 1 || u.RolId == 3));
+
+            var query = _context.Briefs.Where(b => b.UsuarioId == usuarioId).AsQueryable(); ;
+
+            if (onlybrief && isAdmin)
+            {
+                query = _context.Briefs.AsQueryable();
+            }
+
+            return query.OrderByDescending(b => b.FechaRegistro).ToList();
+        }
+
+        /// <summary>
+        /// Obtiene un Brief por su ID, incluyendo información del usuario relacionado.
+        /// </summary>
+        /// <param name="id">ID del Brief.</param>
+        /// <returns>El Brief con su información, o null si no existe.</returns>
+        public Brief GetById(int id)
+        {
+            return _context.Briefs
+                .Include(b => b.Usuario)
+                .FirstOrDefault(b => b.Id == id);
+        }
+
+        /// <summary>
+        /// Inserta un nuevo Brief en la base de datos.
+        /// </summary>
+        /// <param name="entity">El objeto Brief a insertar.</param>
+        public void Insert(Brief entity)
+        {
+            _context.Briefs.Add(entity);
+            _context.SaveChanges();
+        }
+
+        /// <summary>
+        /// Actualiza un Brief existente con nuevos valores.
+        /// </summary>
+        /// <param name="entity">El objeto Brief con valores actualizados.</param>
+        public void Update(Brief entity)
+        {
+            var existingEntity = _context.Briefs.Find(entity.Id);
+            if (existingEntity != null)
+            {
+                _context.Entry(existingEntity).CurrentValues.SetValues(entity);
                 _context.SaveChanges();
             }
-                
         }
-        public void EliminarParticipante(int id)
+
+        /// <summary>
+        /// Obtiene todos los EstatusBrief activos.
+        /// </summary>
+        /// <returns>Enumerable de EstatusBrief activos.</returns>
+        public IEnumerable<EstatusBrief> GetAllEstatusBrief()
         {
-            var participante = _context.Participantes.Where(q => q.Id == id).FirstOrDefault();
-            if (participante != null)
-            {
-
-                _context.Remove(participante);
-                _context.SaveChanges();
-            }
-
+            return _context.EstatusBriefs
+                .Where(e => e.Activo)
+                .ToList();
         }
-        public ConteoProyectos ObtenerConteoProyectos(int UsuarioId)
+
+        /// <summary>
+        /// Obtiene todos los TipoBrief activos.
+        /// </summary>
+        /// <returns>Enumerable de TipoBrief activos.</returns>
+        public IEnumerable<TipoBrief> GetAllTipoBrief()
         {
-            var conteoProyectos = new ConteoProyectos();
-            var isAdmin = _context.Usuarios.Where(q => q.Id == UsuarioId && (q.RolId == 1 || q.RolId == 3) ).FirstOrDefault();
-            List<Brief> briefs = new List<Brief>();
-            briefs.AddRange(_context.Briefs.Where(q => q.UsuarioId == UsuarioId).ToList());
-            if (isAdmin !=  null )
-            {
-                briefs = _context.Briefs.ToList();
-            }
-            
-            var today = DateTime.Today;
-            var startOfWeek = today.AddDays(-(int)today.DayOfWeek);
-            var startOfNextWeek = startOfWeek.AddDays(7);
-            var endOfNextWeek = startOfNextWeek.AddDays(7).AddDays(-1);
-
-            // Alertas de hoy
-            conteoProyectos.Hoy = briefs
-                .Where(q => q.EstatusBriefId == 1
-                            && q.FechaPublicacion.Date == today)
-                .Count();
-
-            // Alertas de esta semana
-            conteoProyectos.EstaSemana = briefs
-                .Where(q => q.EstatusBriefId == 1
-                            && q.FechaPublicacion.Date >= startOfWeek
-                            && q.FechaPublicacion.Date <= today)
-                .Count();
-
-            // Alertas de la próxima semana
-            conteoProyectos.ProximaSemana = briefs
-                .Where(q =>  q.EstatusBriefId == 1
-                            && q.FechaPublicacion.Date >= startOfNextWeek
-                            && q.FechaPublicacion.Date <= endOfNextWeek)
-                .Count();
-
-            // Total de proyectos con IdTipoAlerta = 1
-            conteoProyectos.TotalProyectos = briefs
-                .Count();
-            var IdsBrief = briefs.Select(q => q.Id).ToList();
-            var materiales = _context.Materiales.Where(q => IdsBrief.Contains(q.BriefId) && (q.EstatusMaterialId == 4 || q.EstatusMaterialId == 5))
-                             .Select(p => new Material
-                             {
-                                 Id = p.Id,
-                                 Nombre = p.Nombre,
-                                 Mensaje = p.Mensaje,
-                                 Prioridad = _context.Prioridad.Where(u => u.Id == p.PrioridadId).FirstOrDefault(),
-                                 Ciclo = p.Ciclo,
-                                 PCN = _context.PCN.Where(u => u.Id == p.Id).FirstOrDefault(),
-                                 Audiencia = _context.Audiencia.Where(u => u.Id == p.AudienciaId).FirstOrDefault(),
-                                 Formato = _context.Formato.Where(u => u.Id == p.FormatoId).FirstOrDefault(),
-                                 FechaEntrega = p.FechaEntrega,
-                                 Responsable = p.Responsable,
-                                 FechaRegistro = p.FechaRegistro,
-                                 FechaModificacion = p.FechaModificacion,
-                                 Brief = _context.Briefs.Where(q => q.Id == p.BriefId).FirstOrDefault(),
-                                 EstatusMaterial = _context.EstatusMateriales.Where(u => u.Id == p.EstatusMaterialId).FirstOrDefault()
-                             }).ToList();
-
-            // Conteo de proyectos con materiales cuya FechaEntrega es menor o igual a la fecha actual
-            conteoProyectos.ProyectoTiempo = materiales
-                .Where(m => m.FechaEntrega >= DateTime.Now && (m.Brief.EstatusBriefId == 4 || m.Brief.EstatusBriefId == 5))
-                .Select(m => m.Brief)
-                .Distinct()
-                .Count(); // Contamos proyectos únicos.
-
-            var ProyectoTiempo = materiales
-              .Where(m => m.FechaEntrega >= DateTime.Now && (m.Brief.EstatusBriefId == 4 || m.Brief.EstatusBriefId == 5))
-              .Select(m => m.Brief)
-              .Distinct().ToList();
-
-            // Conteo de proyectos con materiales cuya FechaEntrega es mayor o igual a hoy
-            conteoProyectos.ProyectoExtra = materiales
-                .Where(m => m.FechaEntrega <= DateTime.Now && (m.Brief.EstatusBriefId == 4 || m.Brief.EstatusBriefId == 5))
-                .Select(m => m.Brief)
-                .Distinct()
-                .Count(); // Contamos proyectos únicos.
-            var ProyectoExtra = materiales
-                .Where(m => m.FechaEntrega <= DateTime.Now && (m.Brief.EstatusBriefId == 4 || m.Brief.EstatusBriefId == 5))
-                .Select(m => m.Brief)
-                .Distinct().ToList();
-
-            return conteoProyectos;
+            return _context.TiposBrief
+                .Where(t => t.Activo)
+                .ToList();
         }
-        public ConteoProyectos ObtenerConteoMateriales(int UsuarioId)
+
+        /// <summary>
+        /// Inserta un Proyecto. Si ya existe un Proyecto con el mismo BriefId, lo actualiza.
+        /// </summary>
+        /// <param name="entity">El objeto Proyecto a insertar o actualizar.</param>
+        public void InsertProyecto(Proyecto entity)
         {
-            var conteoProyectos = new ConteoProyectos();
-            var isAdmin = _context.Usuarios.Where(q => q.Id == UsuarioId && (q.RolId == 1 || q.RolId == 3)).FirstOrDefault();
-            var idsbrief = _context.Briefs.Where(q => q.UsuarioId == UsuarioId).Select(p => p.Id).ToList();
-            var materiales = _context.Materiales.Where(q => idsbrief.Contains(q.BriefId)).ToList();
+            var proyecto = _context.Proyectos
+                .FirstOrDefault(p => p.BriefId == entity.BriefId);
 
-            if (isAdmin !=  null)
+            if (proyecto != null)
             {
-                materiales = _context.Materiales.ToList();
-            }
-
-            var today = DateTime.Today;
-            var startOfWeek = today.AddDays(-(int)today.DayOfWeek);
-            var startOfNextWeek = startOfWeek.AddDays(7);
-            var endOfNextWeek = startOfNextWeek.AddDays(7).AddDays(-1);
-
-            // Alertas de hoy
-            conteoProyectos.Hoy = materiales
-                .Where(q => q.EstatusMaterialId == 1
-                            && q.FechaRegistro.Date == today)
-                .Count();
-
-            // Alertas de esta semana
-            conteoProyectos.EstaSemana = materiales
-                .Where(q => q.EstatusMaterialId == 1
-                            && q.FechaRegistro.Date >= startOfWeek
-                            && q.FechaRegistro.Date <= today)
-                .Count();
-
-            // Alertas de la próxima semana
-            conteoProyectos.ProximaSemana = materiales
-                .Where(q => q.EstatusMaterialId == 1
-                            && q.FechaRegistro.Date >= startOfNextWeek
-                            && q.FechaRegistro.Date <= endOfNextWeek)
-                .Count();
-
-            // Total de proyectos con IdTipoAlerta = 1
-            conteoProyectos.TotalProyectos = materiales
-                .Count();
-
-            return conteoProyectos;
-        }
-        public int ObtenerConteoProyectoFecha(int UsuarioId)
-        {
-            var isAdmin = _context.Usuarios.Where(q => q.Id == UsuarioId && (q.RolId == 1 || q.RolId == 3)).FirstOrDefault();
-            if(isAdmin != null)
-            {
-                return _context.Briefs.Where(q => q.FechaEntrega >= q.FechaPublicacion).Count();
+                _context.Entry(proyecto).CurrentValues.SetValues(entity);
             }
             else
             {
-                return 0;
+                _context.Proyectos.Add(entity);
+            }
+
+            _context.SaveChanges();
+        }
+
+        /// <summary>
+        /// Inserta un nuevo Material en la base de datos.
+        /// </summary>
+        /// <param name="entity">El objeto Material a insertar.</param>
+        public void InsertMaterial(Material entity)
+        {
+            _context.Materiales.Add(entity);
+            _context.SaveChanges();
+        }
+
+        /// <summary>
+        /// Obtiene un Proyecto asociado al Brief especificado por su ID.
+        /// </summary>
+        /// <param name="id">ID del Brief.</param>
+        /// <returns>El objeto Proyecto asociado, o null si no existe.</returns>
+        public Proyecto GetProyectoByBriefId(int id)
+        {
+            return _context.Proyectos
+                .FirstOrDefault(p => p.BriefId == id);
+        }
+
+        /// <summary>
+        /// Obtiene todos los Materiales asociados a un Brief por su ID.
+        /// </summary>
+        /// <param name="id">ID del Brief.</param>
+        /// <returns>Lista de Materiales asociados.</returns>
+        public List<Material> GetMaterialesByBriefId(int id)
+        {
+            return _context.Materiales
+                .Where(m => m.BriefId == id)
+                .Include(m => m.Prioridad)
+                .Include(m => m.PCN)
+                .Include(m => m.Audiencia)
+                .Include(m => m.Formato)
+                .Include(m => m.Brief)
+                .Include(m => m.EstatusMaterial)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Elimina un Material por su ID.
+        /// </summary>
+        /// <param name="id">ID del Material a eliminar.</param>
+        public void EliminarMaterial(int id)
+        {
+            var material = _context.Materiales.Find(id);
+            if (material != null)
+            {
+                _context.Materiales.Remove(material);
+                _context.SaveChanges();
             }
         }
+
+        /// <summary>
+        /// Elimina un Participante por su ID.
+        /// </summary>
+        /// <param name="id">ID del Participante a eliminar.</param>
+        public void EliminarParticipante(int id)
+        {
+            var participante = _context.Participantes.Find(id);
+            if (participante != null)
+            {
+                _context.Participantes.Remove(participante);
+                _context.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// Obtiene el conteo de proyectos agrupados por fechas específicas y estatus.
+        /// </summary>
+        /// <param name="UsuarioId">ID del usuario.</param>
+        /// <returns>Objeto ConteoProyectos con los resultados.</returns>
+        public ConteoProyectos ObtenerConteoProyectos(int UsuarioId)
+        {
+            var isAdmin = _context.Usuarios
+                .Any(u => u.Id == UsuarioId && (u.RolId == 1 || u.RolId == 3));
+
+            var briefsQuery = isAdmin
+                ? _context.Briefs.AsQueryable()
+                : _context.Briefs.Where(b => b.UsuarioId == UsuarioId);
+
+            var today = DateTime.Today;
+            var startOfWeek = today.AddDays(-(int)today.DayOfWeek);
+            var startOfNextWeek = startOfWeek.AddDays(7);
+            var endOfNextWeek = startOfNextWeek.AddDays(6);
+
+            // Proyección inicial para evitar múltiples consultas
+            var briefs = briefsQuery
+                .Select(b => new
+                {
+                    b.Id,
+                    b.EstatusBriefId,
+                    b.FechaPublicacion,
+                    b.UsuarioId
+                }).ToList();
+
+            var conteoProyectos = new ConteoProyectos
+            {
+                Hoy = briefs.Count(b => b.EstatusBriefId == 1 && b.FechaPublicacion.Date == today),
+                EstaSemana = briefs.Count(b =>
+                    b.EstatusBriefId == 1 &&
+                    b.FechaPublicacion.Date >= startOfWeek &&
+                    b.FechaPublicacion.Date <= today),
+                ProximaSemana = briefs.Count(b =>
+                    b.EstatusBriefId == 1 &&
+                    b.FechaPublicacion.Date >= startOfNextWeek &&
+                    b.FechaPublicacion.Date <= endOfNextWeek),
+                TotalProyectos = briefs.Count
+            };
+
+            var briefIds = briefs.Select(b => b.Id).ToList();
+
+            var materiales = _context.Materiales
+                .Where(m => briefIds.Contains(m.BriefId) && (m.EstatusMaterialId == 4 || m.EstatusMaterialId == 5))
+                .Select(m => new
+                {
+                    m.FechaEntrega,
+                    BriefId = m.BriefId,
+                    EstatusBriefId = m.Brief.EstatusBriefId
+                })
+                .ToList();
+
+            conteoProyectos.ProyectoTiempo = materiales
+                .Where(m => m.FechaEntrega >= DateTime.Now && (m.EstatusBriefId == 4 || m.EstatusBriefId == 5))
+                .Select(m => m.BriefId)
+                .Distinct()
+                .Count();
+
+            conteoProyectos.ProyectoExtra = materiales
+                .Where(m => m.FechaEntrega <= DateTime.Now && (m.EstatusBriefId == 4 || m.EstatusBriefId == 5))
+                .Select(m => m.BriefId)
+                .Distinct()
+                .Count();
+
+            return conteoProyectos;
+        }
+
+        /// <summary>
+        /// Obtiene el conteo de materiales agrupados por fechas y estatus.
+        /// </summary>
+        /// <param name="UsuarioId">ID del usuario.</param>
+        /// <returns>Objeto ConteoProyectos con los resultados.</returns>
+        public ConteoProyectos ObtenerConteoMateriales(int UsuarioId)
+        {
+            var isAdmin = _context.Usuarios
+                .Any(u => u.Id == UsuarioId && (u.RolId == 1 || u.RolId == 3));
+
+            var materialesQuery = _context.Materiales.Where(m => m.Brief.UsuarioId == UsuarioId).AsQueryable();
+
+            if (isAdmin)
+            {
+                materialesQuery = _context.Materiales.AsQueryable();  
+            }
+
+            var materiales = materialesQuery.ToList();
+
+            var today = DateTime.Today;
+            var startOfWeek = today.AddDays(-(int)today.DayOfWeek);
+            var startOfNextWeek = startOfWeek.AddDays(7);
+            var endOfNextWeek = startOfNextWeek.AddDays(6);
+
+            return new ConteoProyectos
+            {
+                Hoy = materiales.Count(m => m.FechaRegistro.Date == today),
+                EstaSemana = materiales.Count(m => m.FechaRegistro.Date >= startOfWeek && m.FechaRegistro.Date <= today),
+                ProximaSemana = materiales.Count(m => m.FechaRegistro.Date >= startOfNextWeek && m.FechaRegistro.Date <= endOfNextWeek),
+                TotalProyectos = materiales.Count
+            };
+        }
+
+        /// <summary>
+        /// Obtiene el conteo de proyectos cuya fecha de entrega es mayor o igual a la fecha de publicación.
+        /// </summary>
+        /// <param name="UsuarioId">ID del usuario.</param>
+        /// <returns>Cantidad de proyectos que cumplen con la condición.</returns>
+        public int ObtenerConteoProyectoFecha(int UsuarioId)
+        {
+            var isAdmin = _context.Usuarios
+                .Any(u => u.Id == UsuarioId && (u.RolId == 1 || u.RolId == 3));
+
+            return isAdmin
+                ? _context.Briefs.Count(b => b.FechaEntrega >= b.FechaPublicacion)
+                : 0;
+        }
+
+        /// <summary>
+        /// Obtiene todos los materiales relacionados con un usuario, incluyendo datos de prioridades y estatus.
+        /// </summary>
+        /// <param name="id">ID del usuario.</param>
+        /// <returns>Lista de Materiales asociados.</returns>
         public List<Material> GetMaterialesByUser(int id)
         {
             var usuarioAdmin = _context.Usuarios.Where(q => q.Id == id && (q.RolId == 1 || q.RolId == 3)).FirstOrDefault();
@@ -394,109 +425,108 @@ namespace DataAccessLayer.Repositories
             }
             return materiales;
         }
+
+        /// <summary>
+        /// Obtiene un material por su ID, incluyendo relaciones como prioridades y estatus.
+        /// </summary>
+        /// <param name="id">ID del material.</param>
+        /// <returns>El Material solicitado, o null si no existe.</returns>
         public Material GetMaterial(int id)
         {
-            var material = _context.Materiales.Where(q => q.Id == id)
-                             .Select(p => new Material
-                             {
-                                 Id = p.Id,
-                                 Nombre = p.Nombre,
-                                 Mensaje = p.Mensaje,
-                                 Prioridad = _context.Prioridad.Where(u => u.Id == p.PrioridadId).FirstOrDefault(),
-                                 Ciclo = p.Ciclo,
-                                 PCN = _context.PCN.Where(u => u.Id == p.PCNId).FirstOrDefault(),
-                                 Audiencia = _context.Audiencia.Where(u => u.Id == p.AudienciaId).FirstOrDefault(),
-                                 Formato = _context.Formato.Where(u => u.Id == p.FormatoId).FirstOrDefault(),
-                                 FechaEntrega = p.FechaEntrega,
-                                 Responsable = p.Responsable,
-                                 Area = p.Area,
-                                 FechaRegistro = p.FechaRegistro,
-                                 FechaModificacion = p.FechaModificacion,
-                                 Brief = _context.Briefs.Where(q => q.Id == p.BriefId).FirstOrDefault(),
-                                 EstatusMaterial = _context.EstatusMateriales.Where(u => u.Id == p.EstatusMaterialId).FirstOrDefault(),
-                                 EstatusMaterialId = p.EstatusMaterialId
-                             }).FirstOrDefault();
-
-            return material;
+            return _context.Materiales
+                .Where(m => m.Id == id)
+                .Include(m => m.Prioridad)
+                .Include(m => m.PCN)
+                .Include(m => m.Audiencia)
+                .Include(m => m.Formato)
+                .Include(m => m.Brief)
+                .Include(m => m.EstatusMaterial)
+                .FirstOrDefault();
         }
+
+        /// <summary>
+        /// Filtra materiales según los criterios especificados en el objeto Material.
+        /// </summary>
+        /// <param name="material">Objeto Material con los criterios de filtro.</param>
+        /// <returns>Lista de Materiales filtrados.</returns>
         public List<Material> GetMaterialesFilter(Material material)
         {
-            var usuarioAdmin = _context.Usuarios.Where(q => q.Id == material.Id && (q.RolId == 1 || q.RolId == 3)).FirstOrDefault();
-            var materiales = _context.Materiales.Where(q => q.Brief.UsuarioId == material.Id && q.Nombre == material.Nombre && q.FechaRegistro == material.FechaRegistro)
-                             .Select(p => new Material
-                             {
-                                 Id = p.Id,
-                                 Nombre = p.Nombre,
-                                 Mensaje = p.Mensaje,
-                                 Prioridad = _context.Prioridad.Where(u => u.Id == p.PrioridadId).FirstOrDefault(),
-                                 Ciclo = p.Ciclo,
-                                 PCN = _context.PCN.Where(u => u.Id == p.PCNId).FirstOrDefault(),
-                                 Audiencia = _context.Audiencia.Where(u => u.Id == p.AudienciaId).FirstOrDefault(),
-                                 Formato = _context.Formato.Where(u => u.Id == p.FormatoId).FirstOrDefault(),
-                                 FechaEntrega = p.FechaEntrega,
-                                 Responsable = p.Responsable,
-                                 Area = p.Area,
-                                 FechaRegistro = p.FechaRegistro,
-                                 FechaModificacion = p.FechaModificacion,
-                                 Brief = _context.Briefs.Where(q => q.Id == p.BriefId).FirstOrDefault(),
-                                 EstatusMaterialId = p.EstatusMaterialId,
-                                 EstatusMaterial = _context.EstatusMateriales.Where(u => u.Id == p.EstatusMaterialId).FirstOrDefault()
-                             }).OrderByDescending(u => u.FechaEntrega).ToList();
+            var isAdmin = _context.Usuarios
+                .Any(u => u.Id == material.Id && (u.RolId == 1 || u.RolId == 3));
 
-            if (usuarioAdmin != null)
+            var query = _context.Materiales.Where(m => m.Brief.UsuarioId == material.Id).AsQueryable();
+
+            if (isAdmin)
             {
-                materiales = _context.Materiales.Select(p => new Material
-                {
-                    Id = p.Id,
-                    Nombre = p.Nombre,
-                    Mensaje = p.Mensaje,
-                    Prioridad = _context.Prioridad.Where(u => u.Id == p.PrioridadId).FirstOrDefault(),
-                    Ciclo = p.Ciclo,
-                    PCN = _context.PCN.Where(u => u.Id == p.PCNId).FirstOrDefault(),
-                    Audiencia = _context.Audiencia.Where(u => u.Id == p.AudienciaId).FirstOrDefault(),
-                    Formato = _context.Formato.Where(u => u.Id == p.FormatoId).FirstOrDefault(),
-                    FechaEntrega = p.FechaEntrega,
-                    Responsable = p.Responsable,
-                    Area = p.Area,
-                    FechaRegistro = p.FechaRegistro,
-                    FechaModificacion = p.FechaModificacion,
-                    Brief = _context.Briefs.Where(q => q.Id == p.BriefId).FirstOrDefault(),
-                    EstatusMaterialId = p.EstatusMaterialId,
-                    EstatusMaterial = _context.EstatusMateriales.Where(u => u.Id == p.EstatusMaterialId).FirstOrDefault()
-                }).OrderByDescending(u => u.FechaEntrega).ToList();
+                query = _context.Materiales.AsQueryable();
             }
-            return materiales;
+
+            return query
+                .Where(m =>
+                    m.Nombre == material.Nombre &&
+                    m.FechaRegistro == material.FechaRegistro)
+                .Include(m => m.Prioridad)
+                .Include(m => m.PCN)
+                .Include(m => m.Audiencia)
+                .Include(m => m.Formato)
+                .Include(m => m.Brief)
+                .Include(m => m.EstatusMaterial)
+                .OrderByDescending(m => m.FechaEntrega)
+                .ToList();
         }
+
+        /// <summary>
+        /// Obtiene todas las Audiencias activas.
+        /// </summary>
+        /// <returns>Enumerable de Audiencias activas.</returns>
         public IEnumerable<Audiencia> GetAllAudiencias()
         {
-            return _context.Audiencia.Where(q=> q.Activo == true).ToList();
+            return _context.Audiencia
+                .Where(a => a.Activo)
+                .ToList();
         }
+
+        /// <summary>
+        /// Obtiene todos los Formatos activos.
+        /// </summary>
+        /// <returns>Enumerable de Formatos activos.</returns>
         public IEnumerable<Formato> GetAllFormatos()
         {
-            return _context.Formato.Where(q => q.Activo == true).ToList();
+            return _context.Formato
+                .Where(f => f.Activo)
+                .ToList();
         }
+
+        /// <summary>
+        /// Obtiene todos los PCN activos.
+        /// </summary>
+        /// <returns>Enumerable de PCN activos.</returns>
         public IEnumerable<PCN> GetAllPCN()
         {
-            return _context.PCN.Where(q => q.Activo == true).ToList();
+            return _context.PCN
+                .Where(p => p.Activo)
+                .ToList();
         }
+
+        /// <summary>
+        /// Obtiene todas las Prioridades activas.
+        /// </summary>
+        /// <returns>Enumerable de Prioridades activas.</returns>
         public IEnumerable<Prioridad> GetAllPrioridades()
         {
-            var prioridades =new List<Prioridad>();
-            try
-            {
-                prioridades = _context.Prioridad.Where(q => q.Activo == true).ToList();
-            }
-            catch (Exception ex)
-            {
-
-                throw;
-            }
-            return prioridades;
-
+            return _context.Prioridad
+                .Where(p => p.Activo)
+                .ToList();
         }
+
+        /// <summary>
+        /// Obtiene el conteo de materiales agrupados por estatus.
+        /// </summary>
+        /// <param name="UsuarioId">ID del usuario.</param>
+        /// <returns>Objeto ConteoMateriales con los resultados.</returns>
         public ConteoMateriales ObtenerConteoEstatusMateriales(int UsuarioId)
         {
-            var usuarioAdmin = _context.Usuarios.Where(q => q.Id == UsuarioId).FirstOrDefault();
+            var usuarioAdmin = _context.Usuarios.Where(q => q.Id == UsuarioId && (q.RolId == 1 || q.RolId == 3)).FirstOrDefault();
             var materiales = _context.Materiales.Where(q => q.Brief.UsuarioId == UsuarioId).ToList();
             ConteoMateriales conteoMateriales = new ConteoMateriales();
             if (usuarioAdmin != null)
@@ -515,63 +545,75 @@ namespace DataAccessLayer.Repositories
 
             return conteoMateriales;
         }
+
+        /// <summary>
+        /// Obtiene todos los EstatusMaterial activos.
+        /// </summary>
+        /// <returns>Enumerable de EstatusMaterial activos.</returns>
         public IEnumerable<EstatusMaterial> GetAllEstatusMateriales()
         {
-            return _context.EstatusMateriales.Where(q => q.Activo == true).ToList();
+            return _context.EstatusMateriales
+                .Where(e => e.Activo)
+                .ToList();
         }
+
+        /// <summary>
+        /// Actualiza el historial de un material y cambia su estatus. Si el estatus es 4 o 5, actualiza también el Brief.
+        /// </summary>
+        /// <param name="historialMaterial">Objeto HistorialMaterial con los datos a actualizar.</param>
         public void ActualizaHistorialMaterial(HistorialMaterial historialMaterial)
         {
-            _context.Add(historialMaterial);
-            var material = _context.Materiales.Where(q => q.Id == historialMaterial.MaterialId).FirstOrDefault();
-            material.EstatusMaterialId = historialMaterial.EstatusMaterialId;
-            _context.Update(material);
-            _context.SaveChanges();
-            if(historialMaterial.EstatusMaterialId == 4)
+            var material = _context.Materiales.FirstOrDefault(m => m.Id == historialMaterial.MaterialId);
+            if (material != null)
             {
-                var Briefs = _context.Materiales.Where(q => q.BriefId == material.BriefId && q.EstatusMaterialId != 4).ToList();
-                if(Briefs == null || Briefs.Count == 0)
-                {
-                    var brief = _context.Briefs.Where(q => q.Id == material.BriefId).FirstOrDefault();
-                    brief.EstatusBriefId = 4;
-                    _context.Update(brief);
-                    _context.SaveChanges();
-                }
-            }
-            if (historialMaterial.EstatusMaterialId == 5)
-            {
-                var Briefs = _context.Materiales.Where(q => q.BriefId == material.BriefId && material.EstatusMaterialId != 5).ToList();
-                if (Briefs == null)
-                {
-                    var brief = _context.Briefs.Where(q => q.Id == material.BriefId).FirstOrDefault();
-                    brief.EstatusBriefId = 5;
-                    _context.Update(brief);
-                    _context.SaveChanges();
-                }
-            }
+                material.EstatusMaterialId = historialMaterial.EstatusMaterialId;
+                _context.HistorialMateriales.Add(historialMaterial);
 
+                if (historialMaterial.EstatusMaterialId == 4 || historialMaterial.EstatusMaterialId == 5)
+                {
+                    var briefs = _context.Materiales
+                        .Where(m => m.BriefId == material.BriefId && m.EstatusMaterialId != historialMaterial.EstatusMaterialId)
+                        .ToList();
 
+                    if (!briefs.Any())
+                    {
+                        var brief = _context.Briefs.FirstOrDefault(b => b.Id == material.BriefId);
+                        if (brief != null)
+                        {
+                            brief.EstatusBriefId = historialMaterial.EstatusMaterialId;
+                            _context.Briefs.Update(brief);
+                        }
+                    }
+                }
+
+                _context.SaveChanges();
+            }
         }
+
+        /// <summary>
+        /// Agrega un registro de retraso para un material.
+        /// </summary>
+        /// <param name="retrasoMaterial">Objeto RetrasoMaterial a agregar.</param>
         public void ActualizaRetrasoMaterial(RetrasoMaterial retrasoMaterial)
         {
-            _context.Add(retrasoMaterial);
+            _context.RetrasoMateriales.Add(retrasoMaterial);
             _context.SaveChanges();
         }
+
+        /// <summary>
+        /// Obtiene el historial de un material por su ID.
+        /// </summary>
+        /// <param name="MaterialId">ID del material.</param>
+        /// <returns>Enumerable de objetos HistorialMaterial.</returns>
         public IEnumerable<HistorialMaterial> GetAllHistorialMateriales(int MaterialId)
         {
-
-            return _context.HistorialMateriales.Where(q => q.MaterialId == MaterialId)
-                                               .Select(p => new HistorialMaterial
-                                               {
-                                                   Id = p.Id,
-                                                   Comentarios = p.Comentarios,
-                                                   FechaRegistro = p.FechaRegistro,
-                                                   EstatusMaterialId = p.EstatusMaterialId,
-                                                   UsuarioId = p.UsuarioId,
-                                                   Usuario = _context.Usuarios.Where(w => w.Id == p.UsuarioId).FirstOrDefault(),
-                                                   MaterialId = p.MaterialId
-                                               })
-                                               .OrderByDescending( u => u.Id)
-                                               .ToList();
+            return _context.HistorialMateriales
+                .Where(h => h.MaterialId == MaterialId)
+                .Include(h => h.Usuario)
+                .OrderByDescending(h => h.Id)
+                .ToList();
         }
+        
+
     }
 }

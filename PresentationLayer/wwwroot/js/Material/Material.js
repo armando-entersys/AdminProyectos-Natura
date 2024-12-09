@@ -128,7 +128,9 @@ function AppViewModel() {
     self.inicializar = function () {
         $.get("Materiales/ObtenerMateriales")
             .then(function (d) {
+                console.log("Datos de materiales:", d.datos); // Verifica la estructura de datos
                 self.registros(d.datos);
+
                 return $.get("Materiales/ObtenerConteoEstatusMateriales");
             })
             .then(function (d) {
@@ -143,7 +145,6 @@ function AppViewModel() {
             .then(function (d) {
                 self.catEstatusMateriales(d.datos);
                 self.catEstatusMaterialesFiltro(d.datos);
-                return ClassicEditor.create(document.querySelector('#comentario-editor'));
             })
  
             .catch(function (error) {
