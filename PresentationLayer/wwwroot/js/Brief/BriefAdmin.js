@@ -152,6 +152,13 @@ function AppViewModel() {
                                                                 self.catAudiencia.removeAll();
                                                                 self.catAudiencia.push.apply(self.catAudiencia, d.datos);
                                                                 $("#divEdicion").modal("hide");
+                                                                const params = new URLSearchParams(window.location.search);
+                                                                const filtro = params.get("filtroNombre");
+                                                                if (filtro) {
+                                                                    self.columns().forEach(function (element, index, array) {
+                                                                        element.searchTitle(filtro)
+                                                                    });
+                                                                }
                                                                
                                                             },
                                                             error: function (xhr, status, error) {
@@ -258,7 +265,25 @@ function AppViewModel() {
         });
 
     }
+    self.EliminarBrief = function (brief) {
+        if (confirm("Desea eliminar el Brief seleccionado?")) {
+            $.ajax({
+                url: "Brief/EliminarBrief/" + self.id(), // URL del método GetAll en tu API
+                type: "GET",
+                contentType: "application/json",
+                success: function (d) {
+                    self.inicializar();
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error al obtener los datos: ", error);
+                    alert("Error al obtener los datos: " + xhr.responseText);
+                }
+            });
+        }
+        
 
+    }
+    
     // Método para comprobar si el rol actual coincide con el pasado
     self.isRoleVisible = function (allowedRoles) {
         return allowedRoles.includes(RolId);
@@ -348,7 +373,10 @@ function AppViewModel() {
             contentType: "application/json",
             data: JSON.stringify(proyecto),
             success: function (d) {
-                alert(d.mensaje);
+                $("#divEdicion").modal("hide");
+                $('#alertMessage').text(d.mensaje);
+                $('#alertModalLabel').text("Solicitud exitosa");
+                $("#alertModal").modal("show");
             },
             error: function (xhr, status, error) {
                 console.error("Error al obtener los datos: ", xhr.responseText);
@@ -422,6 +450,11 @@ function AppViewModel() {
                     self.determinarEstado(d.datos.estado);
                     self.comentarioProyecto(d.datos.comentario);
                     self.fechaPublicacion(new Date(d.datos.fechaPublicacion).toISOString().split('T')[0]);
+                }
+                else {
+                    self.planComunicacion("No");
+                    self.comentarioProyecto("");
+                    self.fechaPublicacion(new Date().toISOString().split('T')[0]);
                 }
 
                 $("#divEdicion").modal("show");
@@ -514,7 +547,7 @@ function AppViewModel() {
             contentType: "application/json",
             data: JSON.stringify(usuario),
             success: function (d) {
-                self.resultadosBusqueda(d.datos); // Asigna resultados al array
+               self.resultadosBusqueda(d.datos); // Asigna resultados al array
             },
             error: function (xhr, status, error) {
                 console.error("Error al buscar usuarios: ", error);
@@ -561,7 +594,13 @@ function AppViewModel() {
         });
        
     };
- 
+    self.setFiltroFromQueryString = function () {
+        const params = new URLSearchParams(window.location.search);
+        const filtro = params.get("filtroNombre");
+        if (filtro) {
+            searchTitle(filtro);
+        }
+    };
 }
 
 // Inicializa SortableJS después de que Knockout haya sido inicializado
@@ -584,3 +623,4 @@ function initializeSortable() {
 
 var appViewModel = new AppViewModel();
 ko.applyBindings(appViewModel);
+//appViewModel.setFiltroFromQueryString();

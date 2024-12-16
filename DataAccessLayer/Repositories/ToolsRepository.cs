@@ -49,15 +49,17 @@ namespace DataAccessLayer.Repositories
         }
         public IEnumerable<Usuario> BuscarUsuario(string nombre, int rolId) 
         {
-            var usuarios = new List<Usuario>();
+           var usuarios = new List<Usuario>();
             if (rolId != 0)
             {
-                usuarios = _context.Usuarios.Where(q => q.RolId == rolId && q.Nombre.ToUpper().Contains(nombre)).ToList();
+                usuarios = _context.Usuarios.Where(q => q.RolId == rolId && (q.Nombre.ToUpper().Contains(nombre) || q.ApellidoPaterno.ToUpper().Contains(nombre)) &&
+                                                    q.Estatus == true ).ToList();
 
             }
             else
             {
-                usuarios = _context.Usuarios.Where(q => q.Nombre.ToUpper().Contains(nombre)).ToList();
+                usuarios = _context.Usuarios.Where(q => (q.Nombre.ToUpper().Contains(nombre) || q.ApellidoPaterno.ToUpper().Contains(nombre)) &&
+                                                    q.Estatus == true).ToList();
             }
             usuarios = usuarios.Select(q => new Usuario
             {

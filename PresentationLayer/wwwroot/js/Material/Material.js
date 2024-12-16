@@ -16,6 +16,8 @@ function AppViewModel() {
     self.catEstatusMaterialesFiltro = ko.observableArray([]);
     self.EstatusMaterialesFiltro = ko.observable();
 
+    self.tituloModal = ko.observable("");
+
     self.revision = ko.observable(0);
     self.produccion = ko.observable(0);
     self.faltaInfo = ko.observable(0);
@@ -154,7 +156,12 @@ function AppViewModel() {
 
     // Editar material
     self.Editar = function (material) {
+        $('.tox-statusbar__branding').hide(); // Oculta el elemento 
+        self.tituloModal("Editar Material" + material.nombre);
         self.Comentario("");
+        // Limpiar el contenido del editor TinyMCE
+        tinymce.get('myComentario').setContent('');
+
         // Limpiar el contenido del editor de comentarios
        // document.getElementById("comentario-editor").innerHTML = "";
         self.id(material.id);
@@ -186,9 +193,9 @@ function AppViewModel() {
 
     // Guardar comentario
     self.GuardarComentario = function () {
-        // Obtener el valor del editor y establecerlo en el observable `Comentario`
-       // var comentarioContenido = comentarioEditor.getData();
-       // self.Comentario(comentarioContenido);
+        // Obtener el valor del editor TinyMCE y establecerlo en el observable `Comentario`
+        var comentarioContenido = tinymce.get('myComentario').getContent();
+        self.Comentario(comentarioContenido);
 
         // Verificar si todos los campos requeridos están presentes
         if (!self.id() || !self.Comentario() || !self.EstatusMateriales() || !self.fechaEntrega()) {
@@ -200,7 +207,7 @@ function AppViewModel() {
         var historialMaterial = {
             MaterialId: self.id(),
             Comentarios: self.Comentario(),
-            FechaRegistro: self.fechaEntrega(),
+            FechaEntrega: self.fechaEntrega(),
             EstatusMaterialId: self.EstatusMateriales().id
         };
 
@@ -226,6 +233,7 @@ function AppViewModel() {
             success: function (response) {
                 // Mostrar mensaje de éxito y refrescar los datos
                 showAlertModal(response.mensaje);
+                
                 self.inicializar();
             },
             error: function (xhr, status, error) {

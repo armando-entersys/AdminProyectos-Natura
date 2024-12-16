@@ -18,13 +18,17 @@ namespace PresentationLayer.Controllers
         private readonly IEmailSender _emailSender;
         private readonly IUsuarioService _usuarioService;
         private readonly IWebHostEnvironment _hostingEnvironment;
-        public InvitacionesController(IToolsService toolService, IAuthService authService, IEmailSender emailSender, IUsuarioService usuarioService, IWebHostEnvironment hostingEnvironment)
+        private readonly IRolService _rolService;
+
+        public InvitacionesController(IToolsService toolService, IAuthService authService, IEmailSender emailSender, 
+                                        IUsuarioService usuarioService, IWebHostEnvironment hostingEnvironment,IRolService rolService)
         {
             _toolService = toolService;
             _authService = authService;
             _emailSender = emailSender;
             _usuarioService = usuarioService;
             _hostingEnvironment = hostingEnvironment;
+            _rolService = rolService;
         }
         public IActionResult Index()
         {
@@ -61,10 +65,9 @@ namespace PresentationLayer.Controllers
                     Correo = q.Correo,
                     Contrasena = q.Contrasena,
                     Estatus = q.Estatus,
-                    RolId = q.RolId
-                    //UserRol = _rolService.TGetById(q.RolId)
-                })
-                .ToList();
+                    RolId = q.RolId,
+                    UserRol = _rolService.TGetAll().Where(p => p.Id == q.RolId).FirstOrDefault()
+                }).ToList();
 
             res.Datos = usuarios;
             res.Exito = true;

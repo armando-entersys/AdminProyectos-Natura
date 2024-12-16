@@ -111,7 +111,7 @@ function AppViewModel() {
                 $("#divEdicion").modal("hide");
 
                 $('#alertMessage').text(d.mensaje);
-                $('#alertModalLabel').text("Success");
+                $('#alertModalLabel').text("Solicitud exitosa");
                 $("#alertModal").modal("show");
                 self.Limpiar();
             },
@@ -146,7 +146,7 @@ function AppViewModel() {
                 self.inicializar();
                 $("#divEdicion").modal("hide");
                 $('#alertMessage').text(d.mensaje);
-                $('#alertModalLabel').text("Success");
+                $('#alertModalLabel').text("Solicitud exitosa");
                 $("#alertModal").modal("show");
                 self.Limpiar();
             },

@@ -334,9 +334,16 @@ namespace PresentationLayer.Controllers
 
             _briefService.Insert(brief);
 
-            if (Addbrief.Archivo != null && (Addbrief.Archivo.ContentType == "application/pdf" ||
-                                            Addbrief.Archivo.ContentType == "application/msword" ||
-                                            Addbrief.Archivo.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+            if (Addbrief.Archivo != null && (Addbrief.Archivo.ContentType == "application/pdf" || // PDF
+                                      Addbrief.Archivo.ContentType == "application/msword" || // Word (doc)
+                                      Addbrief.Archivo.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || // Word (docx)
+                                      Addbrief.Archivo.ContentType == "application/vnd.ms-excel" || // Excel (xls)
+                                      Addbrief.Archivo.ContentType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || // Excel (xlsx)
+                                      Addbrief.Archivo.ContentType == "image/jpeg" || // JPG
+                                      Addbrief.Archivo.ContentType == "image/png" || // PNG
+                                      Addbrief.Archivo.ContentType == "video/mp4" || // MP4
+                                      Addbrief.Archivo.ContentType == "video/x-msvideo" || // AVI
+                                      Addbrief.Archivo.ContentType == "video/x-matroska")) // MKV
             {
                 // Guardar el archivo en una ruta específica o procesarlo según sea necesario
                 string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "\\uploads\\Brief\\" + brief.Id);
@@ -394,9 +401,16 @@ namespace PresentationLayer.Controllers
         {
             respuestaServicio res = new respuestaServicio();
             Brief briefOld = _briefService.GetById(Addbrief.Id);
-            if (Addbrief.Archivo != null && (Addbrief.Archivo.ContentType == "application/pdf" ||
-                                             Addbrief.Archivo.ContentType == "application/msword" ||
-                                             Addbrief.Archivo.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+            if (Addbrief.Archivo != null && (Addbrief.Archivo.ContentType == "application/pdf" || // PDF
+                                             Addbrief.Archivo.ContentType == "application/msword" || // Word (doc)
+                                             Addbrief.Archivo.ContentType == "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || // Word (docx)
+                                             Addbrief.Archivo.ContentType == "application/vnd.ms-excel" || // Excel (xls)
+                                             Addbrief.Archivo.ContentType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || // Excel (xlsx)
+                                             Addbrief.Archivo.ContentType == "image/jpeg" || // JPG
+                                             Addbrief.Archivo.ContentType == "image/png" || // PNG
+                                             Addbrief.Archivo.ContentType == "video/mp4" || // MP4
+                                             Addbrief.Archivo.ContentType == "video/x-msvideo" || // AVI
+                                             Addbrief.Archivo.ContentType == "video/x-matroska")) // MKV
             {
                 // Guardar el archivo en una ruta específica o procesarlo según sea necesario
                 string uploadsFolder = @_hostingEnvironment.WebRootPath + "\\uploads\\Brief\\" + briefOld.Id;
@@ -547,6 +561,19 @@ namespace PresentationLayer.Controllers
                 };
 
                 _toolsService.CrearAlerta(alertaAdmin);
+
+                // Diccionario con los valores dinámicos a reemplazar
+                var valoresDinamicos = new Dictionary<string, string>()
+                {
+                    { "nombreProyecto", brief.Nombre },
+                    { "nombreMaterial", material.Nombre },
+                    { "link", urlBase + "/Materiales?filtroNombre=" + material.Nombre  }
+
+                };
+                var Destinatarios = new List<string>();
+                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
+
+                _emailSender.SendEmail(Destinatarios, "NuevoMaterial", valoresDinamicos);
 
                 res.Mensaje = "Creado exitosamente";
                 res.Exito = true;
@@ -720,5 +747,44 @@ namespace PresentationLayer.Controllers
 
             return Ok(res);
         }
+        [HttpGet]
+        public ActionResult EliminarBrief(int id)
+        {
+            respuestaServicio res = new respuestaServicio();
+
+            try
+            {
+                var brief = _briefService.GetById(id);
+                _briefService.Delete(id);
+                var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
+
+                res.Exito = true;
+                var usuarioLogin = _usuarioService.TGetById(Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));
+
+                // Diccionario con los valores dinámicos a reemplazar
+                var valoresDinamicos = new Dictionary<string, string>()
+                {
+                    { "nombreProyecto", brief.Nombre },
+                    { "usuario", usuarioLogin.Nombre + " " + usuarioLogin.ApellidoPaterno },
+
+                };
+                var Destinatarios = new List<string>();
+                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
+                Destinatarios.AddRange(_usuarioService.TGetAll().Where(q=> q.RolId == 1).Select(p => p.Correo).ToList());
+
+                Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
+
+
+                _emailSender.SendEmail(Destinatarios, "EliminarProyecto", valoresDinamicos);
+            }
+            catch (Exception ex)
+            {
+                res.Mensaje = "Error al remover el Material";
+                res.Exito = false;
+            }
+            return Ok(res);
+
+        }
+        
     }
 }

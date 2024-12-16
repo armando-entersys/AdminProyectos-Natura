@@ -27,6 +27,20 @@ namespace DataAccessLayer.Repositories
             var brief = _context.Briefs.Find(id);
             if (brief != null)
             {
+                var proyecto = _context.Proyectos.Where(p => p.BriefId == brief.Id).FirstOrDefault();
+                if (proyecto != null) {
+                    _context.Proyectos.Remove(proyecto);
+                }
+                var materiales = _context.Materiales.Where(p => p.BriefId == brief.Id).ToList();
+                if (materiales != null) {
+                    _context.Materiales.RemoveRange(materiales);
+                }
+                var participantes = _context.Participantes.Where(p => p.BriefId == brief.Id).ToList();
+                if (participantes != null) {
+                    _context.Participantes.RemoveRange(participantes);
+                }
+                _context.SaveChanges();
+
                 _context.Briefs.Remove(brief);
                 _context.SaveChanges();
             }
@@ -177,7 +191,13 @@ namespace DataAccessLayer.Repositories
 
             if (proyecto != null)
             {
-                _context.Entry(proyecto).CurrentValues.SetValues(entity);
+                proyecto.BriefId = entity.BriefId;
+                proyecto.Comentario = entity.Comentario;
+                proyecto.RequierePlan = entity.RequierePlan;
+                proyecto.Estado = entity.Estado;
+                proyecto.FechaPublicacion = entity.FechaPublicacion;
+                proyecto.FechaModificacion = DateTime.Now;
+                _context.Proyectos.Update(proyecto);
             }
             else
             {
@@ -564,8 +584,19 @@ namespace DataAccessLayer.Repositories
         public void ActualizaHistorialMaterial(HistorialMaterial historialMaterial)
         {
             var material = _context.Materiales.FirstOrDefault(m => m.Id == historialMaterial.MaterialId);
+            
             if (material != null)
             {
+                if(historialMaterial.FechaEntrega != null)
+                {
+                    if (material.FechaEntrega != historialMaterial.FechaEntrega)
+                    {
+                        material.FechaEntrega = (DateTime)historialMaterial.FechaEntrega;
+                        _context.Materiales.Update(material);
+                        
+                    }
+                }
+                
                 material.EstatusMaterialId = historialMaterial.EstatusMaterialId;
                 _context.HistorialMateriales.Add(historialMaterial);
 

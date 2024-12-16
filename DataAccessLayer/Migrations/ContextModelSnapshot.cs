@@ -228,6 +228,9 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("EstatusMaterialId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("FechaEntrega")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("FechaRegistro")
                         .HasColumnType("datetime2");
 

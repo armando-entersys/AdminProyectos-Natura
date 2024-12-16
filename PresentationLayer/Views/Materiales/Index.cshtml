@@ -13,6 +13,7 @@
     a.form-control:hover {
         color: #FFAA16 !important;
     }
+
 </style>
 <h3>Gestión de Material</h3>
 
@@ -111,50 +112,53 @@
 
 <div class="row">
     <div class="col">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th scope="col">Nombre de Material</th>
-                    <th scope="col">Mensaje</th>
-                    <th scope="col">Formato</th>
-                    <th scope="col">Estatus</th>
-                    <th scope="col">Nombre del proyecto</th>
-                    <th scope="col">Audiencia</th>
-                    <th scope="col">Responsable</th>
-                    <th scope="col">Area</th>
-                    <th scope="col">Fecha Entrega</th>
-                    <th scope="col">Acciones</th>
+         <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Nombre de Material</th>
+                        <th scope="col">Mensaje</th>
+                        <th scope="col">Formato</th>
+                        <th scope="col">Estatus</th>
+                        <th scope="col">Nombre del proyecto</th>
+                        <th scope="col">Audiencia</th>
+                        <th scope="col">Responsable</th>
+                        <th scope="col">Area</th>
+                        <th scope="col">Fecha Entrega</th>
+                        <th scope="col">Acciones</th>
 
-                </tr>
-            </thead>
-            <tbody data-bind="foreach: paginatedRegistros">
-                <tr>
-                    <td data-bind="text: nombre"></td>
-                    <td data-bind="text: mensaje"></td>
-                    <td data-bind="text: formato.descripcion"></td>
-                    <td data-bind="text: estatusMaterial.descripcion"></td>
-                    <td data-bind="text: brief.nombre"></td>
-                    <td data-bind="text: audiencia.descripcion"></td>
-                    <td data-bind="text: responsable"></td>
-                    <td data-bind="text: area"></td>
-                    <td data-bind="text: fechaEntrega"></td>
-                    <td class="small">
-                        <button type="button" class="btn btn-outline-primary" data-bind="click:$root.Editar">
-                            <i class="lni lni-pencil-1"></i>
-                            <span>Editar</span>
-                        </button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="pagination">
-            <button class="btn btn-primary" data-bind="click: () => goToPage(currentPage() - 1), enable: currentPage() > 1">Anterior</button>
-            <!-- Mostrar número de páginas -->
-            <span data-bind="foreach: ko.utils.range(1, totalPages())">
-                <button class="btn btn-outline-secondary mx-3" data-bind="text: $data, click: () => $root.goToPage($data), css: { 'btn-primary': $data === $root.currentPage() }"></button>
-            </span>
-            <button class="btn btn-primary" data-bind="click: () => goToPage(currentPage() + 1), enable: currentPage() < totalPages()">Siguiente</button>
+                    </tr>
+                </thead>
+                <tbody data-bind="foreach: paginatedRegistros">
+                    <tr>
+                        <td data-bind="text: nombre"></td>
+                        <td data-bind="text: mensaje"></td>
+                        <td data-bind="text: formato.descripcion"></td>
+                        <td data-bind="text: estatusMaterial.descripcion"></td>
+                        <td data-bind="text: brief.nombre"></td>
+                        <td data-bind="text: audiencia.descripcion"></td>
+                        <td data-bind="text: responsable"></td>
+                        <td data-bind="text: area"></td>
+                        <td data-bind="text: fechaEntrega"></td>
+                        <td class="small">
+                            <button type="button" class="btn btn-outline-primary" data-bind="click:$root.Editar">
+                                <i class="lni lni-pencil-1"></i>
+                                <span>Editar</span>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination">
+                <button class="btn btn-primary" data-bind="click: () => goToPage(currentPage() - 1), enable: currentPage() > 1">Anterior</button>
+                <!-- Mostrar número de páginas -->
+                <span data-bind="foreach: ko.utils.range(1, totalPages())">
+                    <button class="btn btn-outline-secondary mx-3" data-bind="text: $data, click: () => $root.goToPage($data), css: { 'btn-primary': $data === $root.currentPage() }"></button>
+                </span>
+                <button class="btn btn-primary" data-bind="click: () => goToPage(currentPage() + 1), enable: currentPage() < totalPages()">Siguiente</button>
+            </div>
         </div>
+       
     </div>
 </div>
 
@@ -162,7 +166,7 @@
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="Modal">Editar Material</h5>
+                <h5 class="modal-title" id="Modal" data-bind="text: tituloModal"></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="background-color: rgba(0, 0, 0, .03);">
@@ -178,12 +182,12 @@
                             <hr class="border border-3 border-primary w-100 mx-auto my-4">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Link de Referencia</label>
-                            <a class="form-control" data-bind="attr: { href: linksReferencias }, text: linksReferencias" target="_blank">Abrir Link</a>
+                            <label>Link de Referencia</label>
+                            <a  data-bind="attr: { href: linksReferencias }, text: linksReferencias" target="_blank">Abrir Link</a>
                         </div>
                         <div class="col-md-6">
-                            <label for="archivoCargado" class="form-label">Archivo Cargado</label>
-                            <a id="archivoCargado" class="form-control text-truncate"
+                            <label for="archivoCargado">Archivo Cargado</label>
+                            <a id="archivoCargado" class="text-truncate"
                                data-bind="attr: { href: '/AdministradorProyectos/Brief/DownloadFile/' + idBrief() }, text: rutaArchivo" target="_blank">Descargar archivo</a>
                         </div>
                     </div>
@@ -204,7 +208,7 @@
                             </div>-->
                             <div class="mb-3">
                                 <label class="form-label">Comentario</label>
-                                <input type="text" class="form-control" data-bind="value: Comentario" />
+                                <textarea id="myComentario"></textarea>
                             </div>
                             <div class="mb-3" data-bind="validationElement: fechaEntrega, visible:isRoleVisible([1])">
                                 <label for="recipient-name" class="col-form-label">Cambiar Fecha Entrega:</label>
@@ -273,13 +277,31 @@
 </div>
 
 @section Scripts {
+
+    <script src="~/js/tinymce/tinymce.min.js"></script>
     <script>
         // Pasar los valores de ViewBag a variables JavaScript
         var RolId = @Html.Raw(ViewBag.RolId);
 
     </script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
-    
+    <script>
+           $(document).ready(function () {
+            tinymce.init({
+                selector: '#myComentario',
+                plugins: 'lists link image table code',
+                toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist outdent indent | link image | code',
+                height: 300,
+                menubar: false,
+                language: 'es',
+                images_upload_url: '/AdministradorProyectos/Materiales/upload',
+                automatic_uploads: true,
+                setup: function (editor) {
+                    editor.on('init', function () {
+                        editor.mode.set('design'); // Establecer modo edición
+                    });
+                }
+            });
+        });
+    </script>
     <script src="~/js/Material/Material.js"></script>
-
 }

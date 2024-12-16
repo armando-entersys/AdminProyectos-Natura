@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Net.Http;
 using BusinessLayer.Concrete;
 using Newtonsoft.Json.Linq;
+using DataAccessLayer.EntityFramework;
 namespace PresentationLayer.Controllers
 {
     public class UsuariosController : Controller
@@ -16,14 +17,17 @@ namespace PresentationLayer.Controllers
         private readonly IRolService _rolService;
         private readonly IEmailSender _emailSender;
         private readonly IToolsService _toolService;
+        private readonly IBriefService _briefService;
 
-        public UsuariosController(IAuthService authService, IUsuarioService usuarioService, IRolService rolService, IEmailSender emailSender, IToolsService toolService)
+        public UsuariosController(IAuthService authService, IUsuarioService usuarioService, IRolService rolService, 
+                                  IEmailSender emailSender, IToolsService toolService, IBriefService briefService)
         {
             _authService = authService;
             _usuarioService = usuarioService;
             _rolService = rolService;
             _emailSender = emailSender;
             _toolService = toolService;
+            _briefService = briefService;
         }
         // GET: UsuariosController
         public ActionResult Index()
@@ -288,7 +292,21 @@ namespace PresentationLayer.Controllers
             {
                 var participanteBD = _toolService.AgregarParticipante(participante);
                 participante.Usuario = _usuarioService.TGetById(participante.UsuarioId);
+               
+                var brief = _briefService.GetById(participante.BriefId);
 
+                var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
+                // Diccionario con los valores dinámicos a reemplazar
+                var valoresDinamicos = new Dictionary<string, string>()
+                {
+                    { "nombreProyecto", brief.Nombre },
+                    { "link", urlBase + "/Brief?filtroNombre=" + brief.Nombre  }
+
+                };
+                var Destinatarios = new List<string>();
+                Destinatarios.Add(participante.Usuario.Correo);
+
+                _emailSender.SendEmail(Destinatarios, "RegistroParticipante", valoresDinamicos);
                 res.Datos = participanteBD;
                 res.Mensaje = "Creado exitosamente";
                 res.Exito = true;

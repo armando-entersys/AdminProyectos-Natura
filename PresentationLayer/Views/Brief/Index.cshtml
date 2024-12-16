@@ -71,7 +71,7 @@
                         <!-- Descripción -->
                         <div class="col-md-12" data-bind="validationElement: descripcion">
                             <label for="descripcion" class="form-label">Descripción</label>
-                            <textarea id="descripcion" class="form-control" rows="2" maxlength="256" placeholder="Describe el brief brevemente" data-bind="value: descripcion"></textarea>
+                            <textarea id="descripcion" class="form-control" rows="2" placeholder="Describe el brief brevemente" data-bind="value: descripcion"></textarea>
                         </div>
 
                         <!-- Objetivo -->
@@ -108,7 +108,7 @@
                         <!-- Cargar Documento -->
                         <div class="col-md-12" data-bind="validationElement: cargaArchivo">
                             <label for="cargaArchivo" class="form-label">Cargar Documento</label>
-                            <input type="file" id="cargaArchivo" class="form-control" accept=".pdf,.doc,.docx"
+                            <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png,.mp4,.avi,.mkv" id="cargaArchivo" class="form-control" accept=".pdf,.doc,.docx"
                                    data-bind="event: { change: cargarArchivo }">
                         </div>
 

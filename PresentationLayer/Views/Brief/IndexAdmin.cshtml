@@ -111,6 +111,7 @@
                             <button class="btn btn-outline-primary btn-sm" data-bind="click: $root.Editar">
                                 Ver Detalles
                             </button>
+
                         </div>
                     </div>
                 </div>
@@ -171,18 +172,18 @@
                 <!-- Tabs -->
                 <ul class="nav nav-tabs mb-3" id="projectTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin" type="button" role="tab" aria-controls="admin" aria-selected="true">
-                            Edición Administrador
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="materiales-tab" data-bs-toggle="tab" data-bs-target="#materiales" type="button" role="tab" aria-controls="materiales" aria-selected="false">
+                        <button class="nav-link active" id="materiales-tab" data-bs-toggle="tab" data-bs-target="#materiales" type="button" role="tab" aria-controls="materiales" aria-selected="true">
                             Materiales
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="participantes-tab" data-bs-toggle="tab" data-bs-target="#participantes" type="button" role="tab" aria-controls="participantes" aria-selected="false">
                             Participantes
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin" type="button" role="tab" aria-controls="admin" aria-selected="false">
+                            Edición Administrador
                         </button>
                     </li>
                 </ul>
@@ -196,6 +197,7 @@
                                 <label class="form-label">Comentario del Proyecto</label>
                                 <textarea class="form-control" rows="2" data-bind="value: comentarioProyecto"></textarea>
                             </div>
+                            
                             <div class="col-md-6">
                                 <label class="form-label">Requiere Plan de Comunicación</label>
                                 <div class="form-check form-check-inline">
@@ -315,7 +317,7 @@
                             <input id="buscarUsuario" type="text" class="form-control mb-3" placeholder="Escribe el nombre del usuario..."
                                    data-bind="value: buscarUsuario, valueUpdate: 'input', event: { keyup: buscarUsuarios }">
                             <ul class="autocomplete-results" data-bind="foreach: resultadosBusqueda">
-                                <li class="list-group-item" data-bind="text: nombre, click: $root.seleccionarUsuario"></li>
+                                <li class="list-group-item" data-bind="text: nombre + ' ' + apellidoPaterno, click: $root.seleccionarUsuario"></li>
                             </ul>
                         </div>
                         <table class="table table-striped">
@@ -342,6 +344,9 @@
 
             <!-- Footer -->
             <div class="modal-footer">
+                <button class="btn btn-danger" data-bind="click: $root.EliminarBrief">
+                    <i class="lni lni-trash"></i> Eliminar
+                </button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
@@ -377,5 +382,6 @@
             window.addEventListener('resize', adjustColumnHeights);
         });
     </script>
+  
     <script src="~/js/brief/BriefAdmin.js?v=1.0.2"></script>
 }

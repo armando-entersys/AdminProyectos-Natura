@@ -209,37 +209,25 @@ namespace PresentationLayer.Controllers
             return Ok(res);
 
         }
+
         [HttpPost]
-public async Task<IActionResult> UploadImage(IFormFile upload)
-{
-    if (upload == null || upload.Length == 0)
-    {
-        return BadRequest(new { error = "No se recibió ningún archivo para cargar." });
-    }
+        public IActionResult upload(IFormFile file)
+        {
+            if (file != null && file.Length > 0)
+            {
+                var fileName = Path.GetFileName(file.FileName);
+                var filePath = Path.Combine("wwwroot/uploads", fileName);
 
-    // Generar un nombre único para el archivo
-    var fileName = Path.GetRandomFileName() + Path.GetExtension(upload.FileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
 
-    // Define la ruta donde guardar el archivo
-    var path = Path.Combine("wwwroot/uploads", fileName);
+                var fileUrl = Url.Content($"~/uploads/{fileName}");
+                return Json(new { location = fileUrl }); // TinyMCE necesita esta respuesta
+            }
 
-    // Crear el directorio si no existe
-    if (!Directory.Exists("wwwroot/uploads"))
-    {
-        Directory.CreateDirectory("wwwroot/uploads");
-    }
-
-    // Guardar el archivo
-    using (var stream = new FileStream(path, FileMode.Create))
-    {
-        await upload.CopyToAsync(stream);
-    }
-
-    // Crear la URL para acceder al archivo cargado
-    var url = Url.Content($"~/uploads/{fileName}");
-
-    // Devolver la URL en el formato esperado por CKEditor
-    return Json(new { url });
-}
+            return BadRequest("No se pudo cargar la imagen.");
+        }
     }
 }

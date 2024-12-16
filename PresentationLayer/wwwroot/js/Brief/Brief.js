@@ -91,14 +91,32 @@
         var file = event.target.files[0];
         if (file) {
             var fileType = file.type;
-            var validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            var fileSize = file.size; // Tamaño del archivo en bytes
+            var maxFileSize = 10 * 1024 * 1024; // 10 MB en bytes
 
-            if (validTypes.includes(fileType)) {
+            var validTypes = [
+                'application/pdf', // PDF
+                'application/msword', // Word (doc)
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // Word (docx)
+                'application/vnd.ms-excel', // Excel (xls)
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // Excel (xlsx)
+                'image/jpeg', // JPG
+                'image/png', // PNG
+                'video/mp4', // MP4
+                'video/x-msvideo', // AVI
+                'video/x-matroska' // MKV
+            ];
+
+            // Validar tipo y tamaño del archivo
+            if (!validTypes.includes(fileType)) {
+                alert('Solo se permiten archivos PDF, Word, Excel, JPG, PNG o Video (MP4, AVI, MKV)');
+                event.target.value = ""; // Limpiar el campo de archivo
+            } else if (fileSize > maxFileSize) {
+                alert('El archivo no debe exceder los 10 MB');
+                event.target.value = ""; // Limpiar el campo de archivo
+            } else {
                 // Aquí podrías procesar el archivo si lo necesitas
                 self.cargaArchivo(file); // Guardar el archivo seleccionado
-            } else {
-                alert('Solo se permiten archivos PDF o DOCX');
-                event.target.value = "";  // Limpiar el campo de archivo
             }
         }
     };
@@ -132,6 +150,7 @@
         self.rutaArchivo("");
         self.cargaArchivo("");
         self.linksReferencias("");
+        document.getElementById('cargaArchivo').value = "";
     }
     self.Editar = function (brief) {
         self.Limpiar();
@@ -197,7 +216,7 @@
                 self.inicializar();
               
                 $('#alertMessage').text(d.mensaje);
-                $('#alertModalLabel').text("Success");
+                $('#alertModalLabel').text("Solicitud exitosa");
                 $("#alertModal").modal("show");
                 self.Limpiar();
                 $(document).ajaxStop(function () {
@@ -241,7 +260,7 @@
                 self.inicializar();
                 $("#divEdicion").modal("hide");
                 $('#alertMessage').text(d.mensaje);
-                $('#alertModalLabel').text("Success");
+                $('#alertModalLabel').text("Solicitud exitosa");
                 $("#alertModal").modal("show");
                 self.Limpiar();
             },
