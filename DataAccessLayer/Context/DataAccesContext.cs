@@ -123,7 +123,7 @@ namespace DataAccessLayer.Context
                 .HasOne(p => p.Usuario)
                 .WithMany(u => u.Participantes) // Asegúrate de que la clase Usuario tenga una propiedad ICollection<Participante>
                 .HasForeignKey(p => p.UsuarioId)
-                .OnDelete(DeleteBehavior.Cascade); // Configurar el comportamiento de eliminación
+                .OnDelete(DeleteBehavior.NoAction); // Cambiado a NoAction para evitar múltiples cascade paths
 
             modelBuilder.Entity<HistorialMaterial>()
                 .HasOne(h => h.Material) // HistorialMaterial tiene un Material
