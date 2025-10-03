@@ -19,7 +19,7 @@ services:
       - ./backups:/backups
 
     networks:
-      - backend
+      - traefik
 
     healthcheck:
       test: /opt/mssql-tools18/bin/sqlcmd -S localhost -No -U sa -P "${SQL_SA_PASSWORD}" -Q "SELECT 1" || exit 1
@@ -93,8 +93,7 @@ services:
       - logs-data:/app/Logs
 
     networks:
-      - traefik      # Para recibir tráfico externo
-      - backend      # Para comunicarse con SQL Server
+      - traefik      # Para recibir tráfico externo y comunicarse con SQL Server
 
     deploy:
       resources:
@@ -188,8 +187,6 @@ services:
 networks:
   traefik:
     external: true  # Red existente de Traefik en el servidor
-  backend:
-    driver: bridge  # Red privada para comunicación interna
 
 # ═══════════════════════════════════════════════════════════
 # VOLUMES - Persistencia de datos
