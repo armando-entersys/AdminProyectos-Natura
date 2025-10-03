@@ -148,7 +148,6 @@ services:
       - "traefik.http.routers.adminproyectos-http.middlewares=adminproyectos-redirect"
 
       # Security headers
-      - "traefik.http.middlewares.adminproyectos-headers.headers.sslredirect=true"
       - "traefik.http.middlewares.adminproyectos-headers.headers.stsSeconds=31536000"
       - "traefik.http.middlewares.adminproyectos-headers.headers.stsIncludeSubdomains=true"
       - "traefik.http.middlewares.adminproyectos-headers.headers.stsPreload=true"
