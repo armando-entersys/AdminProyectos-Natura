@@ -70,8 +70,8 @@ RUN chown -R appuser:appuser /app/Logs /app/wwwroot/uploads
 USER appuser
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
-    CMD curl -f http://localhost:80/Home/Index || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
+    CMD curl -f http://localhost:80/ || exit 1
 
 # Labels informativos
 LABEL maintainer="NATURA ADCON" \
