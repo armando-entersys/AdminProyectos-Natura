@@ -121,23 +121,25 @@ using (var scope = app.Services.CreateScope())
             // Seed de datos iniciales
             logger.LogInformation("Insertando datos iniciales...");
 
-            // Crear rol Administrador
-            var rolAdmin = new Rol
-            {
-                Descripcion = "Administrador"
-            };
-            context.Roles.Add(rolAdmin);
+            // ═══════════════════════════════════════════════════════════
+            // ROLES
+            // ═══════════════════════════════════════════════════════════
+            var rolAdmin = new Rol { Descripcion = "Administrador" };
+            var rolUsuario = new Rol { Descripcion = "Usuario" };
+            context.Roles.AddRange(rolAdmin, rolUsuario);
             context.SaveChanges();
+            logger.LogInformation("✅ Roles creados");
 
-            // Crear usuario admin
-            // Nota: La contraseña se guarda directamente (considera usar hash en producción)
+            // ═══════════════════════════════════════════════════════════
+            // USUARIO ADMIN
+            // ═══════════════════════════════════════════════════════════
             var usuarioAdmin = new Usuario
             {
                 Nombre = "Admin",
                 ApellidoPaterno = "Sistema",
                 ApellidoMaterno = "",
                 Correo = "ajcortest@gmail.com",
-                Contrasena = "Operaciones.2025", // IMPORTANTE: En producción usar hash
+                Contrasena = "Operaciones.2025",
                 RolId = rolAdmin.Id,
                 Estatus = true,
                 FechaRegistro = DateTime.Now,
@@ -147,8 +149,148 @@ using (var scope = app.Services.CreateScope())
             };
             context.Usuarios.Add(usuarioAdmin);
             context.SaveChanges();
+            logger.LogInformation("✅ Usuario admin creado");
 
-            logger.LogInformation("✅ Datos iniciales insertados: Usuario admin creado");
+            // ═══════════════════════════════════════════════════════════
+            // MENÚS
+            // ═══════════════════════════════════════════════════════════
+            var menus = new List<Menu>
+            {
+                new Menu { Nombre = "Home", Ruta = "/Home/Index", Orden = 1, Icono = "lni lni-home", RolId = rolAdmin.Id },
+                new Menu { Nombre = "Briefs", Ruta = "/Brief/Index", Orden = 2, Icono = "lni lni-briefcase", RolId = rolAdmin.Id },
+                new Menu { Nombre = "Calendario", Ruta = "/Calendario/Index", Orden = 3, Icono = "lni lni-calendar", RolId = rolAdmin.Id },
+                new Menu { Nombre = "Materiales", Ruta = "/Materiales/Index", Orden = 4, Icono = "lni lni-files", RolId = rolAdmin.Id },
+                new Menu { Nombre = "Alertas", Ruta = "/Alertas/Index", Orden = 5, Icono = "lni lni-alarm", RolId = rolAdmin.Id },
+                new Menu { Nombre = "Usuarios", Ruta = "/Usuarios/Index", Orden = 6, Icono = "lni lni-users", RolId = rolAdmin.Id },
+                new Menu { Nombre = "Invitaciones", Ruta = "/Invitaciones/Index", Orden = 7, Icono = "lni lni-envelope", RolId = rolAdmin.Id },
+                new Menu { Nombre = "Catálogos", Ruta = "/Catalogos/Index", Orden = 8, Icono = "lni lni-list", RolId = rolAdmin.Id }
+            };
+            context.Menus.AddRange(menus);
+            context.SaveChanges();
+            logger.LogInformation("✅ Menús creados");
+
+            // ═══════════════════════════════════════════════════════════
+            // CATÁLOGOS - ESTATUS BRIEF
+            // ═══════════════════════════════════════════════════════════
+            var estatusBriefs = new List<EstatusBrief>
+            {
+                new EstatusBrief { Descripcion = "Pendiente", Activo = true },
+                new EstatusBrief { Descripcion = "En Proceso", Activo = true },
+                new EstatusBrief { Descripcion = "Completado", Activo = true },
+                new EstatusBrief { Descripcion = "Cancelado", Activo = true }
+            };
+            context.EstatusBriefs.AddRange(estatusBriefs);
+            context.SaveChanges();
+            logger.LogInformation("✅ Estatus Brief creados");
+
+            // ═══════════════════════════════════════════════════════════
+            // CATÁLOGOS - TIPO BRIEF
+            // ═══════════════════════════════════════════════════════════
+            var tiposBrief = new List<TipoBrief>
+            {
+                new TipoBrief { Descripcion = "Campaña Digital", Activo = true },
+                new TipoBrief { Descripcion = "Campaña Tradicional", Activo = true },
+                new TipoBrief { Descripcion = "Evento", Activo = true },
+                new TipoBrief { Descripcion = "Producto", Activo = true },
+                new TipoBrief { Descripcion = "Servicio", Activo = true }
+            };
+            context.TiposBrief.AddRange(tiposBrief);
+            context.SaveChanges();
+            logger.LogInformation("✅ Tipos Brief creados");
+
+            // ═══════════════════════════════════════════════════════════
+            // CATÁLOGOS - PRIORIDAD
+            // ═══════════════════════════════════════════════════════════
+            var prioridades = new List<Prioridad>
+            {
+                new Prioridad { Descripcion = "Baja", Activo = true },
+                new Prioridad { Descripcion = "Media", Activo = true },
+                new Prioridad { Descripcion = "Alta", Activo = true },
+                new Prioridad { Descripcion = "Urgente", Activo = true }
+            };
+            context.Prioridad.AddRange(prioridades);
+            context.SaveChanges();
+            logger.LogInformation("✅ Prioridades creadas");
+
+            // ═══════════════════════════════════════════════════════════
+            // CATÁLOGOS - AUDIENCIA
+            // ═══════════════════════════════════════════════════════════
+            var audiencias = new List<Audiencia>
+            {
+                new Audiencia { Descripcion = "General", Activo = true },
+                new Audiencia { Descripcion = "Jóvenes (18-25)", Activo = true },
+                new Audiencia { Descripcion = "Adultos (26-40)", Activo = true },
+                new Audiencia { Descripcion = "Adultos Mayores (41+)", Activo = true },
+                new Audiencia { Descripcion = "Empresarial", Activo = true }
+            };
+            context.Audiencia.AddRange(audiencias);
+            context.SaveChanges();
+            logger.LogInformation("✅ Audiencias creadas");
+
+            // ═══════════════════════════════════════════════════════════
+            // CATÁLOGOS - FORMATO
+            // ═══════════════════════════════════════════════════════════
+            var formatos = new List<Formato>
+            {
+                new Formato { Descripcion = "Video", Activo = true },
+                new Formato { Descripcion = "Imagen", Activo = true },
+                new Formato { Descripcion = "Audio", Activo = true },
+                new Formato { Descripcion = "Texto", Activo = true },
+                new Formato { Descripcion = "Infografía", Activo = true },
+                new Formato { Descripcion = "Banner", Activo = true },
+                new Formato { Descripcion = "Post Social Media", Activo = true }
+            };
+            context.Formato.AddRange(formatos);
+            context.SaveChanges();
+            logger.LogInformation("✅ Formatos creados");
+
+            // ═══════════════════════════════════════════════════════════
+            // CATÁLOGOS - PCN
+            // ═══════════════════════════════════════════════════════════
+            var pcns = new List<PCN>
+            {
+                new PCN { Descripcion = "Digital", Activo = true },
+                new PCN { Descripcion = "Impreso", Activo = true },
+                new PCN { Descripcion = "Audiovisual", Activo = true },
+                new PCN { Descripcion = "Web", Activo = true },
+                new PCN { Descripcion = "Redes Sociales", Activo = true }
+            };
+            context.PCN.AddRange(pcns);
+            context.SaveChanges();
+            logger.LogInformation("✅ PCN creados");
+
+            // ═══════════════════════════════════════════════════════════
+            // CATÁLOGOS - ESTATUS MATERIALES
+            // ═══════════════════════════════════════════════════════════
+            var estatusMateriales = new List<EstatusMaterial>
+            {
+                new EstatusMaterial { Descripcion = "Pendiente", Activo = true },
+                new EstatusMaterial { Descripcion = "En Diseño", Activo = true },
+                new EstatusMaterial { Descripcion = "En Revisión", Activo = true },
+                new EstatusMaterial { Descripcion = "Aprobado", Activo = true },
+                new EstatusMaterial { Descripcion = "En Producción", Activo = true },
+                new EstatusMaterial { Descripcion = "Entregado", Activo = true },
+                new EstatusMaterial { Descripcion = "Rechazado", Activo = true }
+            };
+            context.EstatusMateriales.AddRange(estatusMateriales);
+            context.SaveChanges();
+            logger.LogInformation("✅ Estatus Materiales creados");
+
+            // ═══════════════════════════════════════════════════════════
+            // CATÁLOGOS - TIPO ALERTA
+            // ═══════════════════════════════════════════════════════════
+            var tipoAlertas = new List<TipoAlerta>
+            {
+                new TipoAlerta { Descripcion = "Información", Activo = true },
+                new TipoAlerta { Descripcion = "Advertencia", Activo = true },
+                new TipoAlerta { Descripcion = "Error", Activo = true },
+                new TipoAlerta { Descripcion = "Crítico", Activo = true }
+            };
+            context.TipoAlerta.AddRange(tipoAlertas);
+            context.SaveChanges();
+            logger.LogInformation("✅ Tipos de Alerta creados");
+
+            logger.LogInformation("✅✅✅ SEED COMPLETO: Todos los datos iniciales insertados exitosamente");
         }
         else
         {
