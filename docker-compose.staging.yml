@@ -131,7 +131,6 @@ services:
       - "traefik.http.routers.adminproyectos.rule=Host(`${DOMAIN_NAME}`)"
       - "traefik.http.routers.adminproyectos.entrypoints=websecure"
       - "traefik.http.routers.adminproyectos.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.adminproyectos.tls.options=modern@file"
 
       # Service (puerto de la aplicación)
       - "traefik.http.services.adminproyectos.loadbalancer.server.port=80"
