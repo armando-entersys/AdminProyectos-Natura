@@ -535,7 +535,7 @@ namespace PresentationLayer.Controllers
             material.EstatusMaterialId = 1;
             try
             {
-                var UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                
                 
                 _briefService.InsertMaterial(material);
                 var brief = _briefService.GetById(material.BriefId);
@@ -543,24 +543,41 @@ namespace PresentationLayer.Controllers
                 {
                     IdUsuario = brief.Id,
                     Nombre = "Nuevo Material",
-                    Descripcion = "Se agrego un material al brief " + brief.Nombre,
+                    Descripcion = "Se agrego un material al proyecto " + brief.Nombre,
                     IdTipoAlerta = 4,
                     Accion = urlBase + "/Materiales?filtroNombre="+material.Nombre
 
                 };
 
                 _toolsService.CrearAlerta(alertaUsuario);
-                Alerta alertaAdmin = new Alerta
+                var usuarios = _toolsService.GetUsuarioByRol(1).Select(q=> q.Id).ToList();
+
+                var usuariosProduccion = _toolsService.GetUsuarioByRol(3).Select(q => q.Id).ToList();
+
+                if(usuariosProduccion != null)
                 {
-                    IdUsuario = UsuarioId,
-                    Nombre = "Nuevo Material",
-                    Descripcion = "Se agrego un material al brief " + brief.Nombre,
-                    IdTipoAlerta = 4,
-                    Accion = urlBase + "/Materiales?filtroNombre=" + material.Nombre
+                    usuarios.AddRange(usuariosProduccion);
 
-                };
+                }
+                if(usuarios != null)
+                {
+                    foreach(var item in usuarios)
+                    {
+                        Alerta alertaAdmin = new Alerta
+                        {
+                            IdUsuario = item,
+                            Nombre = "Nuevo Material",
+                            Descripcion = "Se agrego un material al proyecto " + brief.Nombre,
+                            IdTipoAlerta = 4,
+                            Accion = urlBase + "/Materiales?filtroNombre=" + material.Nombre
 
-                _toolsService.CrearAlerta(alertaAdmin);
+                        };
+
+                        _toolsService.CrearAlerta(alertaAdmin);
+                    }
+                    
+                }
+               
 
                 // Diccionario con los valores dinámicos a reemplazar
                 var valoresDinamicos = new Dictionary<string, string>()
@@ -572,6 +589,8 @@ namespace PresentationLayer.Controllers
                 };
                 var Destinatarios = new List<string>();
                 Destinatarios.Add(_usuarioService.TGetById(brief.UsuarioId).Correo);
+
+                Destinatarios.AddRange(_toolsService.GetUsuarioByRol(3).Select(q => q.Correo).ToList());
 
                 _emailSender.SendEmail(Destinatarios, "NuevoMaterial", valoresDinamicos);
 

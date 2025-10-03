@@ -26,7 +26,7 @@ namespace DataAccessLayer.Repositories
         public IEnumerable<Usuario> GetUsuarioByRol(int rolId)
         {
             return _context.Usuarios
-                                 .Where(m => m.RolId == rolId)
+                                 .Where(m => m.RolId == rolId && m.Estatus == true)
                                  .ToList();
         }
         public IEnumerable<Usuario> GetUsuarioBySolicitud()

@@ -69,7 +69,7 @@ function AppViewModel() {
     self.determinarEstado = ValidationModule.validations.requiredField();
     self.planComunicacion = ValidationModule.validations.requiredField();
     self.fechaPublicacion = ValidationModule.validations.requiredField();
-    self.comentarioProyecto = ValidationModule.validations.requiredField();
+    self.comentarioProyecto = ko.observable("");
 
     self.registrosMateriales = ko.observableArray();
     self.registrosParticipantes = ko.observableArray();
@@ -391,7 +391,6 @@ function AppViewModel() {
         self.nombreMaterial("");
         self.mensaje("");
         self.ciclo("");
-        self.fechaEntrega("");
         self.responsable("");
         self.area("");
         self.prioridad("");
@@ -400,6 +399,7 @@ function AppViewModel() {
         self.audiencia("");
     }
     self.GuardarMaterial = function () {
+        
         validarYProcesarFormulario(self.errors, function () {
             var Material = {
                 BriefId: self.id(),
@@ -424,7 +424,9 @@ function AppViewModel() {
                     
                     self.ObtenerMateriales(self.id());
                     self.LimpiarMaterial();
+                    
                     alert(d.mensaje);
+
                 },
                 error: function (xhr, status, error) {
                     console.error("Error al obtener los datos: ", error);

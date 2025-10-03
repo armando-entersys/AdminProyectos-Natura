@@ -1,0 +1,203 @@
+version: '3.8'
+
+services:
+  # ═══════════════════════════════════════════════════════════
+  # SQL SERVER - Base de datos
+  # ═══════════════════════════════════════════════════════════
+  adminproyectos-sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: natura-adminproyectos-sqlserver
+    restart: unless-stopped
+
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SQL_SA_PASSWORD}
+      - MSSQL_PID=Express  # Express Edition (gratis, hasta 10GB)
+
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+      - ./backups:/backups
+
+    networks:
+      - backend
+
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "${SQL_SA_PASSWORD}" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    labels:
+      - "app.name=adminproyectos-sqlserver"
+      - "app.owner=natura"
+      - "app.component=database"
+
+  # ═══════════════════════════════════════════════════════════
+  # APLICACIÓN WEB - AdminProyectos
+  # ═══════════════════════════════════════════════════════════
+  adminproyectos-web:
+    build:
+      context: .
+      dockerfile: PresentationLayer/Dockerfile
+    container_name: natura-adminproyectos-web
+    restart: unless-stopped
+
+    depends_on:
+      adminproyectos-sqlserver:
+        condition: service_healthy
+
+    environment:
+      # ASP.NET Core
+      - ASPNETCORE_ENVIRONMENT=Staging
+      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_HTTPS_PORT=443
+
+      # Base de datos
+      - ConnectionStrings__DefaultConnection=Server=adminproyectos-sqlserver;Database=AdminProyectosNaturaDB;User Id=sa;Password=${SQL_SA_PASSWORD};TrustServerCertificate=True;
+
+      # Logs
+      - Logging__LogLevel__Default=Information
+      - Logging__LogLevel__Microsoft=Warning
+
+      # File Storage
+      - FileStorage__UploadPath=/app/uploads/Brief
+
+      # Email (desde appsettings.json)
+      - EmailSettings__SmtpServer=${SMTP_SERVER:-smtp.gmail.com}
+      - EmailSettings__SmtpPort=${SMTP_PORT:-587}
+      - EmailSettings__SenderEmail=${SENDER_EMAIL}
+      - EmailSettings__Username=${SMTP_USERNAME}
+      - EmailSettings__Password=${SMTP_PASSWORD}
+      - EmailSettings__UseSsl=true
+
+    volumes:
+      # Persistencia de archivos subidos
+      - uploads-data:/app/wwwroot/uploads
+      # Logs persistentes
+      - logs-data:/app/Logs
+
+    networks:
+      - traefik      # Para recibir tráfico externo
+      - backend      # Para comunicarse con SQL Server
+
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+        labels: "app.name,app.version"
+        tag: "{{.Name}}/{{.ID}}"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/Home/Index", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+    # ═══════════════════════════════════════════════════════════
+    # LABELS - TRAEFIK (Configuración de routing y SSL)
+    # ═══════════════════════════════════════════════════════════
+    labels:
+      # Habilitar Traefik
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+
+      # Router HTTPS principal
+      - "traefik.http.routers.adminproyectos.rule=Host(`${DOMAIN_NAME}`)"
+      - "traefik.http.routers.adminproyectos.entrypoints=websecure"
+      - "traefik.http.routers.adminproyectos.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.adminproyectos.tls.options=modern@file"
+
+      # Service (puerto de la aplicación)
+      - "traefik.http.services.adminproyectos.loadbalancer.server.port=80"
+
+      # Health check en Traefik
+      - "traefik.http.services.adminproyectos.loadbalancer.healthcheck.path=/Home/Index"
+      - "traefik.http.services.adminproyectos.loadbalancer.healthcheck.interval=30s"
+      - "traefik.http.services.adminproyectos.loadbalancer.healthcheck.timeout=5s"
+
+      # Redirect HTTP → HTTPS
+      - "traefik.http.middlewares.adminproyectos-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.adminproyectos-http.rule=Host(`${DOMAIN_NAME}`)"
+      - "traefik.http.routers.adminproyectos-http.entrypoints=web"
+      - "traefik.http.routers.adminproyectos-http.middlewares=adminproyectos-redirect"
+
+      # Security headers
+      - "traefik.http.middlewares.adminproyectos-headers.headers.sslredirect=true"
+      - "traefik.http.middlewares.adminproyectos-headers.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.adminproyectos-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.adminproyectos-headers.headers.stsPreload=true"
+      - "traefik.http.middlewares.adminproyectos-headers.headers.forceSTSHeader=true"
+      - "traefik.http.middlewares.adminproyectos-headers.headers.frameDeny=true"
+      - "traefik.http.middlewares.adminproyectos-headers.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.adminproyectos-headers.headers.browserXssFilter=true"
+
+      # Aplicar middlewares
+      - "traefik.http.routers.adminproyectos.middlewares=adminproyectos-headers"
+
+      # ═══════════════════════════════════════════════════════════
+      # LABELS - MONITOREO (Prometheus y alertas)
+      # ═══════════════════════════════════════════════════════════
+      # Prometheus scraping (cAdvisor ya expone métricas del contenedor)
+      - "prometheus.io/scrape=true"
+      - "prometheus.io/port=80"
+
+      # Metadata de la aplicación
+      - "app.name=adminproyectos"
+      - "app.version=1.0.0"
+      - "app.owner=natura"
+      - "app.environment=staging"
+      - "app.team=desarrollo"
+      - "app.contact=devops@natura.com"
+      - "app.description=Sistema de Administración de Proyectos NATURA"
+
+      # Configuración de alertas
+      - "alert.deployment=true"              # Evita falsos positivos durante deploy
+      - "alert.critical=false"               # No es crítico (staging)
+      - "alert.sla=95.0"                     # SLA objetivo 95%
+
+# ═══════════════════════════════════════════════════════════
+# NETWORKS
+# ═══════════════════════════════════════════════════════════
+networks:
+  traefik:
+    external: true  # Red existente de Traefik en el servidor
+  backend:
+    driver: bridge  # Red privada para comunicación interna
+
+# ═══════════════════════════════════════════════════════════
+# VOLUMES - Persistencia de datos
+# ═══════════════════════════════════════════════════════════
+volumes:
+  sqlserver-data:
+    driver: local
+  uploads-data:
+    driver: local
+  logs-data:
+    driver: local

@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -11,22 +10,41 @@
     }
 
     .fc-event-title-container {
-        white-space: nowrap; /* Evita que el texto salte de línea */
-        overflow: hidden; /* Oculta el texto que se desborda */
-        text-overflow: ellipsis; /* Agrega puntos suspensivos al texto truncado */
-        max-width: 100%; /* Ajusta al tamaño del contenedor */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
     }
 
     .fc-daygrid-event {
-        cursor: pointer; /* Cambia el cursor a mano */
+        cursor: pointer;
     }
+
+    /* Responsiveness */
+    #calendar {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .modal-body label {
+        font-weight: bold;
+        display: block;
+        margin-top: 10px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+   
 </style>
 <div class="container py-4">
     <h1 class="text-center mb-4">Calendario de Materiales</h1>
     <div id="calendar"></div>
 </div>
 <div class="modal fade" id="divEdicion" tabindex="-1" aria-labelledby="Modal" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="Modal">Material</h5>
@@ -34,18 +52,17 @@
             </div>
             <div class="modal-body">
                 <label>Fecha de Entrega</label>
-                <p data-bind="text:fechaEntrega"></p>
+                <p data-bind="text:fechaEntrega" class="text-break"></p>
                 <label>Nombre Material</label>
-                <p data-bind="text:nombre"></p>
+                <p data-bind="text:nombre" class="text-break"></p>
                 <label>Responsable</label>
-                <p data-bind="text:responsable"></p>
-                <label>Area</label>
-                <p data-bind="text:area"></p>
+                <p data-bind="text:responsable" class="text-break"></p>
+                <label>Área</label>
+                <p data-bind="text:area" class="text-break"></p>
                 <a class="btn btn-primary"
                    data-bind="attr: { href: '/AdministradorProyectos/Materiales?filtroNombre=' + encodeURIComponent(nombre()) }">
                     Ver Material
                 </a>
-                
             </div>
         </div>
     </div>
@@ -56,6 +73,5 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/es.js"></script>
-    <script src="~/js/Calendario/Calendario.js?v=1.0.0"></script>
-
+    <script src="~/js/Calendario/Calendario.js?v=1.0.3"></script>
 }

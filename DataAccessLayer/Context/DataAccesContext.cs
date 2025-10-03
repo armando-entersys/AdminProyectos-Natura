@@ -1,15 +1,37 @@
 ﻿using EntityLayer.Concrete;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace DataAccessLayer.Context
 {
     public class DataAccesContext : DbContext
     {
+        // Constructor con opciones (para inyección de dependencias)
+        public DataAccesContext(DbContextOptions<DataAccesContext> options) : base(options)
+        {
+        }
+
+        // Constructor sin parámetros para compatibilidad con migraciones
+        public DataAccesContext()
+        {
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseSqlServer("Server=solucionesmkt.com.mx;initial catalog=AdminProyectosNaturaDB;user id=mkt;password=123456789;");
+            // Solo configurar si no se pasaron opciones (para migraciones y desarrollo local)
+            if (!optionsBuilder.IsConfigured)
+            {
+                // Primero intentar variable de entorno (Docker)
+                var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
 
+                // Si no existe variable de entorno, usar el connection string de desarrollo local
+                if (string.IsNullOrEmpty(connectionString))
+                {
+                    connectionString = "Server=solucionesmkt.com.mx;initial catalog=AdminProyectosNaturaDB;user id=mkt;password=123456789;";
+                }
+
+                optionsBuilder.UseSqlServer(connectionString);
+            }
         }
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Alerta> Alertas { get; set; }
