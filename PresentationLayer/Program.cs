@@ -170,7 +170,10 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// HTTPS Redirection deshabilitado cuando está detrás de Traefik
+// Traefik maneja SSL/TLS, la app recibe HTTP y responde HTTP
+// app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
