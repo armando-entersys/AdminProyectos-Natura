@@ -1,0 +1,94 @@
+version: '3.8'
+
+services:
+  # ═══════════════════════════════════════════════════════════
+  # SQL SERVER - Base de datos
+  # ═══════════════════════════════════════════════════════════
+  adminproyectos-sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: local-adminproyectos-sqlserver
+    restart: unless-stopped
+
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Operaciones.2025
+      - MSSQL_PID=Express  # Express Edition (gratis, hasta 10GB)
+
+    ports:
+      - "1433:1433"  # Exponer puerto SQL Server para conexiones externas si necesitas
+
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+      - ./backups:/backups
+
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -No -U sa -P "Operaciones.2025" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+
+  # ═══════════════════════════════════════════════════════════
+  # APLICACIÓN WEB - AdminProyectos
+  # ═══════════════════════════════════════════════════════════
+  adminproyectos-web:
+    build:
+      context: .
+      dockerfile: PresentationLayer/Dockerfile
+    container_name: local-adminproyectos-web
+    restart: unless-stopped
+
+    depends_on:
+      adminproyectos-sqlserver:
+        condition: service_healthy
+
+    environment:
+      # ASP.NET Core
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_HTTPS_PORT=443
+
+      # Base de datos
+      - ConnectionStrings__DefaultConnection=Server=adminproyectos-sqlserver;Database=AdminProyectosNaturaDB;User Id=sa;Password=Operaciones.2025;TrustServerCertificate=True;
+
+      # Logs
+      - Logging__LogLevel__Default=Information
+      - Logging__LogLevel__Microsoft=Warning
+
+      # File Storage
+      - FileStorage__UploadPath=/app/uploads/Brief
+
+      # Email (opcional para desarrollo local)
+      - EmailSettings__SmtpServer=smtp.gmail.com
+      - EmailSettings__SmtpPort=587
+      - EmailSettings__SenderEmail=test@test.com
+      - EmailSettings__Username=test@test.com
+      - EmailSettings__Password=test
+      - EmailSettings__UseSsl=true
+
+    ports:
+      - "8080:80"  # Acceder desde http://localhost:8080
+
+    volumes:
+      # Persistencia de archivos subidos
+      - uploads-data:/app/wwwroot/uploads
+      # Logs persistentes
+      - logs-data:/app/Logs
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+# ═══════════════════════════════════════════════════════════
+# VOLUMES - Persistencia de datos
+# ═══════════════════════════════════════════════════════════
+volumes:
+  sqlserver-data:
+    driver: local
+  uploads-data:
+    driver: local
+  logs-data:
+    driver: local

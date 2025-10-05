@@ -42,7 +42,7 @@ function AppViewModel() {
         if (seleccionado != null && seleccionado!= undefined ) {
             // Llama al servicio con la información del catálogo seleccionado
             $.ajax({
-                url: "Catalogos/GetCatalogoInfo?nombreCatalogo=" + seleccionado.Descripcion, // URL del servicio
+                url: "/Catalogos/GetCatalogoInfo?nombreCatalogo=" + seleccionado.Descripcion, // URL del servicio
                 type: "GET",
                 contentType: "application/json",
                 success: function (d) {
@@ -86,7 +86,7 @@ function AppViewModel() {
             }
         }
         $.ajax({
-            url: "Catalogos/Create", // URL del método GetAll en tu API
+            url: "/Catalogos/Create", // URL del método GetAll en tu API
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(peticionCatalogos),
@@ -119,7 +119,7 @@ function AppViewModel() {
             }
         }
         $.ajax({
-            url: "Catalogos/Create", // URL del método GetAll en tu API
+            url: "/Catalogos/Create", // URL del método GetAll en tu API
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(peticionCatalogos),
@@ -154,7 +154,7 @@ function AppViewModel() {
             nombreCatalogo: self.Catalogo().Descripcion
         }
         $.ajax({
-            url: "Catalogos/Delete", // URL del método GetAll en tu API
+            url: "/Catalogos/Delete", // URL del método GetAll en tu API
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify(peticionCatalogos),
