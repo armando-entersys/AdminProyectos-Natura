@@ -25,8 +25,8 @@
                     else
                     {
                         // Descomponer la ruta en controlador y acción
-                        var rutaDividida = menu.Ruta.Split('/');
-                        controlador = rutaDividida[0];
+                        var rutaDividida = menu.Ruta.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                        controlador = rutaDividida.Length > 0 ? rutaDividida[0] : "Home";
                         accion = rutaDividida.Length > 1 ? rutaDividida[1] : "Index";
                     }
                    
