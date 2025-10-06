@@ -76,12 +76,12 @@ services:
       - logs-data:/app/Logs
 
     networks:
-      - traefik-public
+      - traefik
       - default
 
     labels:
       - "traefik.enable=true"
-      - "traefik.docker.network=traefik-public"
+      - "traefik.docker.network=traefik"
 
       # HTTP
       - "traefik.http.routers.adminproyectos-http.rule=Host(`adminproyectos.entersys.mx`)"
@@ -119,5 +119,5 @@ volumes:
 # NETWORKS - Traefik
 # ═══════════════════════════════════════════════════════════
 networks:
-  traefik-public:
+  traefik:
     external: true
