@@ -58,12 +58,12 @@ services:
       # File Storage
       - FileStorage__UploadPath=/app/uploads/Brief
 
-      # Email (opcional para desarrollo local)
+      # Email - Gmail configurado
       - EmailSettings__SmtpServer=smtp.gmail.com
       - EmailSettings__SmtpPort=587
-      - EmailSettings__SenderEmail=test@test.com
-      - EmailSettings__Username=test@test.com
-      - EmailSettings__Password=test
+      - EmailSettings__SenderEmail=armando.cortes@entersys.mx
+      - EmailSettings__Username=armando.cortes@entersys.mx
+      - EmailSettings__Password=bjmg bjyr elnt ycnv
       - EmailSettings__UseSsl=true
 
     ports:

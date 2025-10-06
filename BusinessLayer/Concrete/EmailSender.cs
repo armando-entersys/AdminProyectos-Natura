@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace BusinessLayer.Concrete
 {
@@ -18,11 +19,13 @@ namespace BusinessLayer.Concrete
     {
         private readonly EmailSettings _emailSettings;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<EmailSender> _logger;
 
-        public EmailSender(IOptions<EmailSettings> emailSettings, IConfiguration configuration)
+        public EmailSender(IOptions<EmailSettings> emailSettings, IConfiguration configuration, ILogger<EmailSender> logger)
         {
             _emailSettings = emailSettings.Value;
             _configuration = configuration;
+            _logger = logger;
         }
         private string ReemplazarMarcadores(string texto, Dictionary<string, string> placeholders)
         {
@@ -76,18 +79,25 @@ namespace BusinessLayer.Concrete
                  client.Connect(_emailSettings.SmtpServer, _emailSettings.SmtpPort, SecureSocketOptions.StartTls);
                  client.Authenticate(_emailSettings.Username, _emailSettings.Password);
 
-               
-                
+
+
                 client.Send(emailMessage);
+                _logger.LogInformation($"Email enviado exitosamente a {string.Join(", ", _toEmails)} - Categoría: {_category}");
             }
             catch (Exception ex)
             {
-                // Manejar errores
-                throw new InvalidOperationException("Error al enviar el correo electrónico", ex);
+                // Registrar error pero NO lanzar excepción para no bloquear la operación
+                _logger.LogWarning(ex, $"No se pudo enviar email a {string.Join(", ", _toEmails)} - Categoría: {_category}. " +
+                    $"Verifique la configuración SMTP en docker-compose.yml o appsettings.json. " +
+                    $"Error: {ex.Message}");
+                // NO lanzar excepción - permitir que la operación continúe sin email
             }
             finally
             {
-                 client.Disconnect(true);
+                if (client.IsConnected)
+                {
+                    client.Disconnect(true);
+                }
             }
         }
     }

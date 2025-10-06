@@ -126,7 +126,8 @@ using (var scope = app.Services.CreateScope())
             // ═══════════════════════════════════════════════════════════
             var rolAdmin = new Rol { Descripcion = "Administrador" };
             var rolUsuario = new Rol { Descripcion = "Usuario" };
-            context.Roles.AddRange(rolAdmin, rolUsuario);
+            var rolProduccion = new Rol { Descripcion = "Producción" };
+            context.Roles.AddRange(rolAdmin, rolUsuario, rolProduccion);
             context.SaveChanges();
             logger.LogInformation("✅ Roles creados");
 
@@ -156,6 +157,7 @@ using (var scope = app.Services.CreateScope())
             // ═══════════════════════════════════════════════════════════
             var menus = new List<Menu>
             {
+                // Menús para Administrador
                 new Menu { Nombre = "Home", Ruta = "/Home/Index", Orden = 1, Icono = "lni lni-home", RolId = rolAdmin.Id },
                 new Menu { Nombre = "Briefs", Ruta = "/Brief/Index", Orden = 2, Icono = "lni lni-briefcase", RolId = rolAdmin.Id },
                 new Menu { Nombre = "Calendario", Ruta = "/Calendario/Index", Orden = 3, Icono = "lni lni-calendar", RolId = rolAdmin.Id },
@@ -163,7 +165,20 @@ using (var scope = app.Services.CreateScope())
                 new Menu { Nombre = "Alertas", Ruta = "/Alertas/Index", Orden = 5, Icono = "lni lni-alarm", RolId = rolAdmin.Id },
                 new Menu { Nombre = "Usuarios", Ruta = "/Usuarios/Index", Orden = 6, Icono = "lni lni-users", RolId = rolAdmin.Id },
                 new Menu { Nombre = "Invitaciones", Ruta = "/Invitaciones/Index", Orden = 7, Icono = "lni lni-envelope", RolId = rolAdmin.Id },
-                new Menu { Nombre = "Catálogos", Ruta = "/Catalogos/Index", Orden = 8, Icono = "lni lni-list", RolId = rolAdmin.Id }
+                new Menu { Nombre = "Catálogos", Ruta = "/Catalogos/Index", Orden = 8, Icono = "lni lni-list", RolId = rolAdmin.Id },
+
+                // Menús para Usuario
+                new Menu { Nombre = "Home", Ruta = "/Home/Index", Orden = 1, Icono = "lni lni-home", RolId = rolUsuario.Id },
+                new Menu { Nombre = "Briefs", Ruta = "/Brief/Index", Orden = 2, Icono = "lni lni-briefcase", RolId = rolUsuario.Id },
+                new Menu { Nombre = "Materiales", Ruta = "/Materiales/Index", Orden = 3, Icono = "lni lni-files", RolId = rolUsuario.Id },
+                new Menu { Nombre = "Calendario", Ruta = "/Calendario/Index", Orden = 4, Icono = "lni lni-calendar", RolId = rolUsuario.Id },
+                new Menu { Nombre = "Alertas", Ruta = "/Alertas/Index", Orden = 5, Icono = "lni lni-alarm", RolId = rolUsuario.Id },
+
+                // Menús para Producción
+                new Menu { Nombre = "Home", Ruta = "/Home/Index", Orden = 1, Icono = "lni lni-home", RolId = rolProduccion.Id },
+                new Menu { Nombre = "Materiales", Ruta = "/Materiales/Index", Orden = 2, Icono = "lni lni-files", RolId = rolProduccion.Id },
+                new Menu { Nombre = "Calendario", Ruta = "/Calendario/Index", Orden = 3, Icono = "lni lni-calendar", RolId = rolProduccion.Id },
+                new Menu { Nombre = "Alertas", Ruta = "/Alertas/Index", Orden = 4, Icono = "lni lni-alarm", RolId = rolProduccion.Id }
             };
             context.Menus.AddRange(menus);
             context.SaveChanges();
@@ -174,10 +189,10 @@ using (var scope = app.Services.CreateScope())
             // ═══════════════════════════════════════════════════════════
             var estatusBriefs = new List<EstatusBrief>
             {
-                new EstatusBrief { Descripcion = "Pendiente", Activo = true },
-                new EstatusBrief { Descripcion = "En Proceso", Activo = true },
-                new EstatusBrief { Descripcion = "Completado", Activo = true },
-                new EstatusBrief { Descripcion = "Cancelado", Activo = true }
+                new EstatusBrief { Descripcion = "En revisión", Activo = true },
+                new EstatusBrief { Descripcion = "Producción", Activo = true },
+                new EstatusBrief { Descripcion = "Falta información", Activo = true },
+                new EstatusBrief { Descripcion = "Programado", Activo = true }
             };
             context.EstatusBriefs.AddRange(estatusBriefs);
             context.SaveChanges();

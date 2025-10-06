@@ -346,7 +346,7 @@ namespace PresentationLayer.Controllers
                                       Addbrief.Archivo.ContentType == "video/x-matroska")) // MKV
             {
                 // Guardar el archivo en una ruta específica o procesarlo según sea necesario
-                string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "\\uploads\\Brief\\" + brief.Id);
+                string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "uploads", "Brief", brief.Id.ToString());
 
                 if (!Directory.Exists(uploadsFolder))
                 {
@@ -413,7 +413,7 @@ namespace PresentationLayer.Controllers
                                              Addbrief.Archivo.ContentType == "video/x-matroska")) // MKV
             {
                 // Guardar el archivo en una ruta específica o procesarlo según sea necesario
-                string uploadsFolder = @_hostingEnvironment.WebRootPath + "\\uploads\\Brief\\" + briefOld.Id;
+                string uploadsFolder = Path.Combine(_hostingEnvironment.WebRootPath, "uploads", "Brief", briefOld.Id.ToString());
 
                 if (!Directory.Exists(uploadsFolder))
                 {
