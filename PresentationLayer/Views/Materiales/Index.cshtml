@@ -188,7 +188,7 @@
                         <div class="col-md-6">
                             <label for="archivoCargado">Archivo Cargado</label>
                             <a id="archivoCargado" class="text-truncate"
-                               data-bind="attr: { href: '/AdministradorProyectos/Brief/DownloadFile/' + idBrief() }, text: rutaArchivo" target="_blank">Descargar archivo</a>
+                               data-bind="attr: { href: '/Brief/DownloadFile/' + idBrief() }, text: rutaArchivo" target="_blank">Descargar archivo</a>
                         </div>
                     </div>
                     
@@ -293,7 +293,7 @@
                 height: 300,
                 menubar: false,
                 language: 'es',
-                images_upload_url: '/AdministradorProyectos/Materiales/upload',
+                images_upload_url: '/Materiales/upload',
                 automatic_uploads: true,
                 setup: function (editor) {
                     editor.on('init', function () {

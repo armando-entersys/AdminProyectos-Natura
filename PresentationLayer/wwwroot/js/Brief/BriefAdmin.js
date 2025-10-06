@@ -105,8 +105,10 @@ function AppViewModel() {
 
                 self.columns.push.apply(self.columns, transformedColumns); // Añadimos las columnas transformadas
 
-                // Inicializa SortableJS una vez que los datos han sido cargados
-                initializeSortable();
+                // Inicializa SortableJS una vez que los datos han sido cargados y Knockout haya renderizado
+                setTimeout(function() {
+                    initializeSortable();
+                }, 100);
                 $.ajax({
                     url: "Brief/GetAllEstatusBrief", // URL del método GetAll en tu API
                     type: "GET",
