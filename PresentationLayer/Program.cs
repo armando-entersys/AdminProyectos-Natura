@@ -33,6 +33,17 @@ builder.Host.UseSerilog();
 // Configuraci�n de servicios
 builder.Services.AddControllersWithViews();
 
+// Configurar CORS para permitir peticiones desde archivos HTML locales
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
 // Configurar DbContext con connection string desde appsettings.json o variables de entorno
 builder.Services.AddDbContext<DataAccesContext>(options =>
 {
@@ -333,6 +344,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 app.UseRouting();
+app.UseCors("AllowAll");
 app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();

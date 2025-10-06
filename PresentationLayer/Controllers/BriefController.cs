@@ -163,12 +163,35 @@ namespace PresentationLayer.Controllers
         {
             respuestaServicio res = new respuestaServicio();
 
-            brief.FechaModificacion = DateTime.Now;
-            brief.FechaRegistro = DateTime.Now;
+            try
+            {
+                // Asignar usuario actual si no viene en el brief
+                if (brief.UsuarioId == 0)
+                {
+                    brief.UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                }
 
-            // _emailSender.SendEmailAsync(usuario.Correo, "Bienvenido a Administrador de Proyectos", "<h1>Gracias por unirte a MyApp</h1>");
-            res.Mensaje = "Brief agregado exitosamente";
-            res.Exito = true;
+                // Asignar estatus inicial "En revisión" (id=1) si no viene
+                if (brief.EstatusBriefId == 0)
+                {
+                    brief.EstatusBriefId = 1;
+                }
+
+                brief.FechaModificacion = DateTime.Now;
+                brief.FechaRegistro = DateTime.Now;
+
+                _briefService.Insert(brief);
+
+                res.Datos = brief;
+                res.Mensaje = "Brief agregado exitosamente";
+                res.Exito = true;
+            }
+            catch (Exception ex)
+            {
+                res.Mensaje = $"Error al crear brief: {ex.Message}";
+                res.Exito = false;
+            }
+
             return Ok(res);
         }
 

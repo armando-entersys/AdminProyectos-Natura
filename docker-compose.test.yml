@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: PresentationLayer/Dockerfile
+    container_name: adminproyectos-web-test
+    ports:
+      - "8080:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=AdminProyectos;User Id=sa;Password=Natura2024$;TrustServerCertificate=True
+      - EmailSettings__SmtpServer=smtp.gmail.com
+      - EmailSettings__SmtpPort=587
+      - EmailSettings__SenderName=Natura ADCON
+      - EmailSettings__SenderEmail=naturalatoreperu@gmail.com
+      - EmailSettings__Username=naturalatoreperu@gmail.com
+      - EmailSettings__Password=jqkb btxd kzxo tzcw
+      - EmailSettings__EnableSsl=true
+    depends_on:
+      - sqlserver
+    networks:
+      - default
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: adminproyectos-sqlserver-test
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Natura2024$
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data-test:/var/opt/mssql
+    networks:
+      - default
+
+volumes:
+  sqlserver-data-test:
+
+networks:
+  default:
+    driver: bridge
