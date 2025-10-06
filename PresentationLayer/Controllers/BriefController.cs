@@ -60,24 +60,17 @@ namespace PresentationLayer.Controllers
             }
             return View();
         }
+        [Authorize]
         public ActionResult IndexAdmin()
         {
-            IEnumerable<Menu> menus = null;
+            ViewBag.RolId = Int32.Parse(User.FindFirst(ClaimTypes.Role)?.Value);
+            ViewBag.Email = User.FindFirst(ClaimTypes.Email)?.Value;
+            ViewBag.Name = User.FindFirst(ClaimTypes.Name)?.Value;
+            ViewBag.UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-            if (User?.Identity?.IsAuthenticated == true)
-            {
-                ViewBag.RolId = Int32.Parse(User.FindFirst(ClaimTypes.Role)?.Value);
-                ViewBag.Email = User.FindFirst(ClaimTypes.Email)?.Value;
-                ViewBag.Name = User.FindFirst(ClaimTypes.Name)?.Value;
-                ViewBag.UsuarioId = Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            ViewBag.Menus = _authService.GetMenusByRole(ViewBag.RolId);
+            ViewBag.ConteoAlertas = _toolsService.GetUnreadAlertsCount(ViewBag.UsuarioId);
 
-                ViewBag.Menus = _authService.GetMenusByRole(ViewBag.RolId);
-                ViewBag.ConteoAlertas = _toolsService.GetUnreadAlertsCount(ViewBag.UsuarioId);
-            }
-            else
-            {
-                RedirectToAction("Index", "Login");
-            }
             return View();
         }
         [HttpGet]
@@ -203,7 +196,7 @@ namespace PresentationLayer.Controllers
             brief.EstatusBrief = estatusBriefs.FirstOrDefault(q => q.Id == brief.EstatusBriefId);
 
             // Obtener destinatarios según el nuevo estatus
-            var urlBase = $"{Request.Scheme}://{Request.Host}/AdministradorProyectos";
+            var urlBase = $"{Request.Scheme}://{Request.Host}";
             var destinatarios = GetRecipientsByStatus(brief, urlBase);
 
             // Crear una alerta general
@@ -361,7 +354,7 @@ namespace PresentationLayer.Controllers
                 }
             }
             //Envio Correo
-            var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
+            var urlBase = $"{Request.Scheme}://{Request.Host}";
             // Diccionario con los valores dinámicos a reemplazar
             var valoresDinamicos = new Dictionary<string, string>()
             {
@@ -460,7 +453,7 @@ namespace PresentationLayer.Controllers
 
             _briefService.Update(brief);
             //Envio Correo
-            var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
+            var urlBase = $"{Request.Scheme}://{Request.Host}";
             // Diccionario con los valores dinámicos a reemplazar
             var valoresDinamicos = new Dictionary<string, string>()
             {
@@ -529,7 +522,7 @@ namespace PresentationLayer.Controllers
         public ActionResult CreateMaterial([FromBody] Material material)
         {
             respuestaServicio res = new respuestaServicio();
-            var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
+            var urlBase = $"{Request.Scheme}://{Request.Host}";
 
             material.FechaModificacion = DateTime.Now;
             material.EstatusMaterialId = 1;
@@ -775,7 +768,7 @@ namespace PresentationLayer.Controllers
             {
                 var brief = _briefService.GetById(id);
                 _briefService.Delete(id);
-                var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
+                var urlBase = $"{Request.Scheme}://{Request.Host}";
 
                 res.Exito = true;
                 var usuarioLogin = _usuarioService.TGetById(Int32.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value));

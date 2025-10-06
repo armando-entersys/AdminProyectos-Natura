@@ -161,7 +161,7 @@ namespace PresentationLayer.Controllers
                     Destinatarios.AddRange(_toolsService.GetUsuarioByRol(3).Select(q => q.Correo).ToList());
 
 
-                    var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
+                    var urlBase = $"{Request.Scheme}://{Request.Host}";
                     // Diccionario con los valores dinámicos a reemplazar
                     var valoresDinamicos = new Dictionary<string, string>()
                 {

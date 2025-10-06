@@ -109,7 +109,7 @@ namespace PresentationLayer.Controllers
             usuario.UserRol = _rolService.TGetById(usuario.RolId);
             _usuarioService.TInsert(usuario);
             
-            var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
+            var urlBase = $"{Request.Scheme}://{Request.Host}";
             
             var valoresDinamicos = new Dictionary<string, string>
             {
@@ -150,7 +150,7 @@ namespace PresentationLayer.Controllers
         [HttpPost]
         public IActionResult SolicitudUsuario(string Nombre, string Correo,string ApellidoPaterno, string ApellidoMaterno, string Contrasena)
         {
-            var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
+            var urlBase = $"{Request.Scheme}://{Request.Host}";
 
             Usuario usuario = new()
             {
@@ -295,7 +295,7 @@ namespace PresentationLayer.Controllers
                
                 var brief = _briefService.GetById(participante.BriefId);
 
-                var urlBase = $"{Request.Scheme}://{Request.Host}" + "/AdministradorProyectos";
+                var urlBase = $"{Request.Scheme}://{Request.Host}";
                 // Diccionario con los valores dinámicos a reemplazar
                 var valoresDinamicos = new Dictionary<string, string>()
                 {
