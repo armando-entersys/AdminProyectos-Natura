@@ -2,7 +2,16 @@
   "permissions": {
     "allow": [
       "Bash(gcloud compute ssh:*)",
-      "Bash(gcloud compute instances:*)"
+      "Bash(gcloud compute instances:*)",
+      "Bash(curl:*)",
+      "Bash(docker exec:*)",
+      "Bash(winpty docker exec:*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker volume rm:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker logs:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

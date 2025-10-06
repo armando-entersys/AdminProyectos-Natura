@@ -94,16 +94,21 @@ function AppViewModel() {
             type: "GET",
             contentType: "application/json",
             success: function (d) {
+                console.log("GetAllColumns response:", d);
                 self.columns.removeAll();
                 // Asegúrate de que los datos se transformen en instancias de Task y Column
                 var transformedColumns = d.datos.map(function (columnData) {
+                    console.log("Processing column:", columnData);
                     var tasks = columnData.tasks.map(function (taskData) {
+                        console.log("Processing task:", taskData);
                         return new Task(taskData.id, taskData.title, taskData.usuarioId, taskData.nombreUsuario, taskData.fechaEntrega);
                     });
                     return new Column(columnData.id, columnData.name, tasks);
                 });
 
+                console.log("Transformed columns:", transformedColumns);
                 self.columns.push.apply(self.columns, transformedColumns); // Añadimos las columnas transformadas
+                console.log("Columns in observable:", self.columns());
 
                 // Inicializa SortableJS una vez que los datos han sido cargados y Knockout haya renderizado
                 setTimeout(function() {
@@ -209,8 +214,9 @@ function AppViewModel() {
                 });
             },
             error: function (xhr, status, error) {
-                console.error("Error al obtener los datos: ", error);
-                alert("Error al obtener los datos: " + xhr.responseText);
+                console.error("Error al obtener GetAllColumns: ", error);
+                console.error("Response:", xhr.responseText);
+                alert("Error al obtener los datos de columnas: " + xhr.responseText);
             }
         });
     };
