@@ -75,6 +75,28 @@ services:
       # Logs persistentes
       - logs-data:/app/Logs
 
+    networks:
+      - traefik-public
+      - default
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-public"
+
+      # HTTP
+      - "traefik.http.routers.adminproyectos-http.rule=Host(`adminproyectos.entersys.mx`)"
+      - "traefik.http.routers.adminproyectos-http.entrypoints=web"
+      - "traefik.http.routers.adminproyectos-http.middlewares=https-redirect"
+
+      # HTTPS
+      - "traefik.http.routers.adminproyectos.rule=Host(`adminproyectos.entersys.mx`)"
+      - "traefik.http.routers.adminproyectos.entrypoints=websecure"
+      - "traefik.http.routers.adminproyectos.tls=true"
+      - "traefik.http.routers.adminproyectos.tls.certresolver=letsencrypt"
+
+      # Service
+      - "traefik.http.services.adminproyectos.loadbalancer.server.port=80"
+
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
       interval: 30s
@@ -92,3 +114,10 @@ volumes:
     driver: local
   logs-data:
     driver: local
+
+# ═══════════════════════════════════════════════════════════
+# NETWORKS - Traefik
+# ═══════════════════════════════════════════════════════════
+networks:
+  traefik-public:
+    external: true
