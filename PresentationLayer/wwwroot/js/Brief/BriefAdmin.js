@@ -614,21 +614,39 @@ function AppViewModel() {
 }
 
 // Inicializa SortableJS después de que Knockout haya sido inicializado
+var sortableInstances = [];
+
 function initializeSortable() {
+    // Destruir instancias previas
+    sortableInstances.forEach(function(instance) {
+        if (instance && instance.destroy) {
+            instance.destroy();
+        }
+    });
+    sortableInstances = [];
+
+    // Crear nuevas instancias
     document.querySelectorAll('.sortable').forEach(function (element) {
-        new Sortable(element, {
+        var instance = new Sortable(element, {
             group: 'kanban',
             animation: 150,
+            forceFallback: true,
+            fallbackOnBody: true,
+            swapThreshold: 0.65,
             onEnd: function (evt) {
                 var taskId = parseInt(evt.item.getAttribute('data-task-id'));
                 var fromColumnId = parseInt(evt.from.id);
                 var toColumnId = parseInt(evt.to.id);
                 var newIndex = evt.newIndex;
 
+                console.log('Moving task:', taskId, 'from column:', fromColumnId, 'to column:', toColumnId);
                 appViewModel.moveTask(taskId, fromColumnId, toColumnId, newIndex);
             }
         });
+        sortableInstances.push(instance);
     });
+
+    console.log('Sortable initialized with', sortableInstances.length, 'instances');
 }
 
 var appViewModel = new AppViewModel();
