@@ -156,14 +156,9 @@ function AppViewModel() {
 
     // Editar material
     self.Editar = function (material) {
-        $('.tox-statusbar__branding').hide(); // Oculta el elemento 
-        self.tituloModal("Editar Material" + material.nombre);
+        self.tituloModal("Editar Material: " + material.nombre);
         self.Comentario("");
-        // Limpiar el contenido del editor TinyMCE
-        tinymce.get('myComentario').setContent('');
 
-        // Limpiar el contenido del editor de comentarios
-       // document.getElementById("comentario-editor").innerHTML = "";
         self.id(material.id);
         self.fechaEntrega(new Date(material.fechaEntrega).toISOString().split('T')[0]);
         self.registrosUsuariosCorreo.removeAll();
@@ -174,7 +169,7 @@ function AppViewModel() {
         else {
             self.linksReferencias(material.brief.linksReferencias);
         }
-        
+
         self.rutaArchivo(material.brief.rutaArchivo);
         var EstatusMateriales = self.catEstatusMateriales().find(function (r) {
             return r.id === material.estatusMaterialId;
@@ -185,6 +180,17 @@ function AppViewModel() {
             .then(function (d) {
                 self.registrosHistorico(d.datos);
                 $("#divEdicion").modal("show");
+
+                // Esperar a que el modal esté completamente abierto y luego limpiar TinyMCE
+                $('#divEdicion').one('shown.bs.modal', function () {
+                    setTimeout(function() {
+                        $('.tox-statusbar__branding').hide();
+                        if (tinymce.get('myComentario')) {
+                            tinymce.get('myComentario').setContent('');
+                            tinymce.get('myComentario').focus();
+                        }
+                    }, 100);
+                });
             })
             .catch(function (error) {
                 console.error("Error al obtener el historial:", error);

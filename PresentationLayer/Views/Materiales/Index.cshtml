@@ -285,7 +285,13 @@
 
     </script>
     <script>
-           $(document).ready(function () {
+        var tinyMCEInitialized = false;
+
+        function initTinyMCE() {
+            if (tinyMCEInitialized) {
+                return;
+            }
+
             tinymce.init({
                 selector: '#myComentario',
                 plugins: 'lists link image table code',
@@ -295,13 +301,25 @@
                 language: 'es',
                 images_upload_url: '/Materiales/upload',
                 automatic_uploads: true,
+                readonly: false,
                 setup: function (editor) {
                     editor.on('init', function () {
-                        editor.mode.set('design'); // Establecer modo edición
+                        console.log('TinyMCE initialized');
+                        editor.setMode('design');
+                        tinyMCEInitialized = true;
                     });
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            // Inicializar TinyMCE cuando se abre el modal
+            $('#divEdicion').on('shown.bs.modal', function () {
+                if (!tinyMCEInitialized) {
+                    initTinyMCE();
                 }
             });
         });
     </script>
-    <script src="~/js/Material/Material.js?v=1.0.3"></script>
+    <script src="~/js/Material/Material.js?v=1.0.4"></script>
 }
