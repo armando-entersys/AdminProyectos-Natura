@@ -285,11 +285,10 @@
 
     </script>
     <script>
-        var tinyMCEInitialized = false;
-
         function initTinyMCE() {
-            if (tinyMCEInitialized) {
-                return;
+            // Remover instancia existente si existe
+            if (tinymce.get('myComentario')) {
+                tinymce.get('myComentario').remove();
             }
 
             tinymce.init({
@@ -301,7 +300,6 @@
                 language: 'es',
                 images_upload_url: '/Materiales/upload',
                 automatic_uploads: true,
-                readonly: false,
                 images_upload_handler: function (blobInfo, success, failure) {
                     var xhr, formData;
                     xhr = new XMLHttpRequest();
@@ -332,9 +330,12 @@
                 },
                 setup: function (editor) {
                     editor.on('init', function () {
-                        console.log('TinyMCE initialized');
-                        editor.setMode('design');
-                        tinyMCEInitialized = true;
+                        console.log('TinyMCE initialized and ready');
+                        // Forzar que el editor sea editable
+                        editor.mode.set('design');
+                        setTimeout(function() {
+                            editor.focus();
+                        }, 100);
                     });
                 }
             });
@@ -343,11 +344,9 @@
         $(document).ready(function () {
             // Inicializar TinyMCE cuando se abre el modal
             $('#divEdicion').on('shown.bs.modal', function () {
-                if (!tinyMCEInitialized) {
-                    initTinyMCE();
-                }
+                initTinyMCE();
             });
         });
     </script>
-    <script src="~/js/Material/Material.js?v=1.0.5"></script>
+    <script src="~/js/Material/Material.js?v=1.0.6"></script>
 }

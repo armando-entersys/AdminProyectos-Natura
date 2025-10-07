@@ -181,15 +181,23 @@ function AppViewModel() {
                 self.registrosHistorico(d.datos);
                 $("#divEdicion").modal("show");
 
-                // Esperar a que el modal esté completamente abierto y luego limpiar TinyMCE
+                // Esperar a que el modal esté completamente abierto y el editor esté listo
                 $('#divEdicion').one('shown.bs.modal', function () {
-                    setTimeout(function() {
-                        $('.tox-statusbar__branding').hide();
-                        if (tinymce.get('myComentario')) {
-                            tinymce.get('myComentario').setContent('');
-                            tinymce.get('myComentario').focus();
+                    // Esperar a que TinyMCE esté completamente inicializado
+                    var checkEditor = setInterval(function() {
+                        var editor = tinymce.get('myComentario');
+                        if (editor && editor.initialized) {
+                            clearInterval(checkEditor);
+                            $('.tox-statusbar__branding').hide();
+                            editor.setContent('');
+                            editor.focus();
                         }
-                    }, 100);
+                    }, 50);
+
+                    // Timeout de seguridad
+                    setTimeout(function() {
+                        clearInterval(checkEditor);
+                    }, 3000);
                 });
             })
             .catch(function (error) {
