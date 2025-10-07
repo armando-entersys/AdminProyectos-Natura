@@ -346,7 +346,14 @@
             $('#divEdicion').on('shown.bs.modal', function () {
                 initTinyMCE();
             });
+
+            // Limpiar TinyMCE cuando se cierra el modal
+            $('#divEdicion').on('hidden.bs.modal', function () {
+                if (tinymce.get('myComentario')) {
+                    tinymce.get('myComentario').remove();
+                }
+            });
         });
     </script>
-    <script src="~/js/Material/Material.js?v=1.0.6"></script>
+    <script src="~/js/Material/Material.js?v=1.0.7"></script>
 }
