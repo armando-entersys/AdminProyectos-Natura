@@ -211,23 +211,38 @@ namespace PresentationLayer.Controllers
         }
 
         [HttpPost]
-        public IActionResult upload(IFormFile file)
+        public async Task<IActionResult> upload(IFormFile file)
         {
             if (file != null && file.Length > 0)
             {
-                var fileName = Path.GetFileName(file.FileName);
-                var filePath = Path.Combine("wwwroot/uploads", fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                try
                 {
-                    file.CopyTo(stream);
-                }
+                    var uploadsFolder = Path.Combine("wwwroot", "uploads");
 
-                var fileUrl = Url.Content($"~/uploads/{fileName}");
-                return Json(new { location = fileUrl }); // TinyMCE necesita esta respuesta
+                    // Asegurar que el directorio existe
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    var fileUrl = Url.Content($"~/uploads/{fileName}");
+                    return Json(new { location = fileUrl });
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest(new { error = $"Error al cargar la imagen: {ex.Message}" });
+                }
             }
 
-            return BadRequest("No se pudo cargar la imagen.");
+            return BadRequest(new { error = "No se proporcionó ningún archivo." });
         }
     }
 }
