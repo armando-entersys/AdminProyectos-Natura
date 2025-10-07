@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crear Briefs de Prueba</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Crear Briefs de Prueba</h1>
+
+    <div class="section">
+        <h2>1. Primero haz Login</h2>
+        <p>Ve a <a href="http://localhost:8080/Login" target="_blank">http://localhost:8080/Login</a></p>
+        <p>Usuario: ajcortest@gmail.com</p>
+        <p>Contraseña: Operaciones.2025</p>
+    </div>
+
+    <div class="section">
+        <h2>2. Crear Briefs de Prueba</h2>
+        <button onclick="crearBriefs()">Crear 5 Briefs de Prueba</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const briefs = [
+            {
+                Nombre: "Campaña Navidad 2024",
+                Descripcion: "Campaña promocional para temporada navideña",
+                Objetivo: "Incrementar ventas en 30%",
+                DirigidoA: "Público general",
+                FechaEntrega: "2024-12-20",
+                TipoBriefId: 1,
+                LinksReferencias: "https://ejemplo.com",
+                RutaArchivo: ""
+            },
+            {
+                Nombre: "Lanzamiento Producto Ekos",
+                Descripcion: "Material para lanzamiento de nueva línea Ekos",
+                Objetivo: "Posicionar nueva línea en mercado",
+                DirigidoA: "Millennials conscientes",
+                FechaEntrega: "2024-11-15",
+                TipoBriefId: 1,
+                LinksReferencias: "https://ejemplo.com",
+                RutaArchivo: ""
+            },
+            {
+                Nombre: "Brief Ciclo 18",
+                Descripcion: "Materiales para inicio de ciclo 18",
+                Objetivo: "Activar red de consultoras",
+                DirigidoA: "Red de consultoras",
+                FechaEntrega: "2024-11-01",
+                TipoBriefId: 1,
+                LinksReferencias: "https://ejemplo.com",
+                RutaArchivo: ""
+            },
+            {
+                Nombre: "Redes Sociales Diciembre",
+                Descripcion: "Contenido para redes sociales mes de diciembre",
+                Objetivo: "Aumentar engagement en redes",
+                DirigidoA: "Seguidores de marca",
+                FechaEntrega: "2024-12-01",
+                TipoBriefId: 1,
+                LinksReferencias: "https://ejemplo.com",
+                RutaArchivo: ""
+            },
+            {
+                Nombre: "Video Institucional 2025",
+                Descripcion: "Video corporativo para presentación anual",
+                Objetivo: "Comunicar resultados y visión 2025",
+                DirigidoA: "Stakeholders e inversores",
+                FechaEntrega: "2025-01-15",
+                TipoBriefId: 1,
+                LinksReferencias: "https://ejemplo.com",
+                RutaArchivo: ""
+            }
+        ];
+
+        async function crearBriefs() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Creando briefs...</p>';
+
+            let created = 0;
+            let errors = 0;
+
+            for (const brief of briefs) {
+                try {
+                    const response = await fetch('http://localhost:8080/Brief/Create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(brief),
+                        credentials: 'include'
+                    });
+
+                    const data = await response.json();
+
+                    if (data.exito) {
+                        created++;
+                        console.log(`✅ Creado: ${brief.Nombre}`);
+                    } else {
+                        errors++;
+                        console.error(`❌ Error en ${brief.Nombre}:`, data.mensaje);
+                    }
+                } catch (error) {
+                    errors++;
+                    console.error(`❌ Error en ${brief.Nombre}:`, error);
+                }
+            }
+
+            resultDiv.innerHTML = `
+                <p class="success">✅ Briefs creados exitosamente: ${created}</p>
+                ${errors > 0 ? `<p class="error">❌ Errores: ${errors}</p>` : ''}
+                <p>Ahora ve a <a href="http://localhost:8080/Brief/IndexAdmin" target="_blank">IndexAdmin</a> para ver el Kanban</p>
+            `;
+        }
+    </script>
+</body>
+</html>

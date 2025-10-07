@@ -32,7 +32,9 @@
 
     // Inicializar datos de la vista
     self.inicializar = function () {
+        console.log("🚀 Inicializando dashboard...");
         self.cargarDatos("Brief/ObtenerConteoPorProyectos", function (data) {
+            console.log("📊 Datos de proyectos:", data);
             self.Hoy(data.datos.hoy);
             self.EstaSemana(data.datos.estaSemana);
             self.ProximaSemana(data.datos.proximaSemana);
@@ -41,18 +43,34 @@
             self.ProyectoExtra(data.datos.proyectoExtra);
         })
             .then(() => self.cargarDatos("Brief/ObtenerConteoMateriales", function (data) {
+                console.log("📦 Datos de materiales:", data);
                 self.Hoy_Material(data.datos.hoy);
                 self.EstaSemana_Material(data.datos.estaSemana);
                 self.ProximaSemana_Material(data.datos.proximaSemana);
                 self.TotalMaterial(data.datos.totalProyectos);
             }))
             .then(() => self.cargarDatos("Home/ObtenerAlertas", function (data) {
+                console.log("🔔 Datos de alertas:", data);
+                console.log("🔔 Número de alertas:", (data.datos || []).length);
                 self.registrosAlerta(data.datos || []);
-            }));
+            }))
+            .then(() => {
+                // Mostrar contenido con animación
+                console.log("✅ Dashboard cargado completamente");
+                const content = document.getElementById('dashboardContent');
+                if (content) {
+                    content.classList.add('loaded');
+                }
+            })
+            .catch((error) => {
+                console.error("❌ Error al cargar dashboard:", error);
+                alert("Error al cargar los datos del dashboard");
+            });
     };
 
     // Método para redirigir a la acción de una alerta
     self.Editar = function (alerta) {
+        console.log("🔔 Click en alerta:", alerta);
         if (!alerta || !alerta.id) return;
 
         self.cargarDatos(`Alertas/ActualizarAlerta/${alerta.id}`, function () {

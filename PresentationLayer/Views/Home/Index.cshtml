@@ -1,16 +1,27 @@
-﻿@{
+﻿@using System.IO
+@{
     ViewData["Title"] = "Home Page";
 }
 <div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.1/knockout-min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/knockout@3.5.1/build/output/knockout-latest.min.js"></script>
 </div>
 <style>
     .card-header{
         background-color: #FFAA16;
     }
+
+    /* Ocultar contenido mientras carga */
+    .dashboard-content {
+        opacity: 0;
+        transition: opacity 0.5s ease-in;
+    }
+
+    .dashboard-content.loaded {
+        opacity: 1;
+    }
 </style>
 
-<div class="row gy-4">
+<div class="row gy-4 dashboard-content" id="dashboardContent">
     <!-- Alertas -->
     <div class="col-lg-6">
         <div class="card shadow">
@@ -140,5 +151,5 @@
         var RolId = @Html.Raw(ViewBag.RolId);
         var UsuarioId = @Html.Raw(ViewBag.UsuarioId);
     </script>
-    <script src="~/js/home/Home.js?v=1.0.3"></script>
+    <script src="~/js/Home/Home.js?v=@DateTime.Now.Ticks"></script>
 }

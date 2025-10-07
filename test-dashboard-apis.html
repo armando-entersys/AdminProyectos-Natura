@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Dashboard APIs</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Test Dashboard APIs</h1>
+
+    <div class="section">
+        <h2>1. Test ObtenerConteoPorProyectos</h2>
+        <button onclick="testProyectos()">Test Proyectos API</button>
+        <pre id="proyectosResult"></pre>
+    </div>
+
+    <div class="section">
+        <h2>2. Test ObtenerConteoMateriales</h2>
+        <button onclick="testMateriales()">Test Materiales API</button>
+        <pre id="materialesResult"></pre>
+    </div>
+
+    <div class="section">
+        <h2>3. Test ObtenerAlertas</h2>
+        <button onclick="testAlertas()">Test Alertas API</button>
+        <pre id="alertasResult"></pre>
+    </div>
+
+    <script>
+        async function testProyectos() {
+            try {
+                const response = await fetch('http://localhost:8080/Brief/ObtenerConteoPorProyectos', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                document.getElementById('proyectosResult').textContent = JSON.stringify(data, null, 2);
+                console.log('Proyectos:', data);
+            } catch (error) {
+                document.getElementById('proyectosResult').textContent = `Error: ${error.message}`;
+                console.error('Error:', error);
+            }
+        }
+
+        async function testMateriales() {
+            try {
+                const response = await fetch('http://localhost:8080/Brief/ObtenerConteoMateriales', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                document.getElementById('materialesResult').textContent = JSON.stringify(data, null, 2);
+                console.log('Materiales:', data);
+            } catch (error) {
+                document.getElementById('materialesResult').textContent = `Error: ${error.message}`;
+                console.error('Error:', error);
+            }
+        }
+
+        async function testAlertas() {
+            try {
+                const response = await fetch('http://localhost:8080/Home/ObtenerAlertas', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                document.getElementById('alertasResult').textContent = JSON.stringify(data, null, 2);
+                console.log('Alertas:', data);
+            } catch (error) {
+                document.getElementById('alertasResult').textContent = `Error: ${error.message}`;
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

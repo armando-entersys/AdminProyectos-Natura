@@ -1,17 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(gcloud compute ssh:*)",
-      "Bash(gcloud compute instances:*)",
-      "Bash(curl:*)",
-      "Bash(docker exec:*)",
-      "Bash(winpty docker exec:*)",
-      "Bash(docker-compose:*)",
-      "Bash(docker volume rm:*)",
-      "Bash(docker-compose up:*)",
-      "Bash(docker logs:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(MSYS_NO_PATHCONV=1 docker exec adminproyectos-sqlserver-test /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Natura2024$' -C -Q \"\nSELECT ''Prioridad'' AS Tabla, Id, Descripcion FROM AdminProyectos.dbo.Prioridad\nUNION ALL\nSELECT ''PCN'', Id, Descripcion FROM AdminProyectos.dbo.PCN\nUNION ALL\nSELECT ''Audiencia'', Id, Descripcion FROM AdminProyectos.dbo.Audiencia\nUNION ALL\nSELECT ''Formato'', Id, Descripcion FROM AdminProyectos.dbo.Formato\nUNION ALL\nSELECT ''EstatusMateriales'', Id, Descripcion FROM AdminProyectos.dbo.EstatusMateriales\nORDER BY Tabla, Id;\n\")",
+      "Bash(MSYS_NO_PATHCONV=1 docker exec adminproyectos-sqlserver-test /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Natura2024$' -C -Q \"SELECT COUNT(*) AS Total FROM AdminProyectos.dbo.Briefs\")"
     ],
     "deny": [],
     "ask": []

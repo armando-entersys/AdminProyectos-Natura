@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Kanban - AdminProyectos</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Test AdminProyectos Kanban</h1>
+
+    <div class="section">
+        <h2>1. Login</h2>
+        <p>Usuario: <input type="text" id="username" value="admin@natura.com" /></p>
+        <p>Contraseña: <input type="password" id="password" value="Admin2024" /></p>
+        <button onclick="login()">Login</button>
+        <div id="loginResult"></div>
+    </div>
+
+    <div class="section">
+        <h2>2. Test GetAllColumns API</h2>
+        <button onclick="testAPI()">Test GetAllColumns</button>
+        <pre id="apiResult"></pre>
+    </div>
+
+    <div class="section">
+        <h2>3. Open Kanban Page</h2>
+        <button onclick="window.open('http://localhost:8080/Brief/IndexAdmin', '_blank')">Open IndexAdmin</button>
+    </div>
+
+    <script>
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const formData = new URLSearchParams();
+            formData.append('Username', username);
+            formData.append('Password', password);
+
+            try {
+                const response = await fetch('http://localhost:8080/Login/Autenticar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData,
+                    credentials: 'include'
+                });
+
+                document.getElementById('loginResult').innerHTML =
+                    `<p style="color: green">Login successful! Status: ${response.status}</p>`;
+
+                if (response.redirected) {
+                    document.getElementById('loginResult').innerHTML +=
+                        `<p>Redirected to: ${response.url}</p>`;
+                }
+            } catch (error) {
+                document.getElementById('loginResult').innerHTML =
+                    `<p style="color: red">Error: ${error.message}</p>`;
+            }
+        }
+
+        async function testAPI() {
+            try {
+                const response = await fetch('http://localhost:8080/Brief/GetAllColumns', {
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                document.getElementById('apiResult').textContent =
+                    JSON.stringify(data, null, 2);
+
+                console.log('GetAllColumns response:', data);
+            } catch (error) {
+                document.getElementById('apiResult').textContent =
+                    `Error: ${error.message}`;
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>
