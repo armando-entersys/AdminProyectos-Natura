@@ -9,6 +9,7 @@ function Task(id, title, usuarioId, nombreUsuario, fechaEntrega) {
 
 // Define el ViewModel de la columna
 function Column(id, name, tasks) {
+    var self = this;
     this.id = id;
     this.name = name;
     this.tasks = ko.observableArray(tasks); // Tareas de la columna
@@ -16,11 +17,18 @@ function Column(id, name, tasks) {
 
     // Filtrar tareas basado en el título
     this.filteredTasks = ko.computed(function () {
-        var search = this.searchTitle().toLowerCase(); // Obtener el valor de búsqueda
-        return this.tasks().filter(function (task) {
+        var search = self.searchTitle().toLowerCase(); // Obtener el valor de búsqueda
+        return self.tasks().filter(function (task) {
             return task.title.toLowerCase().includes(search); // Filtrar tareas por título
         });
     }, this);
+
+    // Reinicializar Sortable cuando cambian las tareas filtradas
+    this.filteredTasks.subscribe(function() {
+        setTimeout(function() {
+            initializeSortable();
+        }, 100);
+    });
 }
 
 function AppViewModel() {
