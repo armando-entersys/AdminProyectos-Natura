@@ -101,7 +101,7 @@
                        data-bind="value: searchTitle, valueUpdate: 'input'" />
             </div>
             <div class="card-body">
-                <div class="list-group sortable" data-bind="foreach: filteredTasks, attr: { id: id }">
+                <div class="list-group sortable" data-bind="attr: { id: id }, foreach: filteredTasks">
                     <div class="list-group-item task-item" data-bind="attr: { 'data-task-id': id }">
                         <div>
                             <strong data-bind="text: title"></strong>
@@ -384,5 +384,5 @@
         });
     </script>
   
-    <script src="~/js/Brief/BriefAdmin.js?v=1.0.5"></script>
+    <script src="~/js/Brief/BriefAdmin.js?v=1.0.6"></script>
 }
