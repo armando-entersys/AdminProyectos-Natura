@@ -10,26 +10,26 @@
     <!-- Botones de acción -->
     <div class="action-buttons">
         <a class="custom-btn" href="~/Brief">
-            <i class="lni lni-file-plus-circle"></i>
+            <i class="lni lni-files"></i>
             <span>Brief</span>
         </a>
         @if (ViewBag.RolId == 1)
         {
             <a class="custom-btn" href="~/Brief/IndexAdmin">
-                <i class="lni lni-folder-1"></i>
+                <i class="lni lni-folder"></i>
                 <span>Proyectos</span>
             </a>
         }
         <a class="custom-btn" href="~/Materiales">
-            <i class="lni lni-photos"></i>
+            <i class="lni lni-gallery"></i>
             <span>Materiales</span>
         </a>
         <a class="custom-btn" href="~/Calendario">
-            <i class="lni lni-calendar-days"></i>
+            <i class="lni lni-calendar"></i>
             <span>Calendario</span>
         </a>
         <a class="custom-btn position-relative" href="~/Alertas">
-            <i class="lni lni-bell-1"></i>
+            <i class="lni lni-alarm"></i>
             <span>Alertas</span>
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                 @ViewBag.ConteoAlertas
