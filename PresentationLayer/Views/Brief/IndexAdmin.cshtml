@@ -77,14 +77,26 @@
         }
 
     .sortable-ghost {
-        opacity: 0.4;
-        background: #e9ecef;
+        opacity: 0.3;
+        background: #c8d4e0;
+        border: 2px dashed #6c757d;
     }
 
     .sortable-drag {
-        opacity: 0.8;
+        opacity: 1;
         background: #fff;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        transform: rotate(2deg);
+        cursor: grabbing !important;
+    }
+
+    .sortable-chosen {
+        background: #e3f2fd;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .sortable .task-item {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .modal {

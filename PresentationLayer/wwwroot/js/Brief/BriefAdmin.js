@@ -638,12 +638,18 @@ function initializeSortable() {
         var instance = new Sortable(element, {
             group: 'kanban',
             animation: 150,
-            handle: '.drag-handle', // Solo permitir arrastrar desde esta área
-            forceFallback: true,
-            fallbackOnBody: true,
+            handle: '.drag-handle',
+            draggable: '.task-item',
+            forceFallback: false, // Usar HTML5 nativo para mejor rendimiento
+            fallbackOnBody: false,
             swapThreshold: 0.65,
+            emptyInsertThreshold: 20, // Facilita soltar en columnas vacías
             dragClass: 'sortable-drag',
             ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            delay: 0, // Sin delay para respuesta inmediata
+            delayOnTouchOnly: false,
+            touchStartThreshold: 0,
             onEnd: function (evt) {
                 var taskId = parseInt(evt.item.getAttribute('data-task-id'));
                 var fromColumnId = parseInt(evt.from.id);
