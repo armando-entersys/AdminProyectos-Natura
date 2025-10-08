@@ -638,9 +638,12 @@ function initializeSortable() {
         var instance = new Sortable(element, {
             group: 'kanban',
             animation: 150,
+            handle: '.drag-handle', // Solo permitir arrastrar desde esta área
             forceFallback: true,
             fallbackOnBody: true,
             swapThreshold: 0.65,
+            dragClass: 'sortable-drag',
+            ghostClass: 'sortable-ghost',
             onEnd: function (evt) {
                 var taskId = parseInt(evt.item.getAttribute('data-task-id'));
                 var fromColumnId = parseInt(evt.from.id);

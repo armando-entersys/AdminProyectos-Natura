@@ -65,6 +65,28 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
+    .drag-handle {
+        cursor: move;
+        padding: 5px;
+        user-select: none;
+    }
+
+        .drag-handle:hover {
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+    .sortable-ghost {
+        opacity: 0.4;
+        background: #e9ecef;
+    }
+
+    .sortable-drag {
+        opacity: 0.8;
+        background: #fff;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
     .modal {
         animation: fadeIn 0.3s ease-in-out;
     }
@@ -103,16 +125,15 @@
             <div class="card-body">
                 <div class="list-group sortable" data-bind="attr: { id: id }, foreach: filteredTasks">
                     <div class="list-group-item task-item" data-bind="attr: { 'data-task-id': id }">
-                        <div>
+                        <div class="drag-handle" style="cursor: move;">
                             <strong data-bind="text: title"></strong>
+                            <div class="text-muted" data-bind="text: nombreUsuario"></div>
+                            <small class="text-muted" data-bind="text: fechaEntrega"></small>
                         </div>
-                        <div class="text-muted" data-bind="text: nombreUsuario"></div>
-                        <small class="text-muted" data-bind="text: fechaEntrega"></small>
                         <div class="mt-2">
                             <button class="btn btn-outline-primary btn-sm" data-bind="click: $root.Editar">
                                 Ver Detalles
                             </button>
-
                         </div>
                     </div>
                 </div>
