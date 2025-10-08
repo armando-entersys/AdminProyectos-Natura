@@ -314,32 +314,44 @@ namespace DataAccessLayer.Repositories
                     b.EstatusBriefId == 1 &&
                     b.FechaPublicacion.Date >= startOfNextWeek &&
                     b.FechaPublicacion.Date <= endOfNextWeek),
-                TotalProyectos = briefs.Count
+                TotalProyectos = briefs.Count(b => b.EstatusBriefId != 5) // Excluir finalizados
             };
 
             var briefIds = briefs.Select(b => b.Id).ToList();
 
-            var materiales = _context.Materiales
-                .Where(m => briefIds.Contains(m.BriefId) && (m.EstatusMaterialId == 4 || m.EstatusMaterialId == 5))
-                .Select(m => new
-                {
-                    m.FechaEntrega,
-                    BriefId = m.BriefId,
-                    EstatusBriefId = m.Brief.EstatusBriefId
-                })
-                .ToList();
+            // Proyectos finalizados (EstatusBriefId == 5)
+            var briefsFinalizados = briefs.Where(b => b.EstatusBriefId == 5).Select(b => b.Id).ToList();
 
-            conteoProyectos.ProyectoTiempo = materiales
-                .Where(m => m.FechaEntrega >= DateTime.Now && (m.EstatusBriefId == 4 || m.EstatusBriefId == 5))
-                .Select(m => m.BriefId)
-                .Distinct()
-                .Count();
+            if (briefsFinalizados.Any())
+            {
+                var materialesFinalizados = _context.Materiales
+                    .Where(m => briefsFinalizados.Contains(m.BriefId))
+                    .Select(m => new
+                    {
+                        m.FechaEntrega,
+                        m.BriefId
+                    })
+                    .ToList();
 
-            conteoProyectos.ProyectoExtra = materiales
-                .Where(m => m.FechaEntrega <= DateTime.Now && (m.EstatusBriefId == 4 || m.EstatusBriefId == 5))
-                .Select(m => m.BriefId)
-                .Distinct()
-                .Count();
+                // En Tiempo: fecha de entrega del material >= ahora
+                conteoProyectos.ProyectoTiempo = materialesFinalizados
+                    .Where(m => m.FechaEntrega >= DateTime.Now)
+                    .Select(m => m.BriefId)
+                    .Distinct()
+                    .Count();
+
+                // Extratemporal: fecha de entrega del material < ahora (se entregaron tarde)
+                conteoProyectos.ProyectoExtra = materialesFinalizados
+                    .Where(m => m.FechaEntrega < DateTime.Now)
+                    .Select(m => m.BriefId)
+                    .Distinct()
+                    .Count();
+            }
+            else
+            {
+                conteoProyectos.ProyectoTiempo = 0;
+                conteoProyectos.ProyectoExtra = 0;
+            }
 
             return conteoProyectos;
         }
