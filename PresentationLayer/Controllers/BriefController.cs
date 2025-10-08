@@ -208,27 +208,28 @@ namespace PresentationLayer.Controllers
                 return Ok(res);
             }
 
-            // Actualizar datos del Brief
-            UpdateBriefData(brief, BriefOrg);
+            // Actualizar el estatus en el Brief original
+            BriefOrg.EstatusBriefId = brief.EstatusBriefId;
+            BriefOrg.FechaModificacion = DateTime.Now;
 
             // Actualizar el Brief en la base de datos
-            _briefService.Update(brief);
+            _briefService.Update(BriefOrg);
 
             // Obtener estatus actualizado
             var estatusBriefs = _briefService.GetAllEstatusBrief();
-            brief.EstatusBrief = estatusBriefs.FirstOrDefault(q => q.Id == brief.EstatusBriefId);
+            BriefOrg.EstatusBrief = estatusBriefs.FirstOrDefault(q => q.Id == BriefOrg.EstatusBriefId);
 
             // Obtener destinatarios según el nuevo estatus
             var urlBase = $"{Request.Scheme}://{Request.Host}";
-            var destinatarios = GetRecipientsByStatus(brief, urlBase);
+            var destinatarios = GetRecipientsByStatus(BriefOrg, urlBase);
 
             // Crear una alerta general
-            CreateAlert(brief, urlBase);
+            CreateAlert(BriefOrg, urlBase);
 
             // Enviar notificación por correo
-            SendStatusChangeEmail(destinatarios, brief, urlBase);
+            SendStatusChangeEmail(destinatarios, BriefOrg, urlBase);
 
-            res.Datos = brief;
+            res.Datos = BriefOrg;
             res.Mensaje = "Actualizado exitosamente";
             res.Exito = true;
 
