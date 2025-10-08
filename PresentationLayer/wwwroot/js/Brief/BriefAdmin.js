@@ -637,19 +637,33 @@ function initializeSortable() {
     document.querySelectorAll('.sortable').forEach(function (element) {
         var instance = new Sortable(element, {
             group: 'kanban',
-            animation: 150,
+            animation: 200,
             handle: '.drag-handle',
             draggable: '.task-item',
-            forceFallback: false, // Usar HTML5 nativo para mejor rendimiento
+            forceFallback: false,
             fallbackOnBody: false,
-            swapThreshold: 0.65,
-            emptyInsertThreshold: 20, // Facilita soltar en columnas vacías
+            swapThreshold: 1, // Más tolerante al intercambio
+            invertSwap: false,
+            direction: 'vertical',
+            emptyInsertThreshold: 50, // Más espacio para soltar en columnas vacías
             dragClass: 'sortable-drag',
             ghostClass: 'sortable-ghost',
             chosenClass: 'sortable-chosen',
-            delay: 0, // Sin delay para respuesta inmediata
+            delay: 0,
             delayOnTouchOnly: false,
-            touchStartThreshold: 0,
+            touchStartThreshold: 5,
+            preventOnFilter: false,
+            scroll: true,
+            scrollSensitivity: 100,
+            scrollSpeed: 20,
+            bubbleScroll: true,
+            // Importante: permitir que el elemento se mueva libremente entre columnas
+            revertOnSpill: false,
+            removeCloneOnHide: true,
+            onMove: function(evt, originalEvent) {
+                // Permitir siempre el movimiento
+                return true;
+            },
             onEnd: function (evt) {
                 var taskId = parseInt(evt.item.getAttribute('data-task-id'));
                 var fromColumnId = parseInt(evt.from.id);
@@ -657,7 +671,11 @@ function initializeSortable() {
                 var newIndex = evt.newIndex;
 
                 console.log('Moving task:', taskId, 'from column:', fromColumnId, 'to column:', toColumnId);
-                appViewModel.moveTask(taskId, fromColumnId, toColumnId, newIndex);
+
+                // Solo actualizar si realmente cambió de columna
+                if (fromColumnId !== toColumnId) {
+                    appViewModel.moveTask(taskId, fromColumnId, toColumnId, newIndex);
+                }
             }
         });
         sortableInstances.push(instance);

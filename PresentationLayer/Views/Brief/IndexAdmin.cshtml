@@ -53,26 +53,30 @@
 
     .task-item {
         background-color: #ffffff;
-        padding: 15px;
+        padding: 10px;
         margin-bottom: 10px;
         border-radius: 8px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: none; /* Deshabilitar transiciones que interfieren con el drag */
         box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+        position: relative;
     }
-
-        .task-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
 
     .drag-handle {
-        cursor: move;
-        padding: 5px;
+        cursor: grab;
+        padding: 12px;
         user-select: none;
+        min-height: 80px; /* Área más grande para arrastrar */
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
     }
 
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
         .drag-handle:hover {
-            background-color: #f8f9fa;
+            background-color: #f0f7ff;
             border-radius: 4px;
         }
 
@@ -95,8 +99,11 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
 
-    .sortable .task-item {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    .card-body {
+        overflow-y: auto;
+        padding: 10px;
+        height: 350px;
+        min-height: 350px; /* Asegurar altura mínima para facilitar drop */
     }
 
     .modal {
