@@ -326,19 +326,31 @@ function AppViewModel() {
             EstatusBriefId: toColumnId
         }
         $.ajax({
-            url: "Brief/EditStatus", // URL del método GetAll en tu API
+            url: "Brief/EditStatus",
             type: "PUT",
             contentType: "application/json",
             data: JSON.stringify(brief),
             success: function (d) {
-                self.inicializar();
+                if (d.exito) {
+                    console.log('Task movido exitosamente');
+                    // Recargar datos y reinicializar SortableJS
+                    setTimeout(function() {
+                        self.inicializar();
+                    }, 100);
+                } else {
+                    console.error('Error al mover task:', d.mensaje);
+                    alert('Error: ' + d.mensaje);
+                    // Revertir el cambio visual recargando
+                    self.inicializar();
+                }
             },
             error: function (xhr, status, error) {
-                console.error("Error al obtener los datos: ", error);
-                alert("Error al obtener los datos: " + xhr.responseText);
+                console.error("Error al mover task: ", error);
+                alert("Error al mover el proyecto: " + (xhr.responseJSON?.mensaje || xhr.responseText || error));
+                // Revertir el cambio visual recargando
+                self.inicializar();
             }
         });
-
     };
     self.cargarArchivo = function (data, event) {
         var file = event.target.files[0];
@@ -625,63 +637,74 @@ function AppViewModel() {
 var sortableInstances = [];
 
 function initializeSortable() {
-    // Destruir instancias previas
+    console.log('Initializing Sortable...');
+
+    // Destruir instancias previas de manera segura
     sortableInstances.forEach(function(instance) {
-        if (instance && instance.destroy) {
-            instance.destroy();
+        try {
+            if (instance && typeof instance.destroy === 'function') {
+                instance.destroy();
+            }
+        } catch (e) {
+            console.warn('Error destroying sortable instance:', e);
         }
     });
     sortableInstances = [];
 
-    // Crear nuevas instancias
-    document.querySelectorAll('.sortable').forEach(function (element) {
-        var instance = new Sortable(element, {
-            group: 'kanban',
-            animation: 200,
-            handle: '.drag-handle',
-            draggable: '.task-item',
-            forceFallback: false,
-            fallbackOnBody: false,
-            swapThreshold: 1, // Más tolerante al intercambio
-            invertSwap: false,
-            direction: 'vertical',
-            emptyInsertThreshold: 50, // Más espacio para soltar en columnas vacías
-            dragClass: 'sortable-drag',
-            ghostClass: 'sortable-ghost',
-            chosenClass: 'sortable-chosen',
-            delay: 0,
-            delayOnTouchOnly: false,
-            touchStartThreshold: 5,
-            preventOnFilter: false,
-            scroll: true,
-            scrollSensitivity: 100,
-            scrollSpeed: 20,
-            bubbleScroll: true,
-            // Importante: permitir que el elemento se mueva libremente entre columnas
-            revertOnSpill: false,
-            removeCloneOnHide: true,
-            onMove: function(evt, originalEvent) {
-                // Permitir siempre el movimiento
-                return true;
-            },
-            onEnd: function (evt) {
-                var taskId = parseInt(evt.item.getAttribute('data-task-id'));
-                var fromColumnId = parseInt(evt.from.id);
-                var toColumnId = parseInt(evt.to.id);
-                var newIndex = evt.newIndex;
+    // Pequeña demora para asegurar que el DOM esté completamente actualizado
+    setTimeout(function() {
+        // Crear nuevas instancias
+        var elements = document.querySelectorAll('.sortable');
+        console.log('Found', elements.length, 'sortable elements');
 
-                console.log('Moving task:', taskId, 'from column:', fromColumnId, 'to column:', toColumnId);
+        elements.forEach(function (element) {
+            var instance = new Sortable(element, {
+                group: 'kanban',
+                animation: 200,
+                handle: '.drag-handle',
+                draggable: '.task-item',
+                forceFallback: false,
+                fallbackOnBody: false,
+                swapThreshold: 1,
+                invertSwap: false,
+                direction: 'vertical',
+                emptyInsertThreshold: 50,
+                dragClass: 'sortable-drag',
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                delay: 0,
+                delayOnTouchOnly: false,
+                touchStartThreshold: 5,
+                preventOnFilter: false,
+                scroll: true,
+                scrollSensitivity: 100,
+                scrollSpeed: 20,
+                bubbleScroll: true,
+                revertOnSpill: false,
+                removeCloneOnHide: true,
+                onMove: function(evt, originalEvent) {
+                    // Permitir siempre el movimiento
+                    return true;
+                },
+                onEnd: function (evt) {
+                    var taskId = parseInt(evt.item.getAttribute('data-task-id'));
+                    var fromColumnId = parseInt(evt.from.id);
+                    var toColumnId = parseInt(evt.to.id);
+                    var newIndex = evt.newIndex;
 
-                // Solo actualizar si realmente cambió de columna
-                if (fromColumnId !== toColumnId) {
-                    appViewModel.moveTask(taskId, fromColumnId, toColumnId, newIndex);
+                    console.log('Moving task:', taskId, 'from column:', fromColumnId, 'to column:', toColumnId);
+
+                    // Solo actualizar si realmente cambió de columna
+                    if (fromColumnId !== toColumnId) {
+                        appViewModel.moveTask(taskId, fromColumnId, toColumnId, newIndex);
+                    }
                 }
-            }
+            });
+            sortableInstances.push(instance);
         });
-        sortableInstances.push(instance);
-    });
 
-    console.log('Sortable initialized with', sortableInstances.length, 'instances');
+        console.log('Sortable initialized with', sortableInstances.length, 'instances');
+    }, 50);
 }
 
 var appViewModel = new AppViewModel();
